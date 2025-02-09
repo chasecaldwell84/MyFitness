@@ -10,5 +10,13 @@ public class GeneralUser extends User{
         sleepHours = 0;
     }
 
+    public void trackHealthData () {}
+    
+    public void setGoals () {}
+    
+    public void viewReports () {}
+    
+    public void recordWorkout () {}
+
 
 }
