@@ -1,3 +1,5 @@
+package MyFitness;
+
 public class GeneralUser extends User{
     double weight;
     double calorieIntake;
