@@ -1,6 +1,6 @@
-package MyFitness;
-
 //Author: Larry O'Connor
+
+package MyFitness;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,9 +12,9 @@ public class ExperienceTracker {
     static Font labelFont = new Font("Arial", Font.BOLD, 20);
     static Font titleFont = new Font("Arial", Font.BOLD, 40);
 
-    public static void main(String[] args) {
+    //Create Experience UI
+    public static void createGUI(){
         SwingUtilities.invokeLater(() -> {
-            // Create the frame
             JFrame frame = new JFrame("Experience UI (WIP TEST)");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(300, 400);
@@ -69,4 +69,8 @@ public class ExperienceTracker {
             frame.setVisible(true);
         });
     }
+    public static void main(String[] args) {
+        createGUI();
+    }
 }
+
