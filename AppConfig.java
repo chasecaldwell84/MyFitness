@@ -10,7 +10,7 @@ public class AppConfig {
     public static void printAppInfo() {//for debug
         System.out.println("App running on iPhone 16 screen size: " + WIDTH + "x" + HEIGHT);
         System.out.println("Logo location: " + LOGO_PATH);
-        System.out.println("Logo display size: " + LOGO_WIDTH + "x" + LOGO_HEIGHT);
+        //System.out.println("Logo display size: " + LOGO_WIDTH + "x" + LOGO_HEIGHT);
     }
 }
 
