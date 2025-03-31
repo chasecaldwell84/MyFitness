@@ -33,6 +33,7 @@ public class Login {
         JPasswordField PasswordField = new JPasswordField(10);
         JButton submitButton = new JButton("Submit");
         submitButton.addActionListener(e -> {
+            Authenticated = false;
             String username = UsernameField.getText();
             String password = PasswordField.getText();
             if(password == null || username.equals("") || password.equals("")){
@@ -40,56 +41,11 @@ public class Login {
             }
             else{
                 try {
-                    Scanner scanner = new Scanner(new File("./src/main/resources/UserAuth.csv"));
-                    String[] headers = scanner.nextLine().split(",");
-                    int UsernameINDEX = -1, PasswordINDEX = -1;
-                    for(int i = 0; i < headers.length; i++){
-                        String column = headers[i].trim().toLowerCase();
-                        if(column.equals("username")){
-                            UsernameINDEX = i;
-                        }
-                        else if(column.equals("password")){
-                            PasswordINDEX = i;
-                        }
-                    }
-                    if(UsernameINDEX == -1 || PasswordINDEX == -1){
-                        JOptionPane.showMessageDialog(frame, "System ERROR");
-                        return;
-                    }
-
-                    int counter = 0;
-                    while(scanner.hasNextLine() && !Authenticated){
-                        String line = scanner.nextLine().trim();
-                        String [] values = line.split(",");
-
-                        /*if(values.length != headers.length){}*/
-                        String Usernameinput = values[UsernameINDEX].trim();
-                        String Passwordinput = values[PasswordINDEX].trim();
-                        if(Usernameinput.equals(username)){
-                            counter++;
-                        }
-                        if(Passwordinput.equals(password)){
-                            counter++;
-                        }
-                        if(counter == 2){
-                            Authenticated = true;
-                        }
-                    }
-
-                    if(Authenticated){
-                        JOptionPane.showMessageDialog(frame, "You have successfully logged in");
-                    }
-                    else{
-                        JOptionPane.showMessageDialog(frame, "You have an incorrect username/password");
-                    }
-                    scanner.close();
+                    authenicating(username,password,frame);
                 } catch (FileNotFoundException ex) {
                     throw new RuntimeException(ex);
                 }
-                //NOTE this is when you call the csv parser to check
-
             }
-
         });
         Username.add(UsernameLabel);
         Username.add(UsernameField);
@@ -100,5 +56,51 @@ public class Login {
 
         frame.setSize(500, 500);
         frame.setVisible(true);
+    }
+
+    public static void authenicating(String username, String password, JFrame frame) throws FileNotFoundException {
+        Scanner scanner = new Scanner(new File("./src/main/resources/UserAuth.csv"));
+        String[] headers = scanner.nextLine().split(",");
+        int UsernameINDEX = -1, PasswordINDEX = -1;
+        for(int i = 0; i < headers.length; i++){
+            String column = headers[i].trim().toLowerCase();
+            if(column.equals("username")){
+                UsernameINDEX = i;
+            }
+            else if(column.equals("password")){
+                PasswordINDEX = i;
+            }
+        }
+        if(UsernameINDEX == -1 || PasswordINDEX == -1){
+            JOptionPane.showMessageDialog(frame, "System ERROR");
+            return;
+        }
+
+        int counter = 0;
+        while(scanner.hasNextLine() && !Authenticated){
+            String line = scanner.nextLine().trim();
+            String [] values = line.split(",");
+
+            /*if(values.length != headers.length){}*/
+            String Usernameinput = values[UsernameINDEX].trim();
+            String Passwordinput = values[PasswordINDEX].trim();
+            if(Usernameinput.equals(username)){
+                counter++;
+            }
+            if(Passwordinput.equals(password)){
+                counter++;
+            }
+            if(counter == 2){
+                Authenticated = true;
+            }
+        }
+
+        if(Authenticated){
+            JOptionPane.showMessageDialog(frame, "You have successfully logged in");
+        }
+        else{
+            JOptionPane.showMessageDialog(frame, "You have an incorrect username/password");
+        }
+        scanner.close();
     }
 }
