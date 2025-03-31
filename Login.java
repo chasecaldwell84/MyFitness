@@ -2,8 +2,13 @@ package MyFitness;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class Login {
+
+    private static Boolean Authenticated = false;
 
     public static void main(String[] args) {
         createGUI();
@@ -38,16 +43,19 @@ public class Login {
         JPasswordField PasswordField = new JPasswordField(10);
         JButton submitButton = new JButton("Submit");
         submitButton.addActionListener(e -> {
+            Authenticated = false;
             String username = UsernameField.getText();
             String password = PasswordField.getText();
             if(password == null || username.equals("") || password.equals("")){
                 JOptionPane.showMessageDialog(frame, "Please enter a valid username/password");
             }
             else{
-                //NOTE this is when you call the csv parser to check
-
+                try {
+                    authenicating(username,password,frame);
+                } catch (FileNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
-
         });
 
 
@@ -74,5 +82,51 @@ public class Login {
 
         frame.setSize(500, 500);
         frame.setVisible(true);
+    }
+
+    public static void authenicating(String username, String password, JFrame frame) throws FileNotFoundException {
+        Scanner scanner = new Scanner(new File("./src/main/resources/UserAuth.csv"));
+        String[] headers = scanner.nextLine().split(",");
+        int UsernameINDEX = -1, PasswordINDEX = -1;
+        for(int i = 0; i < headers.length; i++){
+            String column = headers[i].trim().toLowerCase();
+            if(column.equals("username")){
+                UsernameINDEX = i;
+            }
+            else if(column.equals("password")){
+                PasswordINDEX = i;
+            }
+        }
+        if(UsernameINDEX == -1 || PasswordINDEX == -1){
+            JOptionPane.showMessageDialog(frame, "System ERROR");
+            return;
+        }
+
+        int counter = 0;
+        while(scanner.hasNextLine() && !Authenticated){
+            String line = scanner.nextLine().trim();
+            String [] values = line.split(",");
+
+            /*if(values.length != headers.length){}*/
+            String Usernameinput = values[UsernameINDEX].trim();
+            String Passwordinput = values[PasswordINDEX].trim();
+            if(Usernameinput.equals(username)){
+                counter++;
+            }
+            if(Passwordinput.equals(password)){
+                counter++;
+            }
+            if(counter == 2){
+                Authenticated = true;
+            }
+        }
+
+        if(Authenticated){
+            JOptionPane.showMessageDialog(frame, "You have successfully logged in");
+        }
+        else{
+            JOptionPane.showMessageDialog(frame, "You have an incorrect username/password");
+        }
+        scanner.close();
     }
 }
