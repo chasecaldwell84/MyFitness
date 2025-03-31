@@ -1,3 +1,5 @@
+package MyFitness;
+
 public class AppConfig {
     public static final int WIDTH = 1179; //suppose iphone 16 screen
     public static final int HEIGHT = 2556;
