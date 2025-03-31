@@ -14,6 +14,16 @@ public class Login {
         frame.setLayout(new BorderLayout());
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Load the image from resources, logo
+        ImageIcon icon = new ImageIcon("resources/images/MyFitnessLogoChose1.jpg");
+        // Resize image
+        Image img = icon.getImage().getScaledInstance(200, 100, Image.SCALE_SMOOTH);
+        icon = new ImageIcon(img);
+        JLabel imageLabel = new JLabel(icon);
+        JPanel imagePanel = new JPanel();
+        imagePanel.add(imageLabel);
+
         JLabel title = new JLabel("Login Page", JLabel.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 20));
         frame.add(title, BorderLayout.NORTH);
@@ -39,12 +49,28 @@ public class Login {
             }
 
         });
+
+
         Username.add(UsernameLabel);
         Username.add(UsernameField);
         Username.add(PasswordLabel);
         Username.add(PasswordField);
         Username.add(submitButton);
-        frame.add(Username, BorderLayout.NORTH);
+        frame.add(Username, BorderLayout.CENTER);
+
+        //Below code for create Sign up button
+        JButton signUpButton = new JButton("Sign-Up");
+        signUpButton.addActionListener(e -> {
+            SignUp signUp = new SignUp();
+            signUp.setVisible(true);
+        });
+
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        bottomPanel.add(signUpButton);
+        frame.add(bottomPanel, BorderLayout.SOUTH);
+        //sign-up code end here, below is the window size,
 
         frame.setSize(500, 500);
         frame.setVisible(true);
