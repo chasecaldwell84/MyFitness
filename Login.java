@@ -20,7 +20,7 @@ public class Login {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Load the image from resources, logo
+        /*// Load the image from resources, logo
         ImageIcon icon = new ImageIcon("resources/images/MyFitnessLogoChose1.jpg");
         // Resize image
         Image img = icon.getImage().getScaledInstance(200, 100, Image.SCALE_SMOOTH);
@@ -28,7 +28,7 @@ public class Login {
         JLabel imageLabel = new JLabel(icon);
         JPanel imagePanel = new JPanel();
         imagePanel.add(imageLabel);
-
+        */
         JLabel title = new JLabel("Login Page", JLabel.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 20));
         frame.add(title, BorderLayout.NORTH);
