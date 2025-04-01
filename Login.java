@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class Login {
 
     private static Boolean Authenticated = false;
-
+    private static JFrame frame;
     public static Boolean getAuthenticated() {
         return Authenticated;
     }
@@ -17,11 +17,11 @@ public class Login {
         createGUI();
     }*/
     public static void createGUI(){
-        JFrame frame = new JFrame("Login");
+        frame = new JFrame("Login");
 
         frame.setLayout(new BorderLayout());
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         JLabel title = new JLabel("Login Page", JLabel.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 20));
         frame.add(title, BorderLayout.NORTH);
@@ -44,7 +44,7 @@ public class Login {
             }
             else{
                 try {
-                    authenicating(username,password,frame);
+                    authenicating(username,password);
                 } catch (FileNotFoundException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -62,7 +62,7 @@ public class Login {
 
     }
 
-    public static void authenicating(String username, String password, JFrame frame) throws FileNotFoundException {
+    public static void authenicating(String username, String password) throws FileNotFoundException {
         Scanner scanner = null;
         try{
             scanner = new Scanner(new File("./src/main/java/MyFitness/resources/UserAuth.csv"));
@@ -108,9 +108,10 @@ public class Login {
 
         if(Authenticated){
             JOptionPane.showMessageDialog(frame, "You have successfully logged in");
-            //NOTE TESTING
+            //NOTE App is init here and it might not be the best place to init
             App.init();
             frame.dispose();
+            LandingPage.dispose();
         }
         else{
             JOptionPane.showMessageDialog(frame, "You have an incorrect username/password");
