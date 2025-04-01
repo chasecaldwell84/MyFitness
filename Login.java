@@ -59,7 +59,14 @@ public class Login {
     }
 
     public static void authenicating(String username, String password, JFrame frame) throws FileNotFoundException {
-        Scanner scanner = new Scanner(new File("./src/main/resources/UserAuth.csv"));
+        Scanner scanner = null;
+        try{
+            scanner = new Scanner(new File("./src/main/java/MyFitness/resources/UserAuth.csv"));
+        }
+        catch(FileNotFoundException e){
+            System.out.println(e + " File not found");
+            return;
+        }
         String[] headers = scanner.nextLine().split(",");
         int UsernameINDEX = -1, PasswordINDEX = -1;
         for(int i = 0; i < headers.length; i++){
