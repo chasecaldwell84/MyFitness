@@ -10,9 +10,12 @@ public class Login {
 
     private static Boolean Authenticated = false;
 
-    public static void main(String[] args) {
-        createGUI();
+    public static Boolean getAuthenticated() {
+        return Authenticated;
     }
+    /*public static void main(String[] args) {
+        createGUI();
+    }*/
     public static void createGUI(){
         JFrame frame = new JFrame("Login");
 
@@ -56,6 +59,7 @@ public class Login {
 
         frame.setSize(500, 500);
         frame.setVisible(true);
+
     }
 
     public static void authenicating(String username, String password, JFrame frame) throws FileNotFoundException {
@@ -104,6 +108,9 @@ public class Login {
 
         if(Authenticated){
             JOptionPane.showMessageDialog(frame, "You have successfully logged in");
+            //NOTE TESTING
+            App.init();
+            frame.dispose();
         }
         else{
             JOptionPane.showMessageDialog(frame, "You have an incorrect username/password");
