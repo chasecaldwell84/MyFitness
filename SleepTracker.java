@@ -1,9 +1,12 @@
 package MyFitness;
 
+import javax.swing.*;
+
 public class SleepTracker {
     private int sleepHours;
     private int sleepMinutes;
-    public SleepTracker() {
+    private static JFrame frame;
+    public static void SleepTracker() {
 
     }
 }
