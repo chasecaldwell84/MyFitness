@@ -9,22 +9,22 @@ import java.util.Scanner;
 public class Login {
 
     private static Boolean Authenticated = false;
-    private static JFrame frame;
+    private static JDialog dialog;
     public static Boolean getAuthenticated() {
         return Authenticated;
     }
     /*public static void main(String[] args) {
         createGUI();
     }*/
-    public static void createGUI(){
-        frame = new JFrame("Login");
+    public static void createGUI(JFrame frame) {
+        dialog = new JDialog(frame, "Login", true);
 
-        frame.setLayout(new BorderLayout());
+        dialog.setLayout(new BorderLayout());
 
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        dialog.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         JLabel title = new JLabel("Login Page", JLabel.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 20));
-        frame.add(title, BorderLayout.NORTH);
+        dialog.add(title, BorderLayout.NORTH);
 
         JPanel Username = new JPanel();
         Username.setLayout(new FlowLayout());
@@ -40,7 +40,7 @@ public class Login {
             String username = UsernameField.getText();
             String password = PasswordField.getText();
             if(password == null || username.equals("") || password.equals("")){
-                JOptionPane.showMessageDialog(frame, "Please enter a valid username/password");
+                JOptionPane.showMessageDialog(dialog, "Please enter a valid username/password");
             }
             else{
                 try {
@@ -55,10 +55,10 @@ public class Login {
         Username.add(PasswordLabel);
         Username.add(PasswordField);
         Username.add(submitButton);
-        frame.add(Username, BorderLayout.NORTH);
+        dialog.add(Username, BorderLayout.NORTH);
 
-        frame.setSize(500, 500);
-        frame.setVisible(true);
+        dialog.setSize(500, 500);
+        dialog.setVisible(true);
 
     }
 
@@ -83,7 +83,7 @@ public class Login {
             }
         }
         if(UsernameINDEX == -1 || PasswordINDEX == -1){
-            JOptionPane.showMessageDialog(frame, "System ERROR");
+            JOptionPane.showMessageDialog(dialog, "System ERROR");
             return;
         }
 
@@ -107,14 +107,14 @@ public class Login {
         }
 
         if(Authenticated){
-            JOptionPane.showMessageDialog(frame, "You have successfully logged in");
+            JOptionPane.showMessageDialog(dialog, "You have successfully logged in");
             //NOTE App is init here and it might not be the best place to init
             App.init();
-            frame.dispose();
+            dialog.dispose();
             LandingPage.dispose();
         }
         else{
-            JOptionPane.showMessageDialog(frame, "You have an incorrect username/password");
+            JOptionPane.showMessageDialog(dialog, "You have an incorrect username/password");
         }
         scanner.close();
     }

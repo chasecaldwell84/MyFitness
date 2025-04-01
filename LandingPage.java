@@ -14,11 +14,11 @@ public class LandingPage {
         frame.setLocationRelativeTo(null);
         JButton login = new JButton("Login");
         JButton signUp = new JButton("Sign Up");
-        login.setBounds(10, 10, 100, 30);
+        login.setBounds(250, 235, 100, 30);
 
-        login.addActionListener(e -> Login.createGUI());
+        login.addActionListener(e -> Login.createGUI(frame));
 
-        signUp.setBounds(10, 50, 100, 30);
+        signUp.setBounds(250, 265, 100, 30);
         //FIXME action listener needs to call signup.createGUI();
 /*
         signUp.addActionListener(e ->);
