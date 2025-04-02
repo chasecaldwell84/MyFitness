@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/* TODO: Refactor code completely. Don't use static. Extend JFrame and JDialog.
+*   Configure so that the user can input a lyft or cardio workout. Configure so
+*   that input is more strict and won't be as prone to user error.  */
+
 public class ExerciseJournal {
     public static void main(String[] args){
         createGUI();
