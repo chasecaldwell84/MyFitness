@@ -6,25 +6,29 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class Login {
+public class Login extends JDialog {
 
-    private static Boolean Authenticated = false;
-    private static JDialog dialog;
-    public static Boolean getAuthenticated() {
+    private Boolean Authenticated = false;
+    //private JDialog dialog;
+    public Boolean getAuthenticated() {
         return Authenticated;
     }
-    /*public static void main(String[] args) {
-        createGUI();
-    }*/
-    public static void createGUI(JFrame frame) {
-        dialog = new JDialog(frame, "Login", true);
+    public Login() {
+        setTitle("Login");
+        setModal(true);
+        setLayout(new BorderLayout());
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //NOTE maybe change to hide.on.close
+        setSize(500, 500);
+        //dialog = new JDialog(frame, "Login", true);
 
-        dialog.setLayout(new BorderLayout());
+        //dialog.setLayout(new BorderLayout());
 
-        dialog.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        //dialog.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         JLabel title = new JLabel("Login Page", JLabel.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 20));
-        dialog.add(title, BorderLayout.NORTH);
+        //dialog.add(title, BorderLayout.NORTH);
+
+        add(title, BorderLayout.NORTH);
 
         JPanel Username = new JPanel();
         Username.setLayout(new FlowLayout());
@@ -40,7 +44,7 @@ public class Login {
             String username = UsernameField.getText();
             String password = PasswordField.getText();
             if(password == null || username.equals("") || password.equals("")){
-                JOptionPane.showMessageDialog(dialog, "Please enter a valid username/password");
+                JOptionPane.showMessageDialog(this, "Please enter a valid username/password");
             }
             else{
                 try {
@@ -55,14 +59,13 @@ public class Login {
         Username.add(PasswordLabel);
         Username.add(PasswordField);
         Username.add(submitButton);
-        dialog.add(Username, BorderLayout.NORTH);
+        add(Username, BorderLayout.NORTH);
 
-        dialog.setSize(500, 500);
-        dialog.setVisible(true);
+
 
     }
 
-    public static void authenicating(String username, String password) throws FileNotFoundException {
+    public void authenicating(String username, String password) throws FileNotFoundException {
         Scanner scanner = null;
         try{
             scanner = new Scanner(new File("./src/main/java/MyFitness/resources/UserAuth.csv"));
@@ -83,7 +86,7 @@ public class Login {
             }
         }
         if(UsernameINDEX == -1 || PasswordINDEX == -1){
-            JOptionPane.showMessageDialog(dialog, "System ERROR");
+            JOptionPane.showMessageDialog(this, "System ERROR");
             return;
         }
 
@@ -107,14 +110,12 @@ public class Login {
         }
 
         if(Authenticated){
-            JOptionPane.showMessageDialog(dialog, "You have successfully logged in");
+            JOptionPane.showMessageDialog(this, "You have successfully logged in");
             //NOTE App is init here and it might not be the best place to init
-            App.init();
-            dialog.dispose();
-            LandingPage.dispose();
+            dispose();
         }
         else{
-            JOptionPane.showMessageDialog(dialog, "You have an incorrect username/password");
+            JOptionPane.showMessageDialog(this, "You have an incorrect username/password");
         }
         scanner.close();
     }

@@ -6,7 +6,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.List;
 
-public class SignUp extends JFrame {
+public class SignUp extends JDialog {
     private JTextField usernameField;
     private JPasswordField passwordField, passwordDoubleField;
     private JButton submitButton;

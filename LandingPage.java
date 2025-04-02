@@ -3,32 +3,37 @@ package MyFitness;
 import javax.swing.*;
 import java.awt.*;
 
-public class LandingPage {
-    private static JFrame frame;
-    public static void init() {
-        frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("MyFitness");
-        frame.getContentPane().setLayout(null);
-        frame.setSize(500, 500);
-        frame.setLocationRelativeTo(null);
+public class LandingPage extends JFrame {
+
+    public LandingPage(App app) {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("MyFitness");
+        getContentPane().setLayout(null);
+        setSize(500, 500);
+        setLocationRelativeTo(null);
+
         JButton login = new JButton("Login");
-        JButton signUp = new JButton("Sign Up");
+        Login loginPanel = new Login();
         login.setBounds(250, 235, 100, 30);
+        login.addActionListener(e -> {
+            loginPanel.setVisible(true);
+            if(loginPanel.getAuthenticated()){
+                loginPanel.dispose();
+                dispose();
+                app.setVisible(true);
+            }
+        });
 
-        login.addActionListener(e -> Login.createGUI(frame));
-
+        JButton signUp = new JButton("Sign Up");
+        SignUp signUpPanel = new SignUp();
         signUp.setBounds(250, 265, 100, 30);
-        //FIXME action listener needs to call signup.createGUI();
-/*
-        signUp.addActionListener(e ->);
-*/
+        signUp.addActionListener(e -> {
+            signUpPanel.setVisible(true);
 
-        frame.add(login);
-        frame.add(signUp);
-        frame.setVisible(true);
-    }
-    public static void dispose(){
-        frame.dispose();
+        });
+
+
+        add(login);
+        add(signUp);
     }
 }
