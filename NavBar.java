@@ -10,6 +10,14 @@ public class NavBar extends JPanel {
         //NOTE: if we want backButton need to store previous frames in like a stack
         /*JButton backButton = new JButton("Back");*/
 
+        JButton Home = new JButton("Home");
+        Home.addActionListener(e -> {
+            frame.getContentPane().removeAll();
+            frame.getContentPane().add(this);
+            frame.add(new JLabel("Home Page"));
+            frame.revalidate();
+            frame.repaint();
+        });
         JButton exerciseButton = new JButton("Exercise Journal");
         exerciseButton.addActionListener(e -> {
             //FIXME need to do this for the different pages
