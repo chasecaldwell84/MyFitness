@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.List;
 
+//FIXME does not work like login where you cant click on landing page
 public class SignUp extends JDialog {
     private JTextField usernameField;
     private JPasswordField passwordField, passwordDoubleField;

@@ -37,7 +37,9 @@ public class NavBar extends JPanel {
             frame.revalidate();
             frame.repaint();
         });
+        add(Home);
         add(exerciseButton);
         add(goalButton);
+
     }
 }
