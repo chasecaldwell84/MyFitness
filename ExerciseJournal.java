@@ -15,9 +15,72 @@ import java.util.List;
 *   Configure so that the user can input a lyft or cardio workout. Configure so
 *   that input is more strict and won't be as prone to user error.  */
 
-public class ExerciseJournal {
+public class ExerciseJournal extends JFrame {
+
+    public ExerciseJournal() {
+        setTitle("Exercise Journal");
+        setSize(350, 250);
+        setLayout(new GridBagLayout());
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        GridBagConstraints c = new GridBagConstraints();
+
+        //Set up Title
+        JLabel title = new JLabel("Exercise Journal", JLabel.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 20));
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 2;
+        add(title, c);
+
+        // add exercise session button
+        JButton addSession = new JButton("Add Exercise Session");
+        addSession.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                openExerciseSessionDialog();
+            }
+        });
+
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 2;
+        c.gridheight = 2;
+        add(addSession, c);
+
+        //Create Exit button that shuts program down
+        JButton exitButton = new JButton("Exit Exercise Journal");
+        exitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                System.exit(0);
+            }
+        });
+
+        JPanel exitButtonPanel = new JPanel();
+        exitButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        exitButtonPanel.add(exitButton);
+
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.LAST_LINE_END;
+        c.weightx = 1;
+        c.weighty = 1;
+        add(exitButtonPanel, c);
+
+        //make frame size and visible
+        setSize(500, 500);
+        setVisible(true);
+
+    }
+
+
     public static void main(String[] args){
-        createGUI();
+//        createGUI();
+
+        ExerciseJournal exerciseJournal = new ExerciseJournal();
+
     }
 
     private static class Workout {
@@ -75,63 +138,63 @@ public class ExerciseJournal {
         }
     }
 
-    public static void createGUI(){
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//    public static void createGUI(){
+//        JFrame frame = new JFrame();
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//
+//        frame.setLayout(new GridBagLayout());
+//        GridBagConstraints c = new GridBagConstraints();
+//
+//        //Set up Title
+//        JLabel title = new JLabel("Exercise Journal", JLabel.CENTER);
+//        title.setFont(new Font("Arial", Font.BOLD, 20));
+//        c.gridx = 0;
+//        c.gridy = 0;
+//        c.gridwidth = 2;
+//        frame.add(title, c);
+//
+//        // add exercise session button
+//        JButton addSession = new JButton("Add Exercise Session");
+//        addSession.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                openExerciseSessionDialog(frame);
+//            }
+//        });
+//
+//        c.gridx = 0;
+//        c.gridy = 1;
+//        c.gridwidth = 2;
+//        c.gridheight = 2;
+//        frame.add(addSession, c);
+//
+//        //Create Exit button that shuts program down
+//        JButton exitButton = new JButton("Exit Exercise Journal");
+//        exitButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                frame.dispose();
+//                System.exit(0);
+//            }
+//        });
+//
+//        JPanel exitButtonPanel = new JPanel();
+//        exitButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+//        exitButtonPanel.add(exitButton);
+//
+//        c.gridx = 0;
+//        c.gridy = 2;
+//        c.gridwidth = 1;
+//        c.anchor = GridBagConstraints.LAST_LINE_END;
+//        c.weightx = 1;
+//        c.weighty = 1;
+//        frame.add(exitButtonPanel, c);
+//
+//        //make frame size and visible
+//        frame.setSize(500, 500);
+//        frame.setVisible(true);
+//    }
 
-        frame.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-
-        //Set up Title
-        JLabel title = new JLabel("Exercise Journal", JLabel.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 20));
-        c.gridx = 0;
-        c.gridy = 0;
-        c.gridwidth = 2;
-        frame.add(title, c);
-
-        // add exercise session button
-        JButton addSession = new JButton("Add Exercise Session");
-        addSession.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                openExerciseSessionDialog(frame);
-            }
-        });
-
-        c.gridx = 0;
-        c.gridy = 1;
-        c.gridwidth = 2;
-        c.gridheight = 2;
-        frame.add(addSession, c);
-
-        //Create Exit button that shuts program down
-        JButton exitButton = new JButton("Exit Exercise Journal");
-        exitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                frame.dispose();
-                System.exit(0);
-            }
-        });
-
-        JPanel exitButtonPanel = new JPanel();
-        exitButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        exitButtonPanel.add(exitButton);
-
-        c.gridx = 0;
-        c.gridy = 2;
-        c.gridwidth = 1;
-        c.anchor = GridBagConstraints.LAST_LINE_END;
-        c.weightx = 1;
-        c.weighty = 1;
-        frame.add(exitButtonPanel, c);
-
-        //make frame size and visible
-        frame.setSize(500, 500);
-        frame.setVisible(true);
-    }
-
-    private static void openExerciseSessionDialog(JFrame frame) {
-        JDialog sessionDialog = new JDialog(frame, "New Exercise Session", true); // Modal dialog
+    private void openExerciseSessionDialog(/* JFrame frame */) {
+        JDialog sessionDialog = new JDialog(this, "New Exercise Session", true); // Modal dialog
         sessionDialog.setSize(300, 150);
         sessionDialog.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -159,7 +222,7 @@ public class ExerciseJournal {
         JButton addWorkout = new JButton("Add Workout");
         addWorkout.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                openWorkoutDialog(frame, session);
+                openWorkoutDialog(session);
             }
         });
 
@@ -184,12 +247,12 @@ public class ExerciseJournal {
         c.anchor = GridBagConstraints.LINE_START;
         sessionDialog.add(submitButton, c);
 
-        sessionDialog.setLocationRelativeTo(frame); // Centers the dialog
+        sessionDialog.setLocationRelativeTo(this); // Centers the dialog
         sessionDialog.setVisible(true);
     }
 
-    private static void openWorkoutDialog(JFrame frame, ExerciseSession session) {
-        JDialog workoutDialog = new JDialog(frame, "New Workout", true);
+    private void openWorkoutDialog(/* JFrame frame, */ ExerciseSession session) {
+        JDialog workoutDialog = new JDialog(this, "New Workout", true);
         workoutDialog.setSize(250, 150);
         workoutDialog.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -262,7 +325,7 @@ public class ExerciseJournal {
         c.anchor = GridBagConstraints.LINE_END;
         workoutDialog.add(buttonPanel, c);
 
-        workoutDialog.setLocationRelativeTo(frame);
+        workoutDialog.setLocationRelativeTo(this);
         workoutDialog.setVisible(true);
     }
 }
