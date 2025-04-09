@@ -11,18 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/* TODO: Refactor code completely. Don't use static. Extend JFrame and JDialog.
+/* TODO: Refactor code completely. Don't use static. Extend JPanel.
 *   Configure so that the user can input a lyft or cardio workout. Configure so
 *   that input is more strict and won't be as prone to user error.  */
 
-public class ExerciseJournal extends JFrame {
+public class ExerciseJournal extends JPanel {
 
-    public ExerciseJournal() {
-        setTitle("Exercise Journal");
-        setSize(350, 250);
+    public ExerciseJournal(JFrame frame) {
+        frame.setTitle("Exercise Journal");
+        frame.setSize(350, 250);
+        setSize(frame.getWidth(), frame.getHeight());
         setLayout(new GridBagLayout());
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         GridBagConstraints c = new GridBagConstraints();
 
@@ -38,7 +39,7 @@ public class ExerciseJournal extends JFrame {
         JButton addSession = new JButton("Add Exercise Session");
         addSession.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                openExerciseSessionDialog();
+                openExerciseSessionDialog(frame);
             }
         });
 
@@ -52,7 +53,7 @@ public class ExerciseJournal extends JFrame {
         JButton exitButton = new JButton("Exit Exercise Journal");
         exitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                dispose();
+                frame.dispose();
                 System.exit(0);
             }
         });
@@ -77,10 +78,12 @@ public class ExerciseJournal extends JFrame {
 
 
     public static void main(String[] args){
-//        createGUI();
+//        createGUI()
 
-        ExerciseJournal exerciseJournal = new ExerciseJournal();
-
+        JFrame frame = new JFrame("Exercise Journal");
+        ExerciseJournal exerciseJournal = new ExerciseJournal(frame);
+        frame.add(exerciseJournal);
+        frame.setVisible(true);
     }
 
     private static class Workout {
@@ -193,8 +196,8 @@ public class ExerciseJournal extends JFrame {
 //        frame.setVisible(true);
 //    }
 
-    private void openExerciseSessionDialog(/* JFrame frame */) {
-        JDialog sessionDialog = new JDialog(this, "New Exercise Session", true); // Modal dialog
+    private void openExerciseSessionDialog( JFrame frame ) {
+        JDialog sessionDialog = new JDialog(frame, "New Exercise Session", true); // Modal dialog
         sessionDialog.setSize(300, 150);
         sessionDialog.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -222,7 +225,7 @@ public class ExerciseJournal extends JFrame {
         JButton addWorkout = new JButton("Add Workout");
         addWorkout.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                openWorkoutDialog(session);
+                openWorkoutDialog(frame, session);
             }
         });
 
@@ -251,8 +254,8 @@ public class ExerciseJournal extends JFrame {
         sessionDialog.setVisible(true);
     }
 
-    private void openWorkoutDialog(/* JFrame frame, */ ExerciseSession session) {
-        JDialog workoutDialog = new JDialog(this, "New Workout", true);
+    private void openWorkoutDialog( JFrame frame,  ExerciseSession session) {
+        JDialog workoutDialog = new JDialog(frame, "New Workout", true);
         workoutDialog.setSize(250, 150);
         workoutDialog.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
