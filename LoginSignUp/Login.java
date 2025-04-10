@@ -1,4 +1,6 @@
-package MyFitness;
+package MyFitness.LoginSignUp;
+
+import MyFitness.User.User;
 
 import javax.swing.*;
 import java.awt.*;

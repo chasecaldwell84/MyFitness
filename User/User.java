@@ -1,4 +1,4 @@
-package MyFitness;
+package MyFitness.User;
 
 /*Note this will be helpful when wanting to have a trainer look at users in the class
 *  we can just make a list of users */
