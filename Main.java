@@ -13,6 +13,14 @@ public class Main {
         */
 
 
+        //testing CalorieTracker
+        //CalorieTracker ct = new CalorieTracker();
+        //ct.setVisible(true);
+
+        //testing CreateGoals
+        //CreateGoals cg = new CreateGoals();
+        //cg.setVisible(true);
+
         //NOTE testing
         /*App app2 = new App();
         app2.setVisible(true);*/
