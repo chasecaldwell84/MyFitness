@@ -65,8 +65,6 @@ public class Login extends JDialog {
         Username.add(submitButton);
         add(Username, BorderLayout.NORTH);
 
-
-
     }
 
     public void authenicating(String username, String password) throws FileNotFoundException {

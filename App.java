@@ -4,13 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class App extends JFrame {
-    private String Username;
+    private User user = new User();
 
     public void setUsername(String username) {
-        Username = username;
+        user.setUserName(username);
     }
     public String getUsername() {
-        return Username;
+        return user.getUserName();
     }
     public App(){
         setTitle("MyFitness");
