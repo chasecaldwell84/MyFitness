@@ -45,19 +45,16 @@ public class ExerciseJournal extends JPanel {
         c.gridwidth = 2;
         add(title, c);
 
-
-
-
-
-
-
-
+        JPanel thisJournal = this;
 
         // add exercise session button
         JButton addSession = new JButton("Add Exercise Session");
         addSession.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                openExerciseSessionDialog(frame);
+                frame.getContentPane().removeAll();
+                frame.add(new ExerciseSession(frame, thisJournal));
+                frame.revalidate();
+                frame.repaint();
             }
         });
 
@@ -67,6 +64,7 @@ public class ExerciseJournal extends JPanel {
         c.gridheight = 2;
         add(addSession, c);
 
+        // TODO: change functionality of exit button
         //Create Exit button that shuts program down
         JButton exitButton = new JButton("Exit Exercise Journal");
         exitButton.addActionListener(new ActionListener() {
@@ -89,7 +87,6 @@ public class ExerciseJournal extends JPanel {
         add(exitButtonPanel, c);
 
         //make frame size and visible
-        setSize(500, 500);
         setVisible(true);
 
     }
@@ -204,13 +201,16 @@ public class ExerciseJournal extends JPanel {
 //        frame.setVisible(true);
 //    }
 
+
+    // NOTE: old code below. . .
+
     private void openExerciseSessionDialog( JFrame frame ) {
         JDialog sessionDialog = new JDialog(frame, "New Exercise Session", true); // Modal dialog
         sessionDialog.setSize(300, 150);
         sessionDialog.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
-        ExerciseSession session = new ExerciseSession(null);
+        ExerciseSession session = new ExerciseSession(frame, null);
 
         // Set general padding and spacing
         c.insets = new Insets(10, 10, 10, 10);
@@ -312,7 +312,7 @@ public class ExerciseJournal extends JPanel {
 
             // Validate input (optional)
             if (!workout.isEmpty() && !weight.isEmpty() && !reps.isEmpty()) {
-                session.addWorkout(new Workout(workout, Double.parseDouble(weight), Integer.parseInt(reps)));
+//                session.addWorkout(new Workout(workout, Double.parseDouble(weight), Integer.parseInt(reps)));
                 JOptionPane.showMessageDialog(workoutDialog,
                         "Workout: " + workout + "\nWeight: " + weight + "\nReps: " + reps,
                         "Workout Saved", JOptionPane.INFORMATION_MESSAGE);
