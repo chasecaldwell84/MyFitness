@@ -37,9 +37,18 @@ public class NavBar extends JPanel {
             frame.revalidate();
             frame.repaint();
         });
+
+        JButton Settings = new JButton("Settings");
+        Settings.addActionListener(e -> {
+            frame.getContentPane().removeAll();
+            frame.getContentPane().add(this);
+            frame.add(new JLabel("Settings"));
+            frame.revalidate();
+            frame.repaint();
+        });
         add(Home);
         add(exerciseButton);
         add(goalButton);
-
+        add(Settings);
     }
 }
