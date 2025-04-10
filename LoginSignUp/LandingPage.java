@@ -15,12 +15,25 @@ public class LandingPage extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new GridBagLayout());
 
+        //add logo image
+        ImageIcon logoIcon = new ImageIcon("resources/images/MyFitnessLogoChose1.jpg");
+        Image image = logoIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+        JLabel logoLabel = new JLabel(new ImageIcon(image));
+
+        GridBagConstraints logoConstraints = new GridBagConstraints();
+        logoConstraints.gridx = 0;
+        logoConstraints.gridy = 0;
+        logoConstraints.gridwidth = 2;
+        logoConstraints.insets = new Insets(10, 0, 10, 0); // Add spacing
+        add(logoLabel, logoConstraints);
+        //until here
+
         JLabel title = new JLabel("Welcome to MyFitness!");
         title.setFont(new Font("Arial", Font.BOLD, 30));
         //title.setBounds(70, 10, 500, 50);
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 0;
+        c.gridy = 1;
         c.gridwidth = 2;
         add(title, c);
 
@@ -52,14 +65,14 @@ public class LandingPage extends JFrame {
         /*pack();*/
         GridBagConstraints loginPlace = new GridBagConstraints();
         loginPlace.gridx = 0;
-        loginPlace.gridy = 1;
+        loginPlace.gridy = 2;
         loginPlace.gridwidth = 1;
         loginPlace.anchor = GridBagConstraints.SOUTHWEST;
         add(login, loginPlace);
 
         GridBagConstraints signUpPlace = new GridBagConstraints();
         signUpPlace.gridx = 1;
-        signUpPlace.gridy = 1;
+        signUpPlace.gridy = 2;
         signUpPlace.gridwidth = 1;
         signUpPlace.anchor = GridBagConstraints.SOUTHEAST;
         add(signUp, signUpPlace);
