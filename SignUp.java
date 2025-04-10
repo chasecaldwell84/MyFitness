@@ -83,7 +83,7 @@ public class SignUp extends JDialog {
 
     private void saveUser(String username, String password) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("./src/main/java/MyFitness/resources/UserAuth.csv", true))) {
-            writer.write(username + "," + password);
+            writer.write(username + "," + password + "," + "User");
             writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();

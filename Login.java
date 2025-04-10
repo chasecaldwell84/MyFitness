@@ -76,7 +76,7 @@ public class Login extends JDialog {
             return;
         }
         String[] headers = scanner.nextLine().split(",");
-        int UsernameINDEX = -1, PasswordINDEX = -1;
+        int UsernameINDEX = -1, PasswordINDEX = -1, TypeIndex = -1;
         for(int i = 0; i < headers.length; i++){
             String column = headers[i].trim().toLowerCase();
             if(column.equals("username")){
@@ -85,12 +85,15 @@ public class Login extends JDialog {
             else if(column.equals("password")){
                 PasswordINDEX = i;
             }
+            else if(column.equals("type")){
+                TypeIndex = i;
+            }
         }
-        if(UsernameINDEX == -1 || PasswordINDEX == -1){
+        if(UsernameINDEX == -1 || PasswordINDEX == -1 || TypeIndex == -1){
             JOptionPane.showMessageDialog(this, "System ERROR");
             return;
         }
-        //FIXME counter gets incremented if password is the same for a different username
+
         int counter = 0;
         while(scanner.hasNextLine() && !Authenticated){
             String line = scanner.nextLine().trim();
