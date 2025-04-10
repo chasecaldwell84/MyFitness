@@ -90,7 +90,7 @@ public class Login extends JDialog {
             JOptionPane.showMessageDialog(this, "System ERROR");
             return;
         }
-
+        //FIXME counter gets incremented if password is the same for a different username
         int counter = 0;
         while(scanner.hasNextLine() && !Authenticated){
             String line = scanner.nextLine().trim();
@@ -107,6 +107,9 @@ public class Login extends JDialog {
             }
             if(counter == 2){
                 Authenticated = true;
+            }
+            else{
+                counter = 0;
             }
         }
 
