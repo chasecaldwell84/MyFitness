@@ -1,4 +1,4 @@
-package MyFitness;
+package MyFitness.LoginSignUp;
 
 import javax.swing.*;
 //import java.awt.event.*;
