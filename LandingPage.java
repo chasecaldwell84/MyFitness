@@ -30,6 +30,11 @@ public class LandingPage extends JFrame {
             loginPanel.setVisible(true);
             if(loginPanel.getAuthenticated()){
                 loginPanel.dispose();
+                app.setUsername(loginPanel.getUsername());
+                //NOTE TESTING
+                /*app.setTitle(loginPanel.getUsername());
+                System.out.println("testing: " + app.getUsername());*/
+
                 dispose();
                 app.setVisible(true);
             }

@@ -16,6 +16,7 @@ public class SignUp extends JDialog {
         setTitle("Sign-Up");
         setSize(350, 250);
         setLayout(null);
+        setModal(true);
         setLocationRelativeTo(null);
 
         JLabel usernameLabel = new JLabel("Username:");

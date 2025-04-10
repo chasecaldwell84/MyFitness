@@ -4,6 +4,14 @@ import javax.swing.*;
 import java.awt.*;
 
 public class App extends JFrame {
+    private String Username;
+
+    public void setUsername(String username) {
+        Username = username;
+    }
+    public String getUsername() {
+        return Username;
+    }
     public App(){
         setTitle("MyFitness");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

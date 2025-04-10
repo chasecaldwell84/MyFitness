@@ -9,6 +9,7 @@ public class Main {
         lp.setVisible(true);
 
         //NOTE testing
+
         /*App app2 = new App();
         app2.setVisible(true);*/
         /*Scanner sc = new Scanner(System.in);
