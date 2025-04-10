@@ -1,5 +1,8 @@
 package MyFitness;
 
+import MyFitness.ExerciseSession.ExerciseSession;
+import MyFitness.ExerciseSession.Workout.Workout;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,8 +10,6 @@ import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /* TODO: Refactor code completely. Don't use static. Extend JPanel.
@@ -17,9 +18,18 @@ import java.util.List;
 
 public class ExerciseJournal extends JPanel {
 
+    public static void main(String[] args){
+//        createGUI()
+
+        JFrame frame = new JFrame("Exercise Journal");
+        ExerciseJournal exerciseJournal = new ExerciseJournal(frame);
+        frame.add(exerciseJournal);
+        frame.setVisible(true);
+    }
+
     public ExerciseJournal(JFrame frame) {
         frame.setTitle("Exercise Journal");
-        frame.setSize(350, 250);
+        frame.setSize(800, 600);
         setSize(frame.getWidth(), frame.getHeight());
         setLayout(new GridBagLayout());
         frame.setLocationRelativeTo(null);
@@ -34,6 +44,14 @@ public class ExerciseJournal extends JPanel {
         c.gridy = 0;
         c.gridwidth = 2;
         add(title, c);
+
+
+
+
+
+
+
+
 
         // add exercise session button
         JButton addSession = new JButton("Add Exercise Session");
@@ -76,60 +94,50 @@ public class ExerciseJournal extends JPanel {
 
     }
 
+//    private static class Workout {
+//        String workoutName;
+//        double weight;
+//        int reps;
+//
+//        public Workout(String workoutName, double weight, int reps) {
+//            this.workoutName = workoutName;
+//            this.weight = weight;
+//            this.reps = reps;
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return workoutName + "," + weight + "," + reps;
+//        }
+//    }
 
-    public static void main(String[] args){
-//        createGUI()
-
-        JFrame frame = new JFrame("Exercise Journal");
-        ExerciseJournal exerciseJournal = new ExerciseJournal(frame);
-        frame.add(exerciseJournal);
-        frame.setVisible(true);
-    }
-
-    private static class Workout {
-        String workoutName;
-        double weight;
-        int reps;
-
-        public Workout(String workoutName, double weight, int reps) {
-            this.workoutName = workoutName;
-            this.weight = weight;
-            this.reps = reps;
-        }
-
-        @Override
-        public String toString() {
-            return workoutName + "," + weight + "," + reps;
-        }
-    }
-
-    private static class ExerciseSession {
-        String date;
-        List<Workout> workouts;
-
-        public ExerciseSession(String date) {
-            this.date = date;
-            this.workouts = new ArrayList<>();
-        }
-
-        public void addWorkout(Workout workout) {
-            workouts.add(workout);
-        }
-
-        public void setDate(String date){
-            this.date = date;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder sessionData = new StringBuilder();
-            sessionData.append(date).append("\n");
-            for (Workout workout : workouts) {
-                sessionData.append(workout.toString()).append("\n");
-            }
-            return sessionData.toString();
-        }
-    }
+//    private static class ExerciseSession {
+//        String date;
+//        List<Workout> workouts;
+//
+//        public ExerciseSession(String date) {
+//            this.date = date;
+//            this.workouts = new ArrayList<>();
+//        }
+//
+//        public void addWorkout(Workout workout) {
+//            workouts.add(workout);
+//        }
+//
+//        public void setDate(String date){
+//            this.date = date;
+//        }
+//
+//        @Override
+//        public String toString() {
+//            StringBuilder sessionData = new StringBuilder();
+//            sessionData.append(date).append("\n");
+//            for (Workout workout : workouts) {
+//                sessionData.append(workout.toString()).append("\n");
+//            }
+//            return sessionData.toString();
+//        }
+//    }
 
     private static void saveSessionToCSV(ExerciseSession session) {
         // Write session and workouts to CSV file
