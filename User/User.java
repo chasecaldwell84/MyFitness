@@ -4,6 +4,8 @@ package MyFitness.User;
 *  we can just make a list of users */
 /*Note 2: have this as a super class so trainer and admin can have extra abilities when overloaded*/
 public class User {
+    /*Note can make a settings for example and then have a function that can be overloaded that makes the settings
+    *  this can be implemented in each type of user/trainer/Admin*/
     String userName;
     String password;
 

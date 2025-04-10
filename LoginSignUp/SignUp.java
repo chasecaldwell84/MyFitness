@@ -50,7 +50,10 @@ public class SignUp extends JDialog {
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword());
         String passwordDouble = new String(passwordDoubleField.getPassword());
-
+        if(username.isEmpty() || password.isEmpty() || passwordDouble.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid username or password.");
+            return;
+        }
         if (!password.equals(passwordDouble)) {
             JOptionPane.showMessageDialog(this, "Passwords do not match.");
             return;
@@ -60,6 +63,7 @@ public class SignUp extends JDialog {
             JOptionPane.showMessageDialog(this, "Please change to another username.");
             return;
         }
+
 
         saveUser(username, password);
         JOptionPane.showMessageDialog(this, "Sign-up successful!");
