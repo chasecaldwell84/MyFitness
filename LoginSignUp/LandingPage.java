@@ -33,7 +33,7 @@ public class LandingPage extends JFrame {
         //title.setBounds(70, 10, 500, 50);
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 1;
+        c.gridy = 1; //new location
         c.gridwidth = 2;
         add(title, c);
 
@@ -65,14 +65,14 @@ public class LandingPage extends JFrame {
         /*pack();*/
         GridBagConstraints loginPlace = new GridBagConstraints();
         loginPlace.gridx = 0;
-        loginPlace.gridy = 2;
+        loginPlace.gridy = 2; //new location
         loginPlace.gridwidth = 1;
         loginPlace.anchor = GridBagConstraints.SOUTHWEST;
         add(login, loginPlace);
 
         GridBagConstraints signUpPlace = new GridBagConstraints();
         signUpPlace.gridx = 1;
-        signUpPlace.gridy = 2;
+        signUpPlace.gridy = 2; //new location
         signUpPlace.gridwidth = 1;
         signUpPlace.anchor = GridBagConstraints.SOUTHEAST;
         add(signUp, signUpPlace);
