@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class NavBar extends JPanel {
-    public NavBar(JFrame frame) {
+    public NavBar(App frame) {
         //NOTE: TESTING
         setLayout(new FlowLayout(FlowLayout.LEFT));
         //NOTE: if we want backButton need to store previous frames in like a stack
@@ -38,17 +38,19 @@ public class NavBar extends JPanel {
             frame.repaint();
         });
 
-        JButton Settings = new JButton("Settings");
-        Settings.addActionListener(e -> {
+        JButton settings = new JButton("Settings");
+        //NOTE: pannel has to be created in the actionListner or else it doesnt update the information
+        settings.addActionListener(e -> {
+            Settings settingsPannel = new Settings(frame);
             frame.getContentPane().removeAll();
             frame.getContentPane().add(this);
-            frame.add(new JLabel("Settings"));
+            frame.add(settingsPannel);
             frame.revalidate();
             frame.repaint();
         });
         add(Home);
         add(exerciseButton);
         add(goalButton);
-        add(Settings);
+        add(settings);
     }
 }
