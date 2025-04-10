@@ -9,10 +9,9 @@ import java.util.Scanner;
 public class Login extends JDialog {
 
     private Boolean Authenticated = false;
-    private String Username = null;
-
-    public String getUsername() {
-        return Username;
+    private User user = null;
+    public User getUser() {
+        return user;
     }
     public Boolean getAuthenticated() {
         return Authenticated;
@@ -113,7 +112,7 @@ public class Login extends JDialog {
 
         if(Authenticated){
             JOptionPane.showMessageDialog(this, "You have successfully logged in");
-            Username = username;
+            user = new User(username, password);
             //NOTE App is init here and it might not be the best place to init
             dispose();
         }

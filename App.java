@@ -6,11 +6,11 @@ import java.awt.*;
 public class App extends JFrame {
     private User user = new User();
 
-    public void setUsername(String username) {
-        user.setUserName(username);
+    public void setUser(User user) {
+        this.user = user;
     }
-    public String getUsername() {
-        return user.getUserName();
+    public User getUser() {
+        return user;
     }
     public App(){
         setTitle("MyFitness");
