@@ -19,13 +19,16 @@ public class ExerciseSession extends JPanel {
 
         // TODO: Make UI
 
+        JPanel session = this;
+
         setSize(frame.getWidth(), frame.getHeight());
         setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
+        Dimension buttonsSize = new Dimension(120, 30);
 
         //Set up Title
-        JLabel title = new JLabel("Exercise Journal", JLabel.CENTER);
+        JLabel title = new JLabel("Exercise Session", JLabel.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 20));
         c.gridx = 0;
         c.gridy = 0;
@@ -46,13 +49,68 @@ public class ExerciseSession extends JPanel {
         add(dateField, c);
 
 
+        JLabel instructionLabel = new JLabel("Select Workout Type: ");
+        instructionLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        c.gridy = 3;
+        instructionLabel.setVisible(false);
+        add(instructionLabel, c);
+
+        JPanel workoutButtons = new JPanel(new FlowLayout());
+
+        JButton liftButton = new JButton("Weight Lifting");
+        liftButton.setPreferredSize(buttonsSize);
+        liftButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.getContentPane().removeAll();
+                frame.getContentPane().add(new LiftWorkout(frame, session));
+                frame.revalidate();
+                frame.repaint();
+            }
+        });
+        workoutButtons.add(liftButton);
+
+        JButton cardioButton = new JButton("Cardio");
+        cardioButton.setPreferredSize(buttonsSize);
+        cardioButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        workoutButtons.add(cardioButton);
+
+        c.gridy = 4;
+        workoutButtons.setVisible(false);
+        add(workoutButtons, c);
+
 
 
         // TODO: add the add workout button and save session button
         // NOTE: need to know what type of workout to create.
+        JPanel buttons = new JPanel();
+        buttons.setLayout(new FlowLayout());
 
+        JButton addWorkout = new JButton("Add Workout");
+        addWorkout.setPreferredSize(buttonsSize);
+        addWorkout.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                instructionLabel.setVisible(true);
+                workoutButtons.setVisible(true);
+            }
+        });
+        buttons.add(addWorkout);
 
+        JButton saveSession = new JButton("Save Session");
+        saveSession.setPreferredSize(buttonsSize);
+        saveSession.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // TODO
+            }
+        });
+        buttons.add(saveSession);
 
+        c.gridy = 2;
+
+        add(buttons, c);
 
 
 
@@ -74,7 +132,7 @@ public class ExerciseSession extends JPanel {
         exitButtonPanel.add(backButton);
 
         c.gridx = 1;
-        c.gridy = 3;
+        c.gridy = 5;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.LAST_LINE_END;
         c.weightx = 1;

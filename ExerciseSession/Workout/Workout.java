@@ -1,6 +1,7 @@
 package MyFitness.ExerciseSession.Workout;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class Workout extends JPanel {
     public enum WorkoutType {
@@ -11,8 +12,13 @@ public class Workout extends JPanel {
     protected String workoutName;
     protected WorkoutType workoutType;
 
-    public Workout() {
-        this.workoutName = null;
-        this.workoutType = null;
+    public Workout(JFrame frame, JPanel session) {
+
+        setSize(frame.getWidth(), frame.getHeight());
+        setLayout(new GridBagLayout());
+
+
     }
+
+
 }
