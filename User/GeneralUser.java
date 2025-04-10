@@ -1,6 +1,6 @@
-package MyFitness;
+package MyFitness.User;
 
-public class GeneralUser extends User{
+public class GeneralUser extends User {
     double weight;
     double calorieIntake;
     double sleepHours;
