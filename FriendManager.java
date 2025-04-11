@@ -2,6 +2,10 @@ package MyFitness;
 
 import MyFitness.User.User;
 import java.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.List;
 
 public class FriendManager {
     private Map<User, List<User>> friendsMap = new HashMap<>();
@@ -31,3 +35,5 @@ public class FriendManager {
         return challengesMap.getOrDefault(user, new ArrayList<>());
     }
 }
+
+
