@@ -16,8 +16,9 @@ public class Workout extends JPanel {
         this.workoutName = workoutName;
         setSize(frame.getWidth(), frame.getHeight());
         setLayout(new GridBagLayout());
+    }
 
-
-
+    public String getWorkoutName() {
+        return workoutName;
     }
 }
