@@ -1,5 +1,7 @@
 package MyFitness.LoginSignUp;
 
+import MyFitness.User.Admin;
+import MyFitness.User.Trainer;
 import MyFitness.User.User;
 
 import javax.swing.*;
@@ -12,12 +14,14 @@ public class Login extends JDialog {
 
     private Boolean Authenticated = false;
     private User user = null;
+
     public User getUser() {
         return user;
     }
     public Boolean getAuthenticated() {
         return Authenticated;
     }
+
     public Login() {
         setTitle("Login");
         setModal(true);
@@ -48,7 +52,7 @@ public class Login extends JDialog {
             Authenticated = false;
             String username = UsernameField.getText();
             String password = PasswordField.getText();
-            if(password == null || username.equals("") || password.equals("")){
+            if(password == null || username.isEmpty() || password.isEmpty()){
                 JOptionPane.showMessageDialog(this, "Please enter a valid username/password");
             }
             else{
@@ -97,6 +101,7 @@ public class Login extends JDialog {
         }
 
         int counter = 0;
+        String TypeInput = "";
         while(scanner.hasNextLine() && !Authenticated){
             String line = scanner.nextLine().trim();
             String [] values = line.split(",");
@@ -104,6 +109,7 @@ public class Login extends JDialog {
             /*if(values.length != headers.length){}*/
             String Usernameinput = values[UsernameINDEX].trim();
             String Passwordinput = values[PasswordINDEX].trim();
+            TypeInput = values[TypeIndex].trim();
             if(Usernameinput.equals(username)){
                 counter++;
             }
@@ -120,8 +126,20 @@ public class Login extends JDialog {
 
         if(Authenticated){
             JOptionPane.showMessageDialog(this, "You have successfully logged in");
-            user = new User(username, password);
-            //NOTE App is init here and it might not be the best place to init
+            if(TypeInput.isEmpty()){
+                JOptionPane.showMessageDialog(this, "SYSTEM ERROR Not assigned type");
+            }
+            else if(TypeInput.equals("User")){
+                user = new User(username, password);
+            }
+            else if(TypeInput.equals("Trainer")){
+                user = new Trainer(username, password);
+                //System.out.println("Trainer: " + user.getUserName());
+            }
+            else if(TypeInput.equals("Admin")){
+                user = new Admin(username, password);
+                //System.out.println("Admin");
+            }
             dispose();
         }
         else{
