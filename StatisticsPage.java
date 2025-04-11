@@ -1,3 +1,5 @@
+//Author: Larry O'Connor
+
 package MyFitness;
 
 import javax.swing.*;
@@ -78,10 +80,10 @@ public class StatisticsPage extends JFrame {
             mainPanel.add(infoPanel, BorderLayout.CENTER);
 
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-            JButton exitButton = new JButton("back");
-            JButton leaderboardButton = new JButton("leaderboard");
-            JButton filterButton = new JButton("filter");
-            JButton exportButton = new JButton("export");
+            JButton exitButton = new JButton("Back");
+            JButton leaderboardButton = new JButton("Experience");
+            JButton filterButton = new JButton("Filter");
+            JButton exportButton = new JButton("Export");
 
             buttonPanel.add(exitButton);
             buttonPanel.add(leaderboardButton);
@@ -93,6 +95,7 @@ public class StatisticsPage extends JFrame {
 
             add(mainPanel);
             setLocationRelativeTo(null);
+            setResizable(false);
             setVisible(true);
         });
     }
@@ -107,7 +110,8 @@ public class StatisticsPage extends JFrame {
         JCheckBox[] filterCheckBoxes = new JCheckBox[6];
 
         filterGUI.setTitle("Filter Stats");
-        filterGUI.setSize(200,500);
+        filterGUI.setSize(200,400);
+        filterGUI.setResizable(false);
 
         JLabel titleLabel = new JLabel("Options");
         titleLabel.setFont(titleFont);
@@ -131,12 +135,19 @@ public class StatisticsPage extends JFrame {
         filterLabels[4].setText("Total Workout");
         filterLabels[5].setText("Total Calories");
 
+        JPanel filterBoxesPanel = new JPanel();
+
         for(int i = 0; i < filterLabels.length; i++) {
             JPanel tempPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             tempPanel.add(filterLabels[i]);
             tempPanel.add(filterCheckBoxes[i]);
-            mainPanel.add(tempPanel);
+            filterBoxesPanel.add(tempPanel);
         }
+        filterBoxesPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(10, 10, 10, 10),  // Outer empty border for spacing
+                BorderFactory.createLineBorder(Color.BLACK, 2)    // Inner line border
+        ));
+        mainPanel.add(filterBoxesPanel);
 
         JPanel buttonsPanel = new JPanel();
 
@@ -147,11 +158,13 @@ public class StatisticsPage extends JFrame {
         JButton applyButton = new JButton("Apply");
         applyButton.addActionListener(new filterApply(filterGUI));
         buttonsPanel.add(applyButton);
+        buttonsPanel.setMaximumSize(buttonsPanel.getPreferredSize());
 
         mainPanel.add(buttonsPanel);
 
 
         filterGUI.add(mainPanel);
+        filterGUI.setLocationRelativeTo(this);
 
     }
     public void showFilterGUI(){
