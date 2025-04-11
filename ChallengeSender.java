@@ -96,13 +96,13 @@ public class ChallengeSender extends JPanel {
         SwingUtilities.invokeLater(() -> {
             User chase = new MyFitness.User.GeneralUser("chase", "pass123");
             User ryan = new MyFitness.User.GeneralUser("ryan", "pass456");
-            User taylor = new MyFitness.User.GeneralUser("michael", "pass789");
+            User michael = new MyFitness.User.GeneralUser("michael", "pass789");
 
             FriendManager fm = new FriendManager();
             fm.addFriend(chase, ryan);
-            fm.addFriend(chase, taylor);
+            fm.addFriend(chase, michael);
 
-            JFrame frame = new JFrame("Challenge Sender Test");
+            JFrame frame = new JFrame("Challenge Sender");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(600, 300);
             frame.setLocationRelativeTo(null);
