@@ -9,7 +9,6 @@ import java.awt.*;
 
 public class NavBar extends JPanel {
     public NavBar(App frame) {
-        //NOTE: TESTING
         setLayout(new FlowLayout(FlowLayout.LEFT));
         //NOTE: if we want backButton need to store previous frames in like a stack
         /*JButton backButton = new JButton("Back");*/
@@ -58,10 +57,9 @@ public class NavBar extends JPanel {
         JButton settings = new JButton("Settings");
         //NOTE: pannel has to be created in the actionListner or else it doesnt update the information
         settings.addActionListener(e -> {
-
-
             frame.getContentPane().removeAll();
             frame.getContentPane().add(this);
+
             frame.add(frame.getUser().getSettings());
             frame.setTitle("Settings");
             frame.revalidate();

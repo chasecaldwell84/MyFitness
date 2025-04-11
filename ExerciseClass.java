@@ -9,10 +9,10 @@ public class ExerciseClass extends ExercisePlan {
     private JButton addButton;
 
     public ExerciseClass() {
-        setTitle("Add User to Workout Class");
+        /*setTitle("Add User to Workout Class");*/
         setSize(1200, 800);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        /*setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);*/
         setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -76,10 +76,10 @@ public class ExerciseClass extends ExercisePlan {
         userName.setText("");
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             new ExerciseClass().setVisible(true);
         });
-    }
+    }*/
 }
 
