@@ -12,13 +12,12 @@ public class Workout extends JPanel {
     protected String workoutName;
     protected WorkoutType workoutType;
 
-    public Workout(JFrame frame, JPanel session) {
-
+    public Workout(JFrame frame, JPanel session, String workoutName) {
+        this.workoutName = workoutName;
         setSize(frame.getWidth(), frame.getHeight());
         setLayout(new GridBagLayout());
 
 
+
     }
-
-
 }

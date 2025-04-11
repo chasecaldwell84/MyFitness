@@ -20,7 +20,7 @@ public class LiftWorkout extends Workout {
     }
 
     public LiftWorkout(JFrame frame, JPanel session, String workoutName) {
-        super(frame, session);
+        super(frame, session, workoutName);
         this.workoutType = WorkoutType.LIFT;
         sets = new ArrayList<LiftSet>();
 
@@ -30,6 +30,11 @@ public class LiftWorkout extends Workout {
         label.setFont(label.getFont().deriveFont(20f));
         add(label);
         setVisible(true);
+
+
+
+
+
 
 
         // Back Button to return to the journal
@@ -56,7 +61,28 @@ public class LiftWorkout extends Workout {
         c.weighty = 1;
         add(exitButtonPanel, c);
 
-//        this.workoutName = workoutName;
+
+
+
+
+
+
+
+
+
+
+
+        // TESTING
+
+        System.out.println("workoutName: " + workoutName);
+
+        int i = 0;
+        for (LiftSet set : sets) {
+            ++i;
+            System.out.println("Set " + i + ": " + set.weight + " " + set.reps);
+        }
+
+
 
 
 

@@ -18,8 +18,8 @@ public class CardioWorkout extends Workout {
         }
     }
 
-    CardioWorkout(JFrame frame, JPanel session) {
-        super(frame, session);
+    CardioWorkout(JFrame frame, JPanel session, String workoutName) {
+        super(frame, session, workoutName);
         this.workoutType = WorkoutType.CARDIO;
 //        this.workoutName = workoutName;
 //        this.distance = distance;
