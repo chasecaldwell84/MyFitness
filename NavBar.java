@@ -1,10 +1,13 @@
 package MyFitness;
 
+import MyFitness.RyanStuff.CalorieTracker;
+import MyFitness.RyanStuff.CreateGoals;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class NavBar extends JPanel {
-    public NavBar(JFrame frame) {
+    public NavBar(App frame) {
         //NOTE: TESTING
         setLayout(new FlowLayout(FlowLayout.LEFT));
         //NOTE: if we want backButton need to store previous frames in like a stack
@@ -28,12 +31,25 @@ public class NavBar extends JPanel {
             frame.repaint();
 
         });
+        JButton CalorieTracker = new JButton("Calorie Tracker");
+        CalorieTracker.addActionListener(e -> {
+            CalorieTracker calorieTrackerPannel = new CalorieTracker(frame);
+            frame.getContentPane().removeAll();
 
+            frame.getContentPane().add(this);
+            frame.add(calorieTrackerPannel);
+
+            frame.revalidate();
+            frame.repaint();
+        });
         JButton goalButton = new JButton("Goals");
         goalButton.addActionListener(e -> {
+            CreateGoals goalsPannel = new CreateGoals(frame);
             frame.getContentPane().removeAll();
+
             frame.getContentPane().add(this);
-            frame.add(new JLabel("Goals"));
+            frame.add(goalsPannel);
+
             frame.revalidate();
             frame.repaint();
         });
@@ -48,6 +64,7 @@ public class NavBar extends JPanel {
         });
         add(Home);
         add(exerciseButton);
+        add(CalorieTracker);
         add(goalButton);
         add(Settings);
     }

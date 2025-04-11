@@ -1,14 +1,16 @@
 //Calorie Tracker Use Case
 //Author: Ryan Meador
 
-package MyFitness;
+package MyFitness.RyanStuff;
+
+import MyFitness.App;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class CalorieTracker extends JFrame{
+public class CalorieTracker extends JPanel{
 
     private static CalorieReport calorieReport;
     private static JLabel totalCaloriesLabel;
@@ -16,12 +18,10 @@ public class CalorieTracker extends JFrame{
     private static JPanel reportPanel;
     //private static JLabel dailyGoalLabel;
 
-    public CalorieTracker(){
-        setTitle("Calorie Tracker");
-        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+    public CalorieTracker(App frame){
+        frame.setTitle("Calorie Tracker");
         setLayout(new GridBagLayout());
         setSize(500, 500);
-        setLocationRelativeTo(null);
 
         calorieReport = new CalorieReport(2000); //change with goals
         createGUI();
@@ -74,7 +74,8 @@ public class CalorieTracker extends JFrame{
         add(calorieInput, c);
 
         //Create Exit Calorie Tracker button that shuts program down
-        JButton exitButton = new JButton("Exit Calorie Tracker");
+        //NOTE do not need Exit button
+        /*JButton exitButton = new JButton("Exit Calorie Tracker");
         exitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
@@ -90,7 +91,7 @@ public class CalorieTracker extends JFrame{
         c.anchor = GridBagConstraints.SOUTHWEST;
         c.weightx = 1;
         c.weighty = 1;
-        add(exitButtonPanel, c);
+        add(exitButtonPanel, c);*/
 
         //call function to make calorie report display
         createCalorieReport();

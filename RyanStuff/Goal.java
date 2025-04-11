@@ -1,4 +1,4 @@
-package MyFitness;
+package MyFitness.RyanStuff;
 
 public class Goal {
     private String goalLength;

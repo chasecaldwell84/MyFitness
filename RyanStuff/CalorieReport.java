@@ -1,4 +1,4 @@
-package MyFitness;
+package MyFitness.RyanStuff;
 
 public class CalorieReport {
     //variables for calories consumed and daily goal

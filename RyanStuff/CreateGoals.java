@@ -1,20 +1,20 @@
-package MyFitness;
+package MyFitness.RyanStuff;
+
+import MyFitness.App;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class CreateGoals extends JFrame {
+public class CreateGoals extends JPanel {
     private static Goal currentGoal;
     private static JLabel goalStatusLabel;
 
-    public CreateGoals() {
-        setTitle("Goal Creator");
-        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+    public CreateGoals(App frame) {
+        frame.setTitle("Goal Creator");
         setLayout(new GridBagLayout());
         setSize(500, 500);
-        setLocationRelativeTo(null);
         createGUI();
     }
 
@@ -88,7 +88,9 @@ public class CreateGoals extends JFrame {
         add(goalStatusLabel, c);
 
         //create exit button
-        JButton exitButton = new JButton("Exit Goal Creator");
+
+        //NOTE do not need exitButton
+        /*JButton exitButton = new JButton("Exit Goal Creator");
         exitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
@@ -105,7 +107,7 @@ public class CreateGoals extends JFrame {
         //c.anchor = GridBagConstraints.SOUTHWEST;
         //c.weightx = 1;
         //c.weighty = 1;
-        add(exitPanel, c);
+        add(exitPanel, c);*/
 
         revalidate();
         repaint();
