@@ -1,11 +1,14 @@
 package MyFitness;
 
+import MyFitness.RyanStuff.CalorieTracker;
+import MyFitness.RyanStuff.CreateGoals;
+import MyFitness.User.Settings;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class NavBar extends JPanel {
-    public NavBar(JFrame frame) {
-        //NOTE: TESTING
+    public NavBar(App frame) {
         setLayout(new FlowLayout(FlowLayout.LEFT));
         //NOTE: if we want backButton need to store previous frames in like a stack
         /*JButton backButton = new JButton("Back");*/
@@ -18,37 +21,56 @@ public class NavBar extends JPanel {
             frame.revalidate();
             frame.repaint();
         });
+
+        NavBar thisNavBar = this;
         JButton exerciseButton = new JButton("Exercise Journal");
         exerciseButton.addActionListener(e -> {
-            //FIXME need to do this for the different pages
+            ExerciseJournal ex = new ExerciseJournal(frame, thisNavBar);
             frame.getContentPane().removeAll();
             frame.getContentPane().add(this);
-            frame.add(new JLabel("Exercise Journal"));
+            frame.add(ex);
             frame.revalidate();
             frame.repaint();
 
         });
+        JButton CalorieTracker = new JButton("Calorie Tracker");
+        CalorieTracker.addActionListener(e -> {
+            CalorieTracker calorieTrackerPannel = new CalorieTracker(frame);
+            frame.getContentPane().removeAll();
 
+            frame.getContentPane().add(this);
+            frame.add(calorieTrackerPannel);
+
+            frame.revalidate();
+            frame.repaint();
+        });
         JButton goalButton = new JButton("Goals");
         goalButton.addActionListener(e -> {
+            CreateGoals goalsPannel = new CreateGoals(frame);
             frame.getContentPane().removeAll();
+
             frame.getContentPane().add(this);
-            frame.add(new JLabel("Goals"));
+            frame.add(goalsPannel);
+
             frame.revalidate();
             frame.repaint();
         });
 
-        JButton Settings = new JButton("Settings");
-        Settings.addActionListener(e -> {
+        JButton settings = new JButton("Settings");
+        //NOTE: pannel has to be created in the actionListner or else it doesnt update the information
+        settings.addActionListener(e -> {
             frame.getContentPane().removeAll();
             frame.getContentPane().add(this);
-            frame.add(new JLabel("Settings"));
+
+            frame.add(frame.getUser().getSettings());
+            frame.setTitle("Settings");
             frame.revalidate();
             frame.repaint();
         });
         add(Home);
         add(exerciseButton);
+        add(CalorieTracker);
         add(goalButton);
-        add(Settings);
+        add(settings);
     }
 }

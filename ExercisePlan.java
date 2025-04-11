@@ -1,4 +1,6 @@
 package MyFitness;
 
-public class ExercisePlan {
+import javax.swing.*;
+
+public class ExercisePlan extends JPanel {
 }
