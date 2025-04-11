@@ -21,12 +21,14 @@ public class NavBar extends JPanel {
             frame.revalidate();
             frame.repaint();
         });
+
+        NavBar thisNavBar = this;
         JButton exerciseButton = new JButton("Exercise Journal");
         exerciseButton.addActionListener(e -> {
-            //FIXME need to do this for the different pages
+            ExerciseJournal ex = new ExerciseJournal(frame, thisNavBar);
             frame.getContentPane().removeAll();
             frame.getContentPane().add(this);
-            frame.add(new JLabel("Exercise Journal"));
+            frame.add(ex);
             frame.revalidate();
             frame.repaint();
 

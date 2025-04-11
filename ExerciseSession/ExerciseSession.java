@@ -1,6 +1,7 @@
 package MyFitness.ExerciseSession;
 
 import MyFitness.ExerciseSession.Workout.*;
+import MyFitness.NavBar;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +12,7 @@ public class ExerciseSession extends JPanel {
     String date;
     Set<Workout> workouts;
 
-    public ExerciseSession(JFrame frame, JPanel journal) {
+    public ExerciseSession(JFrame frame, JPanel journal, NavBar navBar) {
         this.date = null;
         this.workouts = new HashSet<>();
 
@@ -155,7 +156,7 @@ public class ExerciseSession extends JPanel {
         JButton backButton = new JButton("Back");
         backButton.addActionListener(e -> {
             frame.getContentPane().removeAll();
-//                frame.getContentPane().add(navBar);
+            frame.getContentPane().add(navBar);
             frame.add(journal);
             frame.revalidate();
             frame.repaint();

@@ -24,20 +24,17 @@ import java.io.IOException;
 
 public class ExerciseJournal extends JPanel {
 
-    public static void main(String[] args){
+    /*public static void main(String[] args){
         JFrame frame = new JFrame("Exercise Journal");
         ExerciseJournal exerciseJournal = new ExerciseJournal(frame);
         frame.add(exerciseJournal);
         frame.setVisible(true);
-    }
+    }*/
 
-    public ExerciseJournal(JFrame frame) {
+    public ExerciseJournal(App frame, NavBar navBar) {
         frame.setTitle("Exercise Journal");
-        frame.setSize(800, 600);
-        setSize(frame.getWidth(), frame.getHeight());
         setLayout(new GridBagLayout());
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(5,5,5,5);
@@ -56,7 +53,7 @@ public class ExerciseJournal extends JPanel {
         addSession.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().removeAll();
-                frame.add(new ExerciseSession(frame, journal));
+                frame.add(new ExerciseSession(frame, journal, navBar));
                 frame.revalidate();
                 frame.repaint();
             }
@@ -72,8 +69,9 @@ public class ExerciseJournal extends JPanel {
         add(note, c);
 
         // TODO: Modify functionality of exit button.
+        //NOTE do not need exit button
         //Create Exit button that shuts program down
-        JButton exitButton = new JButton("Exit Exercise Journal");
+        /*JButton exitButton = new JButton("Exit Exercise Journal");
         exitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
@@ -91,7 +89,7 @@ public class ExerciseJournal extends JPanel {
         c.insets = new Insets(5, 5, 5, 5);
         c.weightx = 1;
         c.weighty = 1;
-        add(exitButtonPanel, c);
+        add(exitButtonPanel, c);*/
 
         setVisible(true);
     }
