@@ -1,12 +1,16 @@
 package MyFitness.User;
 
+import javax.swing.*;
+
 public class Admin extends User {
 
     public Admin() {
         super();
+        SettingGUI();
     }
     public Admin(String username, String password) {
         super(username, password);
+        SettingGUI();
     }
     @Override
     public String getUserName() {
@@ -25,4 +29,7 @@ public class Admin extends User {
         super.setPassword(password);
     }
 
+    public void SettingGUI(){
+        settings.add(new JLabel("Admin"));
+    }
 }

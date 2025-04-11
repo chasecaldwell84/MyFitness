@@ -1,11 +1,15 @@
 package MyFitness.User;
 
+import javax.swing.*;
+
 public class Trainer extends User {
     public Trainer() {
         super();
+        SettingGUI();
     }
     public Trainer(String name, String password) {
         super(name, password);
+        SettingGUI();
     }
 
     @Override
@@ -23,5 +27,9 @@ public class Trainer extends User {
     @Override
     public void setPassword(String password) {
         super.setPassword(password);
+    }
+
+    public void SettingGUI(){
+        settings.add(new JLabel("Trainer"));
     }
 }

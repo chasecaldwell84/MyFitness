@@ -2,6 +2,7 @@ package MyFitness;
 
 import MyFitness.RyanStuff.CalorieTracker;
 import MyFitness.RyanStuff.CreateGoals;
+import MyFitness.User.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,10 +58,12 @@ public class NavBar extends JPanel {
         JButton settings = new JButton("Settings");
         //NOTE: pannel has to be created in the actionListner or else it doesnt update the information
         settings.addActionListener(e -> {
-            Settings settingsPannel = new Settings(frame);
+
+
             frame.getContentPane().removeAll();
             frame.getContentPane().add(this);
-            frame.add(settingsPannel);
+            frame.add(frame.getUser().getSettings());
+            frame.setTitle("Settings");
             frame.revalidate();
             frame.repaint();
         });
