@@ -1,5 +1,7 @@
 package MyFitness.ExerciseSession.Workout;
 
+import MyFitness.NavBar;
+
 import javax.swing.*;
 import java.awt.*;
 

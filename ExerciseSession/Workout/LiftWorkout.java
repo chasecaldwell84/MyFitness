@@ -1,5 +1,7 @@
 package MyFitness.ExerciseSession.Workout;
 
+import MyFitness.NavBar;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ public class LiftWorkout extends Workout {
         }
     }
 
-    public LiftWorkout(JFrame frame, JPanel session, String workoutName) {
+    public LiftWorkout(JFrame frame, JPanel session, NavBar navBar, String workoutName) {
         super(frame, session, workoutName);
         this.workoutType = WorkoutType.LIFT;
         sets = new ArrayList<LiftSet>();
@@ -48,14 +50,13 @@ public class LiftWorkout extends Workout {
             String reps = repsField.getText();
             JDialog saveDialog = new JDialog(frame, "Save", true);
             if (!weight.isEmpty() && !reps.isEmpty()) {
-//                session.addWorkout(new Workout(workout, Double.parseDouble(weight), Integer.parseInt(reps)));
                 sets.add(new LiftSet(Double.parseDouble(weight), Integer.parseInt(reps)));
                 JOptionPane.showMessageDialog(saveDialog,
                         "Workout: " + workoutName +"\nWeight: " + weight + "\nReps: " + reps,
                         "Workout Saved", JOptionPane.INFORMATION_MESSAGE);
 
                 frame.getContentPane().removeAll();
-//                frame.getContentPane().add(navBar);
+                frame.getContentPane().add(navBar);
                 frame.add(session);
                 frame.revalidate();
                 frame.repaint();
@@ -81,7 +82,7 @@ public class LiftWorkout extends Workout {
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(e -> {
             frame.getContentPane().removeAll();
-//                frame.getContentPane().add(navBar);
+            frame.getContentPane().add(navBar);
             frame.add(session);
             frame.revalidate();
             frame.repaint();

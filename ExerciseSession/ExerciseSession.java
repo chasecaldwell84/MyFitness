@@ -29,7 +29,7 @@ public class ExerciseSession extends JPanel {
         JLabel title = new JLabel("Exercise Session", JLabel.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 20));
         c.gridx = 0;
-        c.gridy = 0;
+        c.gridy = 1;
         c.gridwidth = 2;
         add(title, c);
 
@@ -49,14 +49,14 @@ public class ExerciseSession extends JPanel {
         JTextField nameField = new JTextField(14);
         namePanel.add(nameField);
         namePanel.setVisible(false);
-        c.gridy = 2;
+        c.gridy = 3;
         c.gridwidth = 1;
         add(namePanel, c);
 
         JLabel instructionLabel = new JLabel("Select Workout Type: ");
         instructionLabel.setFont(new Font("Arial", Font.BOLD, 20));
         instructionLabel.setVisible(false);
-        c.gridy = 3;
+        c.gridy = 4;
         add(instructionLabel, c);
 
         JPanel workoutButtons = new JPanel(new FlowLayout());
@@ -83,10 +83,11 @@ public class ExerciseSession extends JPanel {
             }
 
             if(isNewWorkout){
-                currWorkout = new LiftWorkout(frame, session, newWorkoutName);
+                currWorkout = new LiftWorkout(frame, session, navBar, newWorkoutName);
                 workouts.add(currWorkout);
             }
 
+            frame.add(navBar);
             frame.getContentPane().add(currWorkout);
             frame.revalidate();
             frame.repaint();
@@ -115,17 +116,18 @@ public class ExerciseSession extends JPanel {
             }
 
             if(isNewWorkout){
-                currWorkout = new CardioWorkout(frame, session, newWorkoutName);
+                currWorkout = new CardioWorkout(frame, session, navBar, newWorkoutName);
                 workouts.add(currWorkout);
             }
 
+            frame.add(navBar);
             frame.getContentPane().add(currWorkout);
             frame.revalidate();
             frame.repaint();
         });
         workoutButtons.add(cardioButton);
 
-        c.gridy = 4;
+        c.gridy = 5;
         workoutButtons.setVisible(false);
         add(workoutButtons, c);
 
@@ -148,7 +150,7 @@ public class ExerciseSession extends JPanel {
         });
         buttons.add(saveSession);
 
-        c.gridy = 1;
+        c.gridy = 2;
 
         add(buttons, c);
 
@@ -167,7 +169,7 @@ public class ExerciseSession extends JPanel {
         exitButtonPanel.add(backButton);
 
 
-        c.gridy = 5;
+        c.gridy = 6;
         c.anchor = GridBagConstraints.LAST_LINE_END;
         c.weightx = 1;
         c.weighty = 1;
