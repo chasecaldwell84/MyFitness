@@ -72,7 +72,14 @@ public class SignUp extends JDialog {
 
     private boolean isUsernameExists(String username) {
         try {
-            List<String> lines = Files.readAllLines(Paths.get("./src/main/java/MyFitness/resources/UserAuth.csv"));
+            List<String> lines;
+            String operatingSystem = System.getProperty("os.name");
+            if(operatingSystem.startsWith("windows")) {
+                lines = Files.readAllLines(Paths.get("./src/main/java/MyFitness/resources/UserAuth.csv"));
+            }
+            else {
+                lines = Files.readAllLines(Paths.get("resources/UserAuth.csv"));
+            }
             for (String line : lines) {
                 String[] parts = line.split(",");
                 if (parts.length > 0 && parts[0].equals(username)) {

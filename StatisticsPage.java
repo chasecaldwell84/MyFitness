@@ -2,20 +2,23 @@
 
 package MyFitness;
 
+import MyFitness.App;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
-public class StatisticsPage extends JFrame {
+public class StatisticsPage extends JPanel {
 
     static double averageSleep = 0;
     static double averageWorkoutLength = 0;
     static double averageCaloriesBurned = 0;
 
-    static double totalSleep;
-    static double totalWorkoutLength;
-    static double totalCaloriesBurned;
+    private static double totalSleep = 0.0;
+    private static double totalWorkoutLength = 0.0;
+    private static double totalCaloriesBurned = 0.0;
 
     static JLabel[] statLabels = new JLabel[6];
     static boolean[] selectedStat = new boolean[6];
@@ -23,15 +26,12 @@ public class StatisticsPage extends JFrame {
     static Font labelFont = new Font("Arial", Font.BOLD, 20);
     static Font titleFont = new Font("Arial", Font.BOLD, 40);
 
-    static JFrame filterGUI = new JFrame();
+    private JFrame filterGUI = new JFrame();
 
-    public StatisticsPage() {
-        for(int i = 0; i < selectedStat.length; i++){
-            selectedStat[i] = true;
-        }
-        setSize(600,700);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setTitle("Statistics Page");
+    public StatisticsPage(App frame) {
+        Arrays.fill(selectedStat, true);
+        frame.setTitle("Statistics Page");
+        setLayout(new BorderLayout(50, 50));
         createStatsGUI();
         createFilterGUI();
     }
@@ -40,14 +40,19 @@ public class StatisticsPage extends JFrame {
     public void createStatsGUI(){
         SwingUtilities.invokeLater(() -> {
 
-            JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+            removeAll();
+            JPanel titlePanel = new JPanel();
+            titlePanel.setLayout(new BoxLayout(titlePanel,BoxLayout.Y_AXIS));
+            JLabel titleLabel = new JLabel("Statistics",SwingConstants.CENTER);
 
-            JLabel titleLabel = new JLabel("Statistics", SwingConstants.CENTER);
+            titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             titleLabel.setFont(titleFont);
-            mainPanel.add(titleLabel, BorderLayout.NORTH);
 
             JPanel infoPanel = new JPanel();
+
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+            titlePanel.add(Box.createVerticalStrut(80));
+            titlePanel.add(titleLabel);
 
             for(int i = 0; i < statLabels.length; i++){
                 statLabels[i] = new JLabel();
@@ -60,9 +65,9 @@ public class StatisticsPage extends JFrame {
             statLabels[4] = new JLabel("Total Workout: " + totalWorkoutLength);
             statLabels[5] = new JLabel("Total Calories Burned: " + totalCaloriesBurned);
 
-            for(int i = 0; i < statLabels.length; i++){
-                statLabels[i].setFont(labelFont);
-                statLabels[i].setAlignmentX(Component.CENTER_ALIGNMENT);
+            for(JLabel statLabel : statLabels) {
+                statLabel.setFont(labelFont);
+                statLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             }
 
 
@@ -73,30 +78,30 @@ public class StatisticsPage extends JFrame {
                 }
             }
             infoPanel.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createEmptyBorder(0, 10, 0, 10),  // Outer empty border for spacing
-                    BorderFactory.createLineBorder(Color.BLACK, 2)    // Inner line border
+                    BorderFactory.createEmptyBorder(45, 45, 90, 45),  // Outer empty border for spacing
+                    BorderFactory.createLineBorder(Color.BLACK, 5)    // Inner line border
             ));
 
-            mainPanel.add(infoPanel, BorderLayout.CENTER);
+            add(titlePanel,BorderLayout.NORTH);
+            add(infoPanel, BorderLayout.CENTER);
 
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-            JButton exitButton = new JButton("Back");
-            JButton leaderboardButton = new JButton("Experience");
+            JButton experienceButton = new JButton("Experience");
             JButton filterButton = new JButton("Filter");
             JButton exportButton = new JButton("Export");
 
-            buttonPanel.add(exitButton);
-            buttonPanel.add(leaderboardButton);
+            buttonPanel.add(experienceButton);
+            experienceButton.addActionListener(new openExperienceUI());
             buttonPanel.add(filterButton);
             filterButton.addActionListener(new filterGUIButtonListener());
             buttonPanel.add(exportButton);
 
-            mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-            add(mainPanel);
-            setLocationRelativeTo(null);
-            setResizable(false);
+            add(buttonPanel, BorderLayout.SOUTH);
             setVisible(true);
+
+            revalidate();
+            repaint();
+
         });
     }
 
@@ -171,17 +176,13 @@ public class StatisticsPage extends JFrame {
         filterGUI.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        StatisticsPage test = new StatisticsPage();
-    }
-
     class filterGUIButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             showFilterGUI();
         }
     }
-    class filterSelectStat implements ActionListener {
+    static class filterSelectStat implements ActionListener {
 
         JCheckBox filterbox;
 
@@ -211,10 +212,10 @@ public class StatisticsPage extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             createStatsGUI();
-            filterGUI.dispose();
+            filterGUI.setVisible(false);
         }
     }
-    class filterBack implements ActionListener {
+    static class filterBack implements ActionListener {
 
         JFrame filterGUI;
 
@@ -225,6 +226,14 @@ public class StatisticsPage extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             filterGUI.dispose();
+        }
+    }
+
+    static class openExperienceUI implements  ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ExperienceTracker xpUI = new ExperienceTracker();
+
         }
     }
 }

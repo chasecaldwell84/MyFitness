@@ -66,11 +66,25 @@ public class NavBar extends JPanel {
             frame.setTitle("Settings");
             frame.revalidate();
             frame.repaint();
+
+        });
+        JButton statistics = new JButton("Statistics");
+        statistics.addActionListener(e -> {
+            StatisticsPage statsPanel = new StatisticsPage(frame);
+            frame.getContentPane().removeAll();
+
+            frame.getContentPane().add(this);
+            frame.add(statsPanel);
+
+            frame.revalidate();
+            frame.repaint();
+
         });
         add(Home);
         add(exerciseButton);
         add(CalorieTracker);
         add(goalButton);
         add(settings);
+        add(statistics);
     }
 }

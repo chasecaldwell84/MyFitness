@@ -8,6 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Login extends JDialog {
@@ -74,8 +76,14 @@ public class Login extends JDialog {
 
     public void authenicating(String username, String password) throws FileNotFoundException {
         Scanner scanner = null;
+        String operatingSystem = System.getProperty("os.name");
         try{
-            scanner = new Scanner(new File("./src/main/java/MyFitness/resources/UserAuth.csv"));
+            if(operatingSystem.startsWith("windows")) {
+                scanner = new Scanner(new File("./src/main/java/MyFitness/resources/UserAuth.csv"));
+            }
+            else {
+                scanner = new Scanner(new File("resources/UserAuth.csv"));
+            }
         }
         catch(FileNotFoundException e){
             System.out.println(e + " File not found");

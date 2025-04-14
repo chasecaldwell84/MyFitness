@@ -4,21 +4,30 @@ package MyFitness;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class ExperienceTracker {
 
-    static int userLevel = 0;
-    static int userXP = 0;
-    static int nextLevelXP = 0;
+    private static int userLevel = 0;
+    private static int userXP = 0;
+    private static int nextLevelXP = 0;
 
     static Font labelFont = new Font("Arial", Font.BOLD, 20);
     static Font titleFont = new Font("Arial", Font.BOLD, 40);
 
+    JFrame frame;
+
+
+    public ExperienceTracker(){
+        createGUI();
+    }
+
     //Create Experience UI
-    public static void createGUI(){
+    public void createGUI(){
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Experience Tracker");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame = new JFrame("Experience Tracker");
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             frame.setSize(300, 400);
 
             JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
@@ -63,6 +72,7 @@ public class ExperienceTracker {
 
             //add buttons
             buttonPanel.add(exitButton);
+            exitButton.addActionListener(new closeXPUI());
             buttonPanel.add(leaderboardButton);
 
             mainPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -73,8 +83,17 @@ public class ExperienceTracker {
             frame.setVisible(true);
         });
     }
+
+    class closeXPUI implements  ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            frame.dispose();
+        }
+    }
+
+
+
     public static void main(String[] args) {
-        createGUI();
     }
 }
 
