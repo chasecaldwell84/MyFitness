@@ -76,6 +76,7 @@ public class Login extends JDialog {
         Scanner scanner = null;
         try{
             scanner = new Scanner(new File("./src/main/java/MyFitness/resources/UserAuth.csv"));
+            //if you are mac and not work for login and signup, use this address that could be useful. Here: "resources/UserAuth.csv"
         }
         catch(FileNotFoundException e){
             System.out.println(e + " File not found");
