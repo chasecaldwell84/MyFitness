@@ -2,8 +2,6 @@
 
 package MyFitness;
 
-import MyFitness.App;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -64,7 +62,7 @@ public class StatisticsPage extends JPanel {
             statLabels[5] = new JLabel("Total Calories Burned: " + totalCaloriesBurned);
 
             for(JLabel statLabel : statLabels) {
-                statLabel.setFont(App.labelFont);
+                statLabel.setFont(App.boldLabelFontLarge);
                 statLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             }
 
@@ -117,7 +115,7 @@ public class StatisticsPage extends JPanel {
         statLabels[5] = new JLabel("Total Calories Burned: " + totalCaloriesBurned);
 
         for(JLabel statLabel : statLabels) {
-            statLabel.setFont(App.labelFont);
+            statLabel.setFont(App.boldLabelFontLarge);
             statLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         }
         for(int i = 0; i < statLabels.length; i++){
