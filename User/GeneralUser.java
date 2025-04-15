@@ -12,6 +12,14 @@ public class GeneralUser extends User {
         sleepHours = 0;
     }
 
+    public GeneralUser(String userName, String password) {
+        super(userName, password);
+        this.weight = 0;
+        this.calorieIntake = 0;
+        this.sleepHours = 0;
+    }
+
+
     public void trackHealthData () {}
     
     public void setGoals () {}
