@@ -31,7 +31,7 @@ public class AdminPage extends JPanel {
         JPanel listPanel = new JPanel();
 
         JList<String> userList = new JList<>((users.toArray(new String[0])));
-        userList.setFont(App.labelFont);
+        userList.setFont(App.boldLabelFontLarge);
         userList.setAlignmentX(Component.CENTER_ALIGNMENT);
         userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -69,10 +69,6 @@ public class AdminPage extends JPanel {
             users.add("Placeholder("+i+")");
             userPasswords.add("password"+i);
         }
-    }
-
-    public static void main(String[] args) {
-        AdminPage adminPage = new AdminPage();
     }
 
 }
