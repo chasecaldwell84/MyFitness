@@ -3,7 +3,7 @@ package MyFitness;
 import MyFitness.RyanStuff.CalorieTracker;
 import MyFitness.RyanStuff.CreateGoals;
 import MyFitness.User.Settings;
-import MyFitness.User.User
+import MyFitness.User.User;
 
 import javax.swing.*;
 import java.awt.*;
