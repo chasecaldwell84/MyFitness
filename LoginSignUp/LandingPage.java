@@ -16,7 +16,14 @@ public class LandingPage extends JFrame {
         setLayout(new GridBagLayout());
 
         //add logo image
-        ImageIcon logoIcon = new ImageIcon("./src/main/java/MyFitness/resources/images/MyFitnessLogoChose1.jpg");
+        ImageIcon logoIcon;
+        String operatingSystem = System.getProperty("os.name");
+        if(operatingSystem.startsWith("Windows")) {
+            logoIcon = new ImageIcon("./src/main/java/MyFitness/resources/images/MyFitnessLogoChose1.jpg");
+        }
+        else {
+            logoIcon = new ImageIcon("resources/images/MyFitnessLogoChose1.jpg");
+        }
         Image image = logoIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
         JLabel logoLabel = new JLabel(new ImageIcon(image));
 
