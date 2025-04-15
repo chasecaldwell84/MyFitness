@@ -14,6 +14,10 @@ public class App extends JFrame {
     public User getUser() {
         return user;
     }
+
+    private FriendManager friendManager = new FriendManager();
+    public FriendManager getFriendManager() { return friendManager; }
+    
     public App(){
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setTitle("MyFitness");
