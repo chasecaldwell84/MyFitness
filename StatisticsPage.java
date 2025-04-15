@@ -23,10 +23,9 @@ public class StatisticsPage extends JPanel {
     static JLabel[] statLabels = new JLabel[6];
     static boolean[] selectedStat = new boolean[6];
 
-    static Font labelFont = new Font("Arial", Font.BOLD, 20);
-    static Font titleFont = new Font("Arial", Font.BOLD, 40);
 
     private JFrame filterGUI = new JFrame();
+    private JPanel infoPanel;
 
     public StatisticsPage(App frame) {
         Arrays.fill(selectedStat, true);
@@ -36,23 +35,22 @@ public class StatisticsPage extends JPanel {
         createFilterGUI();
     }
 
-    //Create Experience UI
+    //Create Stats UI
     public void createStatsGUI(){
         SwingUtilities.invokeLater(() -> {
 
-            removeAll();
             JPanel titlePanel = new JPanel();
             titlePanel.setLayout(new BoxLayout(titlePanel,BoxLayout.Y_AXIS));
             JLabel titleLabel = new JLabel("Statistics",SwingConstants.CENTER);
 
             titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            titleLabel.setFont(titleFont);
+            titleLabel.setFont(App.titleFont);
 
-            JPanel infoPanel = new JPanel();
-
-            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
             titlePanel.add(Box.createVerticalStrut(80));
             titlePanel.add(titleLabel);
+
+            infoPanel = new JPanel();
+            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 
             for(int i = 0; i < statLabels.length; i++){
                 statLabels[i] = new JLabel();
@@ -66,7 +64,7 @@ public class StatisticsPage extends JPanel {
             statLabels[5] = new JLabel("Total Calories Burned: " + totalCaloriesBurned);
 
             for(JLabel statLabel : statLabels) {
-                statLabel.setFont(labelFont);
+                statLabel.setFont(App.labelFont);
                 statLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             }
 
@@ -83,7 +81,7 @@ public class StatisticsPage extends JPanel {
             ));
 
             add(titlePanel,BorderLayout.NORTH);
-            add(infoPanel, BorderLayout.CENTER);
+            add(infoPanel,BorderLayout.CENTER);
 
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
             JButton experienceButton = new JButton("Experience");
@@ -105,6 +103,38 @@ public class StatisticsPage extends JPanel {
         });
     }
 
+    public void updateStatsGUI(){
+        infoPanel.removeAll();
+        for(int i = 0; i < statLabels.length; i++){
+            statLabels[i] = new JLabel();
+        }
+        statLabels[0] = new JLabel("Average Sleep: " + averageSleep);
+        statLabels[1] = new JLabel("Average Workout: " + averageWorkoutLength);
+        statLabels[2] = new JLabel("Average Calories Burned: " + averageCaloriesBurned);
+
+        statLabels[3] = new JLabel("Total Sleep: " + totalSleep);
+        statLabels[4] = new JLabel("Total Workout: " + totalWorkoutLength);
+        statLabels[5] = new JLabel("Total Calories Burned: " + totalCaloriesBurned);
+
+        for(JLabel statLabel : statLabels) {
+            statLabel.setFont(App.labelFont);
+            statLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        }
+        for(int i = 0; i < statLabels.length; i++){
+            if(selectedStat[i]) {
+                infoPanel.add(Box.createVerticalStrut(25));
+                infoPanel.add(statLabels[i]);
+            }
+        }
+        infoPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(45, 45, 90, 45),  // Outer empty border for spacing
+                BorderFactory.createLineBorder(Color.BLACK, 5)    // Inner line border
+        ));
+        infoPanel.repaint();
+        revalidate();
+        repaint();
+    }
+
     public void createFilterGUI(){
 
         JPanel mainPanel = new JPanel();
@@ -119,7 +149,7 @@ public class StatisticsPage extends JPanel {
         filterGUI.setResizable(false);
 
         JLabel titleLabel = new JLabel("Options");
-        titleLabel.setFont(titleFont);
+        titleLabel.setFont(App.titleFont);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(titleLabel, BorderLayout.NORTH);
 
@@ -211,7 +241,7 @@ public class StatisticsPage extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            createStatsGUI();
+            updateStatsGUI();
             filterGUI.setVisible(false);
         }
     }

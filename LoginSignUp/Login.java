@@ -8,14 +8,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Login extends JDialog {
 
     private Boolean Authenticated = false;
     private User user = null;
+
+    //private Font labelFont = new Font("Arial", Font.BOLD, 14);
+    private Font loginTitleFont = new Font("Arial", Font.BOLD, 40);
+
 
     public User getUser() {
         return user;
@@ -29,17 +31,23 @@ public class Login extends JDialog {
         setModal(true);
         setLayout(new BorderLayout());
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); //NOTE maybe change to hide.on.close
-        setSize(500, 500);
+        setSize(500, 300);
+        setLocationRelativeTo(null);
+
+        JPanel titlePanel = new JPanel();
+        JLabel titleLabel = new JLabel("Login");
+        titleLabel.setFont(loginTitleFont);
+        titlePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titlePanel.add(Box.createVerticalStrut(80));
+        titlePanel.add(titleLabel);
+
         //dialog = new JDialog(frame, "Login", true);
-
         //dialog.setLayout(new BorderLayout());
-
         //dialog.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        JLabel title = new JLabel("Login Page", JLabel.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 20));
+        //JLabel title = new JLabel("Login Page", JLabel.CENTER);
+        //title.setFont(new Font("Arial", Font.BOLD, 20));
         //dialog.add(title, BorderLayout.NORTH);
-
-        add(title, BorderLayout.NORTH);
+        //add(title, BorderLayout.NORTH);
 
         JPanel Username = new JPanel();
         Username.setLayout(new FlowLayout());
@@ -69,8 +77,12 @@ public class Login extends JDialog {
         Username.add(UsernameField);
         Username.add(PasswordLabel);
         Username.add(PasswordField);
-        Username.add(submitButton);
-        add(Username, BorderLayout.NORTH);
+        JPanel submitPanel = new JPanel();
+        submitPanel.add(submitButton);
+
+        add(titlePanel,BorderLayout.NORTH);
+        add(Username, BorderLayout.CENTER);
+        add(submitPanel, BorderLayout.SOUTH);
 
     }
 
