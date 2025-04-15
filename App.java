@@ -4,6 +4,8 @@ import MyFitness.User.User;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class App extends JFrame {
     private User user = new User();
@@ -17,6 +19,10 @@ public class App extends JFrame {
 
     private FriendManager friendManager = new FriendManager();
     public FriendManager getFriendManager() { return friendManager; }
+
+    private List<User> allUsers = new ArrayList<User>();
+    public List<User> getAllUsers() { return allUsers; }
+    public void setAllUsers(List<User> users) { this.allUsers = users; }
     
     public App(){
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
