@@ -3,6 +3,7 @@ package MyFitness;
 import MyFitness.RyanStuff.CalorieTracker;
 import MyFitness.RyanStuff.CreateGoals;
 import MyFitness.User.Settings;
+import MyFitness.User.User
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,16 +58,37 @@ public class NavBar extends JPanel {
         });
 
         JButton socialButton = new JButton("Social");
-        JPanel socialPanel = new JPanel(new GridLayout(3, 1, 10, 10));
         socialButton.addActionListener(e -> {
-            CreateGoals friendPanel = new CreateGoals(frame);
+            JPanel socialPanel = new JPanel(new GridLayout(3, 1, 10, 10));
 
             JButton addFriendButton = new JButton("Add Friend");
             JButton sendChallengeButton = new JButton("Send Challenge");
             JButton viewChallengesButton = new JButton("View Challenges");
 
             addFriendButton.addActionListener(ae -> {
-                JOptionPane.showMessageDialog(frame, "Add Friend clicked!");
+                String friendUsername = JOptionPane.showInputDialog(frame, "Enter friend's username:");
+                if (friendUsername == null || friendUsername.trim().isEmpty()) {
+                    return;
+                }
+
+                FriendManager fm = frame.getFriendManager();
+                User currentUser = frame.getUser();
+
+                // Find the friend by username from all known users (you'll need a way to access them)
+                // For now, assume you have access to a list of all users:
+                User friend = frame.getAllUsers().stream()
+                        .filter(u -> u.getUserName().equalsIgnoreCase(friendUsername.trim()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (friend == null) {
+                    JOptionPane.showMessageDialog(frame, "User not found.");
+                    return;
+                }
+
+                fm.addFriend(currentUser, friend);
+                JOptionPane.showMessageDialog(frame, friend.getUserName() + " added as a friend!");
+                JOptionPane.showMessageDialog(frame, "Added Friend");
             });
 
             sendChallengeButton.addActionListener(ae -> {
