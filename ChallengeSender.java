@@ -91,8 +91,8 @@ public class ChallengeSender extends JPanel {
         });
     }
 
-    public static void main(String[] args) {
-        // TEMPORARY TEST LAUNCH
+   /* public static void main(String[] args) {
+        // test 
         SwingUtilities.invokeLater(() -> {
             User chase = new MyFitness.User.GeneralUser("chase", "pass123");
             User ryan = new MyFitness.User.GeneralUser("ryan", "pass456");
@@ -109,5 +109,5 @@ public class ChallengeSender extends JPanel {
             frame.add(new ChallengeSender(fm, chase));
             frame.setVisible(true);
         });
-    }
+    }*/
 }
