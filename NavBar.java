@@ -56,6 +56,46 @@ public class NavBar extends JPanel {
             frame.repaint();
         });
 
+        JButton socialButton = new JButton("Social");
+        JPanel socialPanel = new JPanel(new GridLayout(3, 1, 10, 10));
+        socialButton.addActionListener(e -> {
+            CreateGoals friendPanel = new CreateGoals(frame);
+
+            JButton addFriendButton = new JButton("Add Friend");
+            JButton sendChallengeButton = new JButton("Send Challenge");
+            JButton viewChallengesButton = new JButton("View Challenges");
+
+            addFriendButton.addActionListener(ae -> {
+                JOptionPane.showMessageDialog(frame, "Add Friend clicked!");
+            });
+
+            sendChallengeButton.addActionListener(ae -> {
+                ChallengeSender sender = new ChallengeSender(frame.getFriendManager(), frame.getUser());
+                frame.getContentPane().removeAll();
+                frame.getContentPane().add(this);
+                frame.add(sender);
+                frame.revalidate();
+                frame.repaint();
+            });
+
+            viewChallengesButton.addActionListener(ae -> {
+                java.util.List<String> challenges = frame.getFriendManager().getChallenges(frame.getUser());
+                JOptionPane.showMessageDialog(frame, String.join("\n", challenges), "Your Challenges", JOptionPane.INFORMATION_MESSAGE);
+            });
+
+            socialPanel.add(addFriendButton);
+            socialPanel.add(sendChallengeButton);
+            socialPanel.add(viewChallengesButton);
+
+            frame.getContentPane().removeAll();
+
+            frame.getContentPane().add(this);
+            frame.add(socialPanel);
+            frame.setTitle("Social Menu");
+            frame.revalidate();
+            frame.repaint();
+        });
+
         JButton settings = new JButton("Settings");
         //NOTE: pannel has to be created in the actionListner or else it doesnt update the information
         settings.addActionListener(e -> {
