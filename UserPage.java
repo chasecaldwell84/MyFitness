@@ -14,7 +14,7 @@ public class UserPage extends JPanel {
     public UserPage(App frame){
         setSize(500,500);
         setLayout(new BorderLayout(10, 10));
-        this.frame = frame;
+        UserPage.frame = frame;
         createGUI();
     }
 
