@@ -1,5 +1,7 @@
 package MyFitness.ExerciseSession.Workout;
 
+import MyFitness.NavBar;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -23,7 +25,7 @@ public class CardioWorkout extends Workout {
         }
     }
 
-    public CardioWorkout(JFrame frame, JPanel session, String workoutName) {
+    public CardioWorkout(JFrame frame, JPanel session, NavBar navBar, String workoutName) {
         super(frame, session, workoutName);
         this.workoutType = WorkoutType.CARDIO;
 
@@ -90,7 +92,7 @@ public class CardioWorkout extends Workout {
                         "Workout Saved", JOptionPane.INFORMATION_MESSAGE);
 
                 frame.getContentPane().removeAll();
-//                frame.getContentPane().add(navBar);
+                frame.getContentPane().add(navBar);
                 frame.add(session);
                 frame.revalidate();
                 frame.repaint();
@@ -114,7 +116,7 @@ public class CardioWorkout extends Workout {
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(e -> {
             frame.getContentPane().removeAll();
-//                frame.getContentPane().add(navBar);
+            frame.getContentPane().add(navBar);
             frame.add(session);
             frame.revalidate();
             frame.repaint();

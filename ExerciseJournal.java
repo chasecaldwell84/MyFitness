@@ -53,6 +53,7 @@ public class ExerciseJournal extends JPanel {
         addSession.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().removeAll();
+                frame.add(navBar);
                 frame.add(new ExerciseSession(frame, journal, navBar));
                 frame.revalidate();
                 frame.repaint();
