@@ -36,7 +36,7 @@ public class AdminPage extends JPanel {
         userList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JScrollPane scrollList = new JScrollPane(userList);
-        scrollList.setPreferredSize(new Dimension(400, 600));
+        scrollList.setPreferredSize(new Dimension(400, 450));
 
         listPanel.add(scrollList, BorderLayout.CENTER);
         listPanel.setBorder(BorderFactory.createCompoundBorder(

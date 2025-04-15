@@ -79,7 +79,6 @@ public class UserPage extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("password button pressed");
             if(passwordLabel.getText().equals("(HIDDEN)")){
                 System.out.println("show");
                 passwordLabel.setText(frame.getUser().getPassword());
