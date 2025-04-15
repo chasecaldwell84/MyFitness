@@ -74,7 +74,7 @@ public class SignUp extends JDialog {
         try {
             List<String> lines;
             String operatingSystem = System.getProperty("os.name");
-            if(operatingSystem.startsWith("windows")) {
+            if(operatingSystem.startsWith("Windows")) {
                 lines = Files.readAllLines(Paths.get("./src/main/java/MyFitness/resources/UserAuth.csv"));
             }
             else {
