@@ -133,6 +133,7 @@ public class NavBar extends JPanel {
         add(exerciseButton);
         add(CalorieTracker);
         add(goalButton);
+        add(socialButton);
         add(settings);
     }
 }
