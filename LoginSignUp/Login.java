@@ -90,7 +90,7 @@ public class Login extends JDialog {
         Scanner scanner = null;
         String operatingSystem = System.getProperty("os.name");
         try{
-            if(operatingSystem.startsWith("windows")) {
+            if(operatingSystem.startsWith("Windows")) {
                 scanner = new Scanner(new File("./src/main/java/MyFitness/resources/UserAuth.csv"));
             }
             else {
