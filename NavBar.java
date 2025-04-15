@@ -71,7 +71,8 @@ public class NavBar extends JPanel {
                 frame.add(adminPage);
             }
             else {
-                frame.add(frame.getUser().getSettings());
+                UserPage userPage = new UserPage(frame);
+                frame.add(userPage);
             }
 
             frame.revalidate();
