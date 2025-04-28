@@ -1,5 +1,6 @@
 package MyFitness;
 
+import MyFitness.RyanStuff.Goal;
 import MyFitness.User.User;
 
 import java.sql.*;
@@ -12,8 +13,29 @@ public class Database {
             Statement stmt = conn.createStatement();
             stmt.executeUpdate(
                     "CREATE TABLE Users (" +
-                            "USERNAME VARCHAR(255) NOT NULL, " +
+                            "USER_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1) , " +
+                            "USERNAME VARCHAR(255) NOT NULL UNIQUE, " +
                             "PASSWORD VARCHAR(255) NOT NULL " +
+                            ")"
+            );
+            stmt.executeUpdate(
+                    "CREATE TABLE UserStats (" +
+                            "STAT_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY, " +
+                            "SLEEP_HOURS INT, " +
+                            "CALORIES_BURNED INT, " +
+                            "STEPS_TAKEN INT, " +
+                            "STAT_DATE DATE, " +
+                            "FOREIGN KEY (USER_ID) REFERENCES User(USER_ID) " +
+                            ")"
+            );
+            //USERS->USERGOALS: GOAL1, GOAL2
+            stmt.executeUpdate(
+                    "CREATE TABLE UserGoals (" +
+                            "GOAL_ID INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY, " +
+                            "GOAL_TYPE VARCHAR(225) NOT NULL , " +
+                            "GOAL_VALUE INT NOT NULL , " +
+                            "GOAL_LENGTH, " +
+                            "FOREIGN KEY (USER_ID) REFERENCES User(USER_ID) " +
                             ")"
             );
             stmt.close();
@@ -23,7 +45,7 @@ public class Database {
                 e.printStackTrace();
         }
     }
-    public void save(User user){
+    public void saveUser(User user){
         try(Connection conn = DriverManager.getConnection(DB_URL)) {
             if(user.getUserName() != null && findByUsername(user.getUserName()) != null){
                 PreparedStatement ps = conn.prepareStatement(
@@ -77,11 +99,33 @@ public class Database {
             e.printStackTrace();
         }
     }
+    //FIXME needs to save goal to UserGoals table
+    /*public void saveGoal(Goal goal){
+        try(Connection conn = DriverManager.getConnection(DB_URL)){
+            PreparedStatement ps = conn.prepareStatement();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }*/
+    //FIXME needs to return Goal type with all goals so the app can display
+    public Goal getAllGoals(){
+        return null;
+    }
+    //FIXME needs to save stats into userstats table
+    public void saveStats(){
+
+    }
+    //FIXME needs to return stats
+    public void getStats(){
+
+    }
+
     public static void main(String[] args) {
         Database db = new Database();
-        db.save(new User("John", "1234"));
-        db.save(new User("Jane", "5678"));
-        db.save(new User("Jack", "5678"));
+        db.saveUser(new User("John", "1234"));
+        db.saveUser(new User("Jane", "5678"));
+        db.saveUser(new User("Jack", "5678"));
         System.out.println(db.findByUsername("John"));
         System.out.println(db.findByUsername("Jane"));
         db.delete("John");
