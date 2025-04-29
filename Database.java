@@ -193,6 +193,7 @@ public class Database {
                 Goal goal = new Goal(goalLength, goalType, goalValue, goalID);
                 goals.add(goal);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -213,6 +214,7 @@ public class Database {
                         rs.getInt("GOAL_ID")
                 );
             }
+
         }
         catch(SQLException e){
             e.printStackTrace();
@@ -236,8 +238,9 @@ public class Database {
     public static void main(String[] args) {
         Database db = new Database();
         User john = new User("John", "1234");
+        User Jane = new User("Jane", "5678");
         db.saveUser(john);
-        db.saveUser(new User("Jane", "5678"));
+        db.saveUser(Jane);
         db.saveUser(new User("Jack", "5678"));
         System.out.println(db.findByUsername("John"));
         System.out.println(db.findByUsername("Jane"));
@@ -269,6 +272,11 @@ public class Database {
         db.saveGoal(john, update);
         List<Goal> johnsGoals2 = db.findGoalsByUser(john);
         for (Goal g : johnsGoals2) {
+            System.out.println(g);
+        }
+        System.out.println("\n Testing user without any data \n");
+        List<Goal> empty = db.findGoalsByUser(Jane);
+        for (Goal g : empty) {
             System.out.println(g);
         }
 
