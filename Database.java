@@ -10,7 +10,9 @@ import java.util.List;
 
 public class Database {
     private static final String DB_URL = "jdbc:derby:memory:Database;create=true";
-
+    /*
+    * Creates or connects to database, makes tables Users, UserStats, UserGoals
+    */
     public Database() {
         try(Connection conn = DriverManager.getConnection(DB_URL)){
             Statement stmt = conn.createStatement();
@@ -25,7 +27,7 @@ public class Database {
                             "STAT_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
                             "USERNAME VARCHAR(255) NOT NULL, " +
                             "PRIMARY KEY (STAT_ID), " +
-                            "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) " +
+                            "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
                             ")"
             );
             //USERS->USERGOALS: GOAL1, GOAL2
@@ -37,7 +39,7 @@ public class Database {
                             "GOAL_VALUE INT NOT NULL, " +
                             "GOAL_LENGTH VARCHAR(225) NOT NULL, " +
                             "PRIMARY KEY (GOAL_ID), " +
-                            "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) " +
+                            "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE " +
                             ")"
             );
             stmt.close();
@@ -47,6 +49,9 @@ public class Database {
                 e.printStackTrace();
         }
     }
+    /*
+    * saves new user or updates user in database
+    */
     public void saveUser(User user){
         try(Connection conn = DriverManager.getConnection(DB_URL)) {
             if(user.getUserName() != null && findByUsername(user.getUserName()) != null){
@@ -56,6 +61,7 @@ public class Database {
                 ps.setString(1, user.getUserName());
                 ps.setString(2, user.getPassword());
                 ps.executeUpdate();
+                ps.close();
             }
             else{
                 PreparedStatement ps = conn.prepareStatement(
@@ -65,6 +71,8 @@ public class Database {
                 ps.setString(1, user.getUserName());
                 ps.setString(2, user.getPassword());
                 ps.executeUpdate();
+                ps.close();
+
 
             }
         }
@@ -72,6 +80,9 @@ public class Database {
             throw new RuntimeException(e);
         }
     }
+    /*
+    * finds user based off of username returns password and username
+    */
     public User findByUsername(String username) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM Users WHERE USERNAME = ?");
@@ -83,56 +94,30 @@ public class Database {
                         rs.getString("PASSWORD")
                 );
             }
+            ps.close();
+            rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
+    /*
+    * Deletes user based off of username
+    */
     public void delete(String username) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement("DELETE FROM Users WHERE USERNAME = ?");
             ps.setString(1, username);
             ps.executeUpdate();
+            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
-    /*public void saveGoal(User user, Goal goal){
-        try(Connection conn = DriverManager.getConnection(DB_URL)){
-            if(goal.getGoalType() != null && findByGoalType(goal.getGoalType()) != null){
-                PreparedStatement ps = conn.prepareStatement(
-                        "UPDATE UserGoals SET GOAL_TYPE=?, GOAL_VALUE=?, GOAL_LENGTH=? WHERE GOAL_ID=? AND USERNAME = ?"
-                );
-                ps.setString(1, goal.getGoalType());
-                ps.setInt(2, goal.getGoalValue());
-                ps.setString(3, goal.getGoalLength());
-                ps.setInt(4,goal.getID());
-                ps.setString(5, user.getUserName());
-
-                ps.executeUpdate();
-            }
-            else {
-                PreparedStatement ps = conn.prepareStatement(
-                        "INSERT INTO UserGoals (USERNAME, GOAL_TYPE, GOAL_VALUE, GOAL_LENGTH ) VALUES (?, ?, ?, ?)",
-                        Statement.RETURN_GENERATED_KEYS
-                );
-                ps.setString(1, user.getUserName());
-                ps.setString(2, goal.getGoalType());
-                ps.setInt(3, goal.getGoalValue());
-                ps.setString(4, goal.getGoalLength());
-                ps.executeUpdate();
-
-                ResultSet keys = ps.getGeneratedKeys();
-                if (keys.next()) {
-                    goal.setID(keys.getInt(1));   // Save the generated GOAL_ID into the Goal object
-                }
-            }
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }*/
+    /*
+    * Saves goal to a specific user or updates goal for that specific user if
+    * the type, and length matches
+    */
     public void saveGoal(User user, Goal goal){
         try(Connection conn = DriverManager.getConnection(DB_URL)){
             PreparedStatement ps = conn.prepareStatement(
@@ -152,6 +137,8 @@ public class Database {
                 update.setInt(1, goal.getGoalValue());
                 update.setInt(2, existingGoalID);
                 update.executeUpdate();
+                ps.close();
+                rs.close();
             }
             else {
                 PreparedStatement ps2 = conn.prepareStatement(
@@ -168,12 +155,18 @@ public class Database {
                 if (keys.next()) {
                     goal.setID(keys.getInt(1));   // Save the generated GOAL_ID into the Goal object
                 }
+                ps2.close();
+                keys.close();
             }
+
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
     }
+    /*
+    * Returns all of the goals for one user
+    */
     public List<Goal> findGoalsByUser(User user) {
         List<Goal> goals = new ArrayList<>();
 
@@ -193,13 +186,17 @@ public class Database {
                 Goal goal = new Goal(goalLength, goalType, goalValue, goalID);
                 goals.add(goal);
             }
-
+            ps.close();
+            rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return goals;
     }
+    /*
+    * finds the goal based off of its type aka weight,sleep,calories
+    */
     public Goal findByGoalType(String goalType){
         try(Connection conn = DriverManager.getConnection(DB_URL)){
             PreparedStatement ps = conn.prepareStatement("SELECT " +
@@ -214,7 +211,8 @@ public class Database {
                         rs.getInt("GOAL_ID")
                 );
             }
-
+            ps.close();
+            rs.close();
         }
         catch(SQLException e){
             e.printStackTrace();
@@ -222,10 +220,6 @@ public class Database {
         return null;
     }
 
-    //FIXME needs to return Goal type with all goals so the app can display
-    public Goal getAllGoals(){
-        return null;
-    }
     //FIXME needs to save stats into userstats table
     public void saveStats(){
 
@@ -234,17 +228,43 @@ public class Database {
     public void getStats(){
 
     }
+    /*
+    * Returns all users this is for admin settings page.
+    */
+    public List<User> getAllUsers(){
+        List<User> users = new ArrayList<>();
+        try(Connection conn = DriverManager.getConnection(DB_URL)){
+
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM Users");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                users.add(new User(
+                        rs.getString("USERNAME"),
+                        rs.getString("PASSWORD")
+                ));
+            }
+            ps.close();
+            rs.close();
+
+
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return users;
+    }
 
     public static void main(String[] args) {
         Database db = new Database();
         User john = new User("John", "1234");
         User Jane = new User("Jane", "5678");
+        User Jack = new User("Jack", "5678");
         db.saveUser(john);
         db.saveUser(Jane);
-        db.saveUser(new User("Jack", "5678"));
+        db.saveUser(Jack);
         System.out.println(db.findByUsername("John"));
-        System.out.println(db.findByUsername("Jane"));
-        db.delete("Jane");
+        System.out.println(db.findByUsername("Jane") + "\n");
+
 
         System.out.println(db.findByUsername("John"));
         Goal goal = new Goal("Year", "Weight", 170);
@@ -274,11 +294,29 @@ public class Database {
         for (Goal g : johnsGoals2) {
             System.out.println(g);
         }
+
+        System.out.println("\n Testing deleting john user should delete goal data. \n");
+        db.delete("John");
+        List<Goal> johnsGoals3 = db.findGoalsByUser(john);
+        for (Goal g : johnsGoals3) {
+            System.out.println(g);
+        }
+
         System.out.println("\n Testing user without any data \n");
         List<Goal> empty = db.findGoalsByUser(Jane);
         for (Goal g : empty) {
             System.out.println(g);
         }
+        if(empty.isEmpty()){
+            System.out.println("\n Correct \n");
+        }
+
+        System.out.println("\n Testing getting all users should have 2 \n");
+        List<User> allUsers = db.getAllUsers();
+        for (User u : allUsers) {
+            System.out.println(u);
+        }
+
 
     }
 }
