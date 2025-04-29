@@ -10,6 +10,10 @@ import java.util.List;
 public class App extends JFrame {
     private User user = new User();
 
+    public static Font boldLabelFontLarge = new Font("Arial", Font.BOLD, 20);
+    public static Font labelFontLarge = new Font("Arial", Font.PLAIN, 20);
+    public static Font titleFont = new Font("Arial", Font.BOLD, 40);
+
     public void setUser(User user) {
         this.user = user;
     }

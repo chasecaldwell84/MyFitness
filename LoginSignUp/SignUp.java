@@ -72,8 +72,14 @@ public class SignUp extends JDialog {
 
     private boolean isUsernameExists(String username) {
         try {
-            List<String> lines = Files.readAllLines(Paths.get("./src/main/java/MyFitness/resources/UserAuth.csv"));
-            //if you are mac and not work for login and signup, use this address that could be useful. Here: "resources/UserAuth.csv"
+            List<String> lines;
+            String operatingSystem = System.getProperty("os.name");
+            if(operatingSystem.startsWith("Windows")) {
+                lines = Files.readAllLines(Paths.get("./src/main/java/MyFitness/resources/UserAuth.csv"));
+            }
+            else {
+                lines = Files.readAllLines(Paths.get("resources/UserAuth.csv"));
+            }
             for (String line : lines) {
                 String[] parts = line.split(",");
                 if (parts.length > 0 && parts[0].equals(username)) {
@@ -88,7 +94,6 @@ public class SignUp extends JDialog {
 
     private void saveUser(String username, String password) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("./src/main/java/MyFitness/resources/UserAuth.csv", true))) {
-            //if you are mac and not work for login and signup, use this address that could be useful. Here: "resources/UserAuth.csv"
             writer.write(username + "," + password + "," + "User");
             writer.newLine();
         } catch (IOException e) {

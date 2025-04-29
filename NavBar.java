@@ -2,6 +2,7 @@ package MyFitness;
 
 import MyFitness.RyanStuff.CalorieTracker;
 import MyFitness.RyanStuff.CreateGoals;
+import MyFitness.User.Admin;
 import MyFitness.User.Settings;
 import MyFitness.User.User;
 
@@ -121,11 +122,33 @@ public class NavBar extends JPanel {
         JButton settings = new JButton("Settings");
         //NOTE: pannel has to be created in the actionListner or else it doesnt update the information
         settings.addActionListener(e -> {
+            frame.setTitle("Settings");
+
+
             frame.getContentPane().removeAll();
             frame.getContentPane().add(this);
 
-            frame.add(frame.getUser().getSettings());
-            frame.setTitle("Settings");
+            if(frame.getUser() instanceof Admin) {
+                AdminPage adminPage = new AdminPage();
+                frame.add(adminPage);
+            }
+            else {
+                UserPage userPage = new UserPage(frame);
+                frame.add(userPage);
+            }
+
+            frame.revalidate();
+            frame.repaint();
+
+        });
+        JButton statistics = new JButton("Statistics");
+        statistics.addActionListener(e -> {
+            StatisticsPage statsPanel = new StatisticsPage(frame);
+            frame.getContentPane().removeAll();
+
+            frame.getContentPane().add(this);
+            frame.add(statsPanel);
+
             frame.revalidate();
             frame.repaint();
         });
@@ -135,6 +158,6 @@ public class NavBar extends JPanel {
         add(goalButton);
         add(socialButton);
         add(settings);
-        add(socialButton);
+        add(statistics);
     }
 }
