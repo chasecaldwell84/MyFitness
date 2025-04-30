@@ -13,7 +13,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class Login extends JDialog {
-    private Database db;
+    private Database db = Database.getInstance();
     private Boolean Authenticated = false;
     private User user = null;
 
@@ -28,8 +28,8 @@ public class Login extends JDialog {
         return Authenticated;
     }
 
-    public Login(Database db) {
-        this.db = db;
+    public Login() {
+
         setTitle("Login");
         setModal(true);
         setLayout(new BorderLayout());

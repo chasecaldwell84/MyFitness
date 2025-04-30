@@ -9,7 +9,6 @@ import java.util.List;
 
 public class App extends JFrame {
     private User user;
-    private Database db;
     public static Font boldLabelFontLarge = new Font("Arial", Font.BOLD, 20);
     public static Font labelFontLarge = new Font("Arial", Font.PLAIN, 20);
     public static Font titleFont = new Font("Arial", Font.BOLD, 40);
@@ -28,8 +27,7 @@ public class App extends JFrame {
     public List<User> getAllUsers() { return allUsers; }
     public void setAllUsers(List<User> users) { this.allUsers = users; }
     
-    public App(Database db) {
-        this.db = db;
+    public App() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setTitle("MyFitness");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

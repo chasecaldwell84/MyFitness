@@ -7,9 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 
 public class LandingPage extends JFrame {
-    private Database db;
+    private Database db = Database.getInstance();
 
-    public LandingPage(App app, Database db) {
+    public LandingPage(App app) {
         this.db = db;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("MyFitness");
@@ -48,7 +48,7 @@ public class LandingPage extends JFrame {
         add(title, c);
 
         JButton login = new JButton("Login");
-        Login loginPanel = new Login(db);
+        Login loginPanel = new Login();
         /*loginPanel.setLayout(new FlowLayout(FlowLayout.LEFT));*/
         //login.setBounds(150, 235, 100, 30);
         login.addActionListener(e -> {
@@ -63,13 +63,13 @@ public class LandingPage extends JFrame {
         });
 
         JButton signUp = new JButton("Sign Up");
-        SignUp signUpPanel = new SignUp(db);
-        //signUp.setBounds(150, 265, 100, 30);
+        SignUp signUpPanel = new SignUp();
+
         signUp.addActionListener(e -> {
             signUpPanel.setVisible(true);
         });
 
-        /*pack();*/
+
         GridBagConstraints loginPlace = new GridBagConstraints();
         loginPlace.gridx = 0;
         loginPlace.gridy = 2; //new location

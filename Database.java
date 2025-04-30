@@ -289,7 +289,7 @@ public class Database {
     }
 
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         Database db = new Database();
         GeneralUser john = new GeneralUser("John", "1234");
         GeneralUser Jane = new GeneralUser("Jane", "5678");
@@ -386,6 +386,5 @@ public class Database {
         db.saveUser(test1);
         db.saveUser(test2);
 
-
-    }
+    }*/
 }

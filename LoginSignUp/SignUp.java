@@ -11,13 +11,12 @@ import java.util.List;
 
 //FIXME does not work like login where you cant click on landing page
 public class SignUp extends JDialog {
-    private Database db;
+    private Database db = Database.getInstance();
     private JTextField usernameField;
     private JPasswordField passwordField, passwordDoubleField;
     private JButton submitButton;
 
-    public SignUp(Database db) {
-        this.db = db;
+    public SignUp() {
         setTitle("Sign-Up");
         setSize(350, 250);
         setLayout(null);

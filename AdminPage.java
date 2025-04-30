@@ -1,11 +1,14 @@
 package MyFitness;
 
+import MyFitness.User.User;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class AdminPage extends JPanel {
-
+    private Database db = Database.getInstance();
     private ArrayList<String> users;
     private ArrayList<String> userPasswords;
 
@@ -60,15 +63,16 @@ public class AdminPage extends JPanel {
     }
 
     private void readUsers(){
+        List<User> allUsers = db.getAllUsers();
 
         users = new ArrayList<String>();
         userPasswords = new ArrayList<String>();
 
-        //placeholder filler, will replace later with actual reading of userAuth.csv
-        for(int i = 0; i < 50; i++){
-            users.add("Placeholder("+i+")");
-            userPasswords.add("password"+i);
-        }
+        //FIXME see what larry wants later for the format of the loops
+        allUsers.forEach(user -> {
+            users.add(user.getUserName());
+            userPasswords.add(user.getPassword());
+        });
     }
 
 }
