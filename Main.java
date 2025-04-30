@@ -12,6 +12,7 @@ public class Main {
         db.saveUser(new Admin("Michael", "1234"));
         db.saveUser(new Admin("Jeremy", "1234"));
         db.saveUser(new Admin("Ryan", "1234"));
+
         App app = new App();
         LandingPage lp = new LandingPage(app);
         lp.setVisible(true);

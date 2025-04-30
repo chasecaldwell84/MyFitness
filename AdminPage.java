@@ -68,7 +68,6 @@ public class AdminPage extends JPanel {
         users = new ArrayList<String>();
         userPasswords = new ArrayList<String>();
 
-        //FIXME see what larry wants later for the format of the loops
         allUsers.forEach(user -> {
             users.add(user.getUserName());
             userPasswords.add(user.getPassword());

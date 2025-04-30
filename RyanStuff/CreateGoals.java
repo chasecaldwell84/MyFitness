@@ -1,6 +1,7 @@
 package MyFitness.RyanStuff;
 
 import MyFitness.App;
+import MyFitness.Database;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class CreateGoals extends JPanel {
+    private Database db = Database.getInstance();
     private static Goal currentGoal;
     private static JLabel goalStatusLabel;
 
@@ -57,6 +59,9 @@ public class CreateGoals extends JPanel {
                         JOptionPane.showMessageDialog(CreateGoals.this, "Goal Value must be greater than zero");
                     } else{
                         currentGoal = new Goal(selectedGoalLength, selectedGoalType, goalValue);
+                        /*NOTE: could update database here but i need to know the user so i can store it under so either the
+                        *  CreateGoals page could know about the user or the user could have a list of goals that it stores
+                        * */
                         updateGoalStatus();
                     }
                 } catch (NumberFormatException ex){
