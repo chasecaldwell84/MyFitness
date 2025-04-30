@@ -1,6 +1,8 @@
 package MyFitness.LoginSignUp;
 
+import MyFitness.Database;
 import MyFitness.User.Admin;
+import MyFitness.User.GeneralUser;
 import MyFitness.User.Trainer;
 import MyFitness.User.User;
 
@@ -11,7 +13,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class Login extends JDialog {
-
+    private Database db;
     private Boolean Authenticated = false;
     private User user = null;
 
@@ -26,7 +28,8 @@ public class Login extends JDialog {
         return Authenticated;
     }
 
-    public Login() {
+    public Login(Database db) {
+        this.db = db;
         setTitle("Login");
         setModal(true);
         setLayout(new BorderLayout());
@@ -86,7 +89,7 @@ public class Login extends JDialog {
 
     }
 
-    public void authenicating(String username, String password) throws FileNotFoundException {
+    /*public void authenicating(String username, String password) throws FileNotFoundException {
         Scanner scanner = null;
         String operatingSystem = System.getProperty("os.name");
         try{
@@ -126,7 +129,7 @@ public class Login extends JDialog {
             String line = scanner.nextLine().trim();
             String [] values = line.split(",");
 
-            /*if(values.length != headers.length){}*/
+            *//*if(values.length != headers.length){}*//*
             String Usernameinput = values[UsernameINDEX].trim();
             String Passwordinput = values[PasswordINDEX].trim();
             TypeInput = values[TypeIndex].trim();
@@ -166,5 +169,36 @@ public class Login extends JDialog {
             JOptionPane.showMessageDialog(this, "You have an incorrect username/password");
         }
         scanner.close();
+    }*/
+    public void authenicating(String username, String password) throws FileNotFoundException {
+        User user1 = db.findByUsername(username);
+
+        if(user1 != null && user1.getPassword() != null && user1.getPassword().equals(password)){
+            Authenticated = true;
+        }
+        else{
+            Authenticated = false;
+        }
+
+
+        if(Authenticated){
+            JOptionPane.showMessageDialog(this, "You have successfully logged in");
+
+            if(user1 instanceof GeneralUser){
+                user = new GeneralUser(username, password);
+            }
+            else if(user1 instanceof Trainer){
+                user = new Trainer(username, password);
+            }
+            else if(user1 instanceof Admin){
+                user = new Admin(username, password);
+            }
+            dispose();
+        }
+        else{
+            JOptionPane.showMessageDialog(this, "You have an incorrect username/password");
+        }
+
     }
-}
+
+    }

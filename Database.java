@@ -1,15 +1,27 @@
 package MyFitness;
 
 import MyFitness.RyanStuff.Goal;
+import MyFitness.User.Admin;
+import MyFitness.User.GeneralUser;
+import MyFitness.User.Trainer;
 import MyFitness.User.User;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class Database {
-    private static final String DB_URL = "jdbc:derby:memory:Database;create=true";
+    private static final String DB_URL = "jdbc:derby:Database;create=true";
+    private static Database instance;
+
+    public static Database getInstance() {
+        if (instance == null) {
+            instance = new Database();
+        }
+        return instance;
+    }
     /*
     * Creates or connects to database, makes tables Users, UserStats, UserGoals
     */
@@ -19,7 +31,8 @@ public class Database {
             stmt.executeUpdate(
                     "CREATE TABLE Users (" +
                             "USERNAME VARCHAR(255) NOT NULL PRIMARY KEY, " +
-                            "PASSWORD VARCHAR(255) NOT NULL " +
+                            "PASSWORD VARCHAR(255) NOT NULL, " +
+                            "USERTYPE VARCHAR(255) NOT NULL " +
                             ")"
             );
             stmt.executeUpdate(
@@ -65,11 +78,18 @@ public class Database {
             }
             else{
                 PreparedStatement ps = conn.prepareStatement(
-                        "INSERT INTO Users VALUES (?, ?)",
+                        "INSERT INTO Users VALUES (?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS
                 );
                 ps.setString(1, user.getUserName());
                 ps.setString(2, user.getPassword());
+                if (user instanceof Admin) {
+                    ps.setString(3, "admin");
+                } else if (user instanceof Trainer) {
+                    ps.setString(3, "trainer");
+                } else {
+                    ps.setString(3, "general");
+                }
                 ps.executeUpdate();
                 ps.close();
 
@@ -81,6 +101,37 @@ public class Database {
         }
     }
     /*
+     * Returns all users this is for admin settings page.
+     */
+    public List<User> getAllUsers(){
+        List<User> users = new ArrayList<>();
+        try(Connection conn = DriverManager.getConnection(DB_URL)){
+
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM Users");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                if(Objects.equals(rs.getString("USERTYPE"), "admin")){
+                    users.add( new Admin(rs.getString("USERNAME"), rs.getString("PASSWORD")));
+                }
+                else if(Objects.equals(rs.getString("USERTYPE"), "trainer")){
+                    users.add(new Trainer(rs.getString("USERNAME"), rs.getString("PASSWORD")));
+                }
+                else if(Objects.equals(rs.getString("USERTYPE"), "general")){
+                    users.add( new GeneralUser(rs.getString("USERNAME"), rs.getString("PASSWORD")));
+                }
+                else{
+                    throw new SQLException();
+                }
+            }
+            ps.close();
+            rs.close();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+        return users;
+    }
+    /*
     * finds user based off of username returns password and username
     */
     public User findByUsername(String username) {
@@ -89,10 +140,18 @@ public class Database {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return new User(
-                        rs.getString("USERNAME"),
-                        rs.getString("PASSWORD")
-                );
+                if(Objects.equals(rs.getString("USERTYPE"), "admin")){
+                    return new Admin(rs.getString("USERNAME"), rs.getString("PASSWORD"));
+                }
+                else if(Objects.equals(rs.getString("USERTYPE"), "trainer")){
+                    return new Trainer(rs.getString("USERNAME"), rs.getString("PASSWORD"));
+                }
+                else if(Objects.equals(rs.getString("USERTYPE"), "general")){
+                    return new GeneralUser(rs.getString("USERNAME"), rs.getString("PASSWORD"));
+                }
+                else{
+                    throw new SQLException();
+                }
             }
             ps.close();
             rs.close();
@@ -228,37 +287,13 @@ public class Database {
     public void getStats(){
 
     }
-    /*
-    * Returns all users this is for admin settings page.
-    */
-    public List<User> getAllUsers(){
-        List<User> users = new ArrayList<>();
-        try(Connection conn = DriverManager.getConnection(DB_URL)){
 
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM Users");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                users.add(new User(
-                        rs.getString("USERNAME"),
-                        rs.getString("PASSWORD")
-                ));
-            }
-            ps.close();
-            rs.close();
-
-
-        }
-        catch (SQLException e){
-            e.printStackTrace();
-        }
-        return users;
-    }
 
     public static void main(String[] args) {
         Database db = new Database();
-        User john = new User("John", "1234");
-        User Jane = new User("Jane", "5678");
-        User Jack = new User("Jack", "5678");
+        GeneralUser john = new GeneralUser("John", "1234");
+        GeneralUser Jane = new GeneralUser("Jane", "5678");
+        GeneralUser Jack = new GeneralUser("Jack", "5678");
         db.saveUser(john);
         db.saveUser(Jane);
         db.saveUser(Jack);
@@ -316,6 +351,40 @@ public class Database {
         for (User u : allUsers) {
             System.out.println(u);
         }
+        //Testing types of users
+        Admin ad2 = new Admin("jeremy", "5678");
+        Trainer t1 = new Trainer("Michael", "1234");
+        db.saveUser(ad2);
+        db.saveUser(t1);
+
+        User test = db.findByUsername("jeremy");
+        User TrainerTest = db.findByUsername("Michael");
+
+        if(test instanceof Admin){
+            System.out.println("ADMIN");
+        }
+        else{
+            System.out.println("NOT WORKS");
+        }
+
+        if(TrainerTest instanceof Trainer){
+            System.out.println("TRAINER");
+        }
+        else{
+            System.out.println("NOT WORKS");
+        }
+
+        if(test instanceof Trainer){
+            System.out.println("should not see this");
+        }
+        else{
+            System.out.println("WORKS");
+        }
+        //NOTE: trying to save the same name twice to see what it returns
+        GeneralUser test1 = new GeneralUser("John1", "1234");
+        GeneralUser test2 = new GeneralUser("John1", "5678");
+        db.saveUser(test1);
+        db.saveUser(test2);
 
 
     }

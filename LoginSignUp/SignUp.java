@@ -1,5 +1,8 @@
 package MyFitness.LoginSignUp;
 
+import MyFitness.Database;
+import MyFitness.User.GeneralUser;
+
 import javax.swing.*;
 //import java.awt.event.*;
 import java.io.*;
@@ -8,11 +11,13 @@ import java.util.List;
 
 //FIXME does not work like login where you cant click on landing page
 public class SignUp extends JDialog {
+    private Database db;
     private JTextField usernameField;
     private JPasswordField passwordField, passwordDoubleField;
     private JButton submitButton;
 
-    public SignUp() {
+    public SignUp(Database db) {
+        this.db = db;
         setTitle("Sign-Up");
         setSize(350, 250);
         setLayout(null);
@@ -59,13 +64,15 @@ public class SignUp extends JDialog {
             return;
         }
 
-        if (isUsernameExists(username)) {
+        if (db.findByUsername(username) != null) {
             JOptionPane.showMessageDialog(this, "Please change to another username.");
             return;
         }
+        //FIXME need to have button or something to specify type of User for now i will just make it general
 
+        db.saveUser(new GeneralUser(username, password));
 
-        saveUser(username, password);
+        //saveUser(username, password);
         JOptionPane.showMessageDialog(this, "Sign-up successful!");
         dispose();
     }

@@ -90,10 +90,5 @@ public class ExperienceTracker {
             frame.dispose();
         }
     }
-
-
-
-    public static void main(String[] args) {
-    }
 }
 
