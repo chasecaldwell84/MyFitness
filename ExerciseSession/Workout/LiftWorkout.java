@@ -17,6 +17,14 @@ public class LiftWorkout extends Workout {
             this.weight = weight;
             this.reps = reps;
         }
+
+        public double getWeight() {
+            return weight;
+        }
+
+        public int getReps() {
+            return reps;
+        }
     }
 
     public LiftWorkout(JFrame frame, JPanel session, NavBar navBar, String workoutName) {
@@ -93,5 +101,9 @@ public class LiftWorkout extends Workout {
         add(buttonPanel, c);
 
         setVisible(true);
+    }
+
+    public ArrayList<LiftSet> getSets() {
+        return sets;
     }
 }
