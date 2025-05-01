@@ -4,11 +4,14 @@
 package MyFitness.RyanStuff;
 
 import MyFitness.App;
+import MyFitness.Database;
+import MyFitness.User.User;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class CalorieTracker extends JPanel{
 
@@ -23,7 +26,8 @@ public class CalorieTracker extends JPanel{
         setLayout(new GridBagLayout());
         setSize(500, 500);
 
-        calorieReport = new CalorieReport(2000); //change with goals
+        int dailyCalorieGoal = getCalorieGoalForUser(frame.getUser());
+        calorieReport = new CalorieReport(dailyCalorieGoal); //change with goals
         createGUI();
     }
 
@@ -137,6 +141,16 @@ public class CalorieTracker extends JPanel{
         c.gridy = 1;
         c.gridwidth = 2;
         add(reportPanel, c);
+    }
+
+    private int getCalorieGoalForUser(User user){
+        List<Goal> goals = Database.getInstance().findGoalsByUser(user);
+        for(Goal goal : goals){
+            if(goal.getGoalType().equalsIgnoreCase("Calories")){
+                return goal.getGoalValue();
+            }
+        }
+        return 2000;
     }
 
 }

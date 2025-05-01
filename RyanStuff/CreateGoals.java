@@ -2,21 +2,25 @@ package MyFitness.RyanStuff;
 
 import MyFitness.App;
 import MyFitness.Database;
+import MyFitness.User.User;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class CreateGoals extends JPanel {
     private Database db = Database.getInstance();
     private static Goal currentGoal;
     private static JLabel goalStatusLabel;
-
+    private JTextArea allGoalsTextArea;
+    private User currentUser;
     public CreateGoals(App frame) {
         frame.setTitle("Goal Creator");
         setLayout(new GridBagLayout());
         setSize(500, 500);
+        currentUser = frame.getUser();
         createGUI();
     }
 
@@ -58,12 +62,14 @@ public class CreateGoals extends JPanel {
                     if(goalValue <= 0){
                         JOptionPane.showMessageDialog(CreateGoals.this, "Goal Value must be greater than zero");
                     } else{
-                        currentGoal = new Goal(selectedGoalLength, selectedGoalType, goalValue);
+                        currentGoal = new Goal(selectedGoalLength, selectedGoalType, goalValue, currentUser);
                         /*NOTE: could update database here but i need to know the user so i can store it under so either the
                         *  CreateGoals page could know about the user or the user could have a list of goals that it stores
                         * */
+                        db.saveGoal(currentUser, currentGoal);
                         updateGoalStatus();
                     }
+
                 } catch (NumberFormatException ex){
                     JOptionPane.showMessageDialog(CreateGoals.this, "Please enter a valid number for the goal value.",
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -92,6 +98,26 @@ public class CreateGoals extends JPanel {
         c.insets = new Insets(10, 10, 10, 10);
         add(goalStatusLabel, c);
 
+        JButton showAllGoalsButton = new JButton("Show All Goals");
+        showAllGoalsButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                displayAllGoals();
+            }
+        });
+        c.gridx = 0;
+        c.gridy = 3;
+        c.gridwidth = 2;
+        add(showAllGoalsButton, c);
+
+        allGoalsTextArea = new JTextArea(10, 30);
+        allGoalsTextArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(allGoalsTextArea);
+
+        c.gridx = 0;
+        c.gridy = 4;
+        c.gridwidth = 2;
+        add(scrollPane, c);
+
         //create exit button
 
         //NOTE do not need exitButton
@@ -116,6 +142,19 @@ public class CreateGoals extends JPanel {
 
         revalidate();
         repaint();
+    }
+
+    private void displayAllGoals() {
+        List<Goal> goals = db.findGoalsByUser(currentUser);
+        if(goals.isEmpty()){
+            allGoalsTextArea.setText("No Goal Set Yet");
+        } else{
+            StringBuilder sb = new StringBuilder();
+            for(Goal goal : goals){
+                sb.append(goal).append("\n");
+            }
+            allGoalsTextArea.setText(sb.toString());
+        }
     }
 
     private void updateGoalStatus() {
