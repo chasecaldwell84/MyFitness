@@ -1,5 +1,8 @@
 package MyFitness;
 
+import MyFitness.ExerciseSession.Workout.CardioWorkout;
+import MyFitness.ExerciseSession.Workout.LiftWorkout;
+import MyFitness.ExerciseSession.Workout.Workout;
 import MyFitness.RyanStuff.Goal;
 import MyFitness.User.Admin;
 import MyFitness.User.GeneralUser;
@@ -48,11 +51,43 @@ public class Database {
                     "CREATE TABLE UserGoals (" +
                             "GOAL_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
                             "USERNAME VARCHAR(255) NOT NULL, " +
-                            "GOAL_TYPE VARCHAR(225) NOT NULL, " +
+                            "GOAL_TYPE VARCHAR(255) NOT NULL, " +
                             "GOAL_VALUE INT NOT NULL, " +
-                            "GOAL_LENGTH VARCHAR(225) NOT NULL, " +
+                            "GOAL_LENGTH VARCHAR(255) NOT NULL, " +
                             "PRIMARY KEY (GOAL_ID), " +
                             "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE " +
+                            ")"
+            );
+            stmt.executeUpdate(
+                    "CREATE TABLE Workouts (" +
+                            "WORKOUT_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+                            "USERNAME VARCHAR(255) NOT NULL, " +
+                            "WORKOUTNAME VARCHAR(255) NOT NULL, "+
+                            "WORKOUTTYPE VARCHAR(255) NOT NULL, " +
+                            "PRIMARY KEY (WORKOUT_ID), " +
+                            "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE " +
+                            ")"
+            );
+            stmt.executeUpdate(
+                    "CREATE TABLE WeightLifting (" +
+                            "WEIGHTLIFTING_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+                            "WORKOUT_ID INTEGER NOT NULL, " +
+                            "WEIGHT DOUBLE PRECISION NOT NULL, " +
+                            "REPS INTEGER NOT NULL, " +
+                            "PRIMARY KEY (WEIGHTLIFTING_ID), " +
+                            "FOREIGN KEY (WORKOUT_ID) REFERENCES Workouts(WORKOUT_ID) ON DELETE CASCADE " +
+                            ")"
+            );
+            stmt.executeUpdate(
+                    "CREATE TABLE Cardio (" +
+                            "CARDIO_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+                            "WORKOUT_ID INTEGER NOT NULL, " +
+                            "DISTANCE DOUBLE PRECISION NOT NULL, " +
+                            "HOURS INTEGER NOT NULL, " +
+                            "MINUTES INTEGER NOT NULL, " +
+                            "SECONDS INTEGER NOT NULL, " +
+                            "PRIMARY KEY(CARDIO_ID), " +
+                            "FOREIGN KEY (WORKOUT_ID) REFERENCES Workouts(WORKOUT_ID) ON DELETE CASCADE " +
                             ")"
             );
             stmt.close();
@@ -278,6 +313,38 @@ public class Database {
         }
         return null;
     }
+    /*
+    public void SaveWorkout(User user, Workout workout){
+        try(Connection conn  = DriverManager.getConnection(DB_URL)){
+            PreparedStatement ps = conn.prepareStatement(
+                    "SELECT * FROM Workouts WHERE USERNAME = ? AND WORKOUT_ID = ? AND WORKOUTNAME = ? AND WORKOUTTYPE = ?"
+            );
+            ps.setString(1, user.getUserName());
+            ps.setInt(2, workout.getId());
+            ps.setString(3, workout.getWorkoutName());
+            if(workout.getWorkoutType() == Workout.WorkoutType.LIFT){
+                LiftWorkout lifting = (LiftWorkout) workout;
+                ps.setString(4, String.valueOf(Workout.WorkoutType.LIFT));
+                PreparedStatement ps2 = conn.prepareStatement(
+                        "UPDATE WeightLifting SET WEIGHT = ? AND REPS = ?"
+                );
+                ps.setDouble(1,);
+            }
+            else {
+                ps.setString(4, String.valueOf(Workout.WorkoutType.CARDIO));
+            }
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        if(workout instanceof LiftWorkout){
+            LiftWorkout liftWorkout = (LiftWorkout) workout;
+        }
+        else{
+            CardioWorkout cardioWorkout = (CardioWorkout) workout;
+        }
+
+    }*/
 
     //FIXME needs to save stats into userstats table
     public void saveStats(){
