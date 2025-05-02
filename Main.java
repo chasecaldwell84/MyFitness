@@ -2,6 +2,7 @@ package MyFitness;
 
 import MyFitness.LoginSignUp.LandingPage;
 import MyFitness.User.Admin;
+import MyFitness.User.Trainer;
 
 import java.io.File;
 
@@ -12,6 +13,7 @@ public class Main {
         db.saveUser(new Admin("Michael", "1234"));
         db.saveUser(new Admin("Jeremy", "1234"));
         db.saveUser(new Admin("Ryan", "1234"));
+        db.saveUser(new Trainer("trainer", "1234"));
 
         App app = new App();
         LandingPage lp = new LandingPage(app);

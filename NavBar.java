@@ -2,8 +2,10 @@ package MyFitness;
 
 import MyFitness.RyanStuff.CalorieTracker;
 import MyFitness.RyanStuff.CreateGoals;
+import MyFitness.RyanStuff.TrainerPage;
 import MyFitness.User.Admin;
 import MyFitness.User.Settings;
+import MyFitness.User.Trainer;
 import MyFitness.User.User;
 
 import javax.swing.*;
@@ -25,21 +27,6 @@ public class NavBar extends JPanel {
         });
 
         NavBar thisNavBar = this;
-        User currUser = frame.getUser();
-
-        //change nav bar is trainer is logged in
-        if(currUser instanceof MyFitness.User.Trainer){
-            JButton trainerPageButton = new JButton("Trainer Page");
-            trainerPageButton.addActionListener(e -> {
-                frame.setTitle("Trainer Panel");
-                frame.getContentPane().removeAll();
-                frame.getContentPane().add(this);
-                frame.add(new MyFitness.RyanStuff.TrainerPage(frame, this, (MyFitness.User.Trainer) currUser));
-                frame.revalidate();
-                frame.repaint();
-            });
-            add(trainerPageButton);
-        }
 
         JButton exerciseButton = new JButton("Exercise Journal");
         exerciseButton.addActionListener(e -> {
@@ -176,18 +163,18 @@ public class NavBar extends JPanel {
         add(settings);
         add(statistics);
 
-        User currentUser2 = frame.getUser();
-        if(currentUser2 instanceof MyFitness.User.Trainer){
-            JButton trainerPageButton = new JButton("Trainer Page");
-            trainerPageButton.addActionListener(e -> {
-                frame.setTitle("Trainer Page");
+        if(frame.getUser() instanceof Trainer) {
+            JButton createPlanButton = new JButton("Create Plan");
+            createPlanButton.addActionListener(e -> {
+                TrainerPage tp = new TrainerPage(frame, this, (Trainer) frame.getUser());
                 frame.getContentPane().removeAll();
                 frame.getContentPane().add(this);
-                frame.add(new MyFitness.RyanStuff.TrainerPage(frame, this, (MyFitness.User.Trainer) currentUser2));
+                frame.add(tp);
+                frame.setTitle("Create Plan");
                 frame.revalidate();
                 frame.repaint();
             });
-            add(trainerPageButton);
+            add(createPlanButton);
         }
     }
 }
