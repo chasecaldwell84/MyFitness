@@ -55,7 +55,7 @@ public class LandingPage extends JFrame {
             loginPanel.setVisible(true);
             if(loginPanel.getAuthenticated()){
                 loginPanel.dispose();
-                app.setUser(loginPanel.getUser());
+                app.setUser(loginPanel.getUser()); //FIXME need the app to know about the user before creating the navbar. Check out constructor for app
 
                 dispose();
                 app.setVisible(true);
