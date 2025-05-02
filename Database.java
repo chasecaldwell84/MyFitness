@@ -55,6 +55,18 @@ public class Database {
                             "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE " +
                             ")"
             );
+            stmt.executeUpdate(
+                    "CREATE TABLE ExercisePlans (" +
+                            "PLAN_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+                            "PLAN_NAME VARCHAR(255) NOT NULL, " +
+                            "EXERCISE VARCHAR(255) NOT NULL, " +
+                            "REPETITIONS VARCHAR(255) NOT NULL, " +
+                            "DURATION INT NOT NULL, " +
+                            "TRAINER_USERNAME VARCHAR(255) NOT NULL, " +
+                            "PRIMARY KEY (PLAN_ID), " +
+                            "FOREIGN KEY (TRAINER_USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
+                            ")"
+            );
             stmt.close();
         }
         catch(SQLException e){
@@ -277,6 +289,23 @@ public class Database {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void saveExercisePlan(String planName, String exercise, String repetitions, int duration, String trainerUsername) throws SQLException {
+        try(Connection conn = DriverManager.getConnection(DB_URL)){
+            PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO ExercisePlans (PLAN_NAME, EXERCISE, REPETITIONS, DURATION, TRAINER_USERNAME) VALUES (?, ?, ?, ?, ?)"
+            );
+            ps.setString(1, planName);
+            ps.setString(2, exercise);
+            ps.setString(3, repetitions);
+            ps.setInt(4, duration);
+            ps.setString(5, trainerUsername);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     //FIXME needs to save stats into userstats table

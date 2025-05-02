@@ -1,4 +1,4 @@
-package MyFitness;
+package MyFitness.RyanStuff;
 
 import javax.swing.*;
 

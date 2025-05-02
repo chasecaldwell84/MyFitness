@@ -1,5 +1,7 @@
 package MyFitness;
 
+import MyFitness.RyanStuff.ExercisePlan;
+
 import javax.swing.*;
 import java.awt.*;
 

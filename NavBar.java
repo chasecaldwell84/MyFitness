@@ -25,6 +25,22 @@ public class NavBar extends JPanel {
         });
 
         NavBar thisNavBar = this;
+        User currUser = frame.getUser();
+
+        //change nav bar is trainer is logged in
+        if(currUser instanceof MyFitness.User.Trainer){
+            JButton trainerPageButton = new JButton("Trainer Page");
+            trainerPageButton.addActionListener(e -> {
+                frame.setTitle("Trainer Panel");
+                frame.getContentPane().removeAll();
+                frame.getContentPane().add(this);
+                frame.add(new MyFitness.RyanStuff.TrainerPage(frame, this, (MyFitness.User.Trainer) currUser));
+                frame.revalidate();
+                frame.repaint();
+            });
+            add(trainerPageButton);
+        }
+
         JButton exerciseButton = new JButton("Exercise Journal");
         exerciseButton.addActionListener(e -> {
             ExerciseJournal ex = new ExerciseJournal(frame, thisNavBar);
@@ -159,5 +175,19 @@ public class NavBar extends JPanel {
         add(socialButton);
         add(settings);
         add(statistics);
+
+        User currentUser2 = frame.getUser();
+        if(currentUser2 instanceof MyFitness.User.Trainer){
+            JButton trainerPageButton = new JButton("Trainer Page");
+            trainerPageButton.addActionListener(e -> {
+                frame.setTitle("Trainer Page");
+                frame.getContentPane().removeAll();
+                frame.getContentPane().add(this);
+                frame.add(new MyFitness.RyanStuff.TrainerPage(frame, this, (MyFitness.User.Trainer) currentUser2));
+                frame.revalidate();
+                frame.repaint();
+            });
+            add(trainerPageButton);
+        }
     }
 }
