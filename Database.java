@@ -313,7 +313,7 @@ public class Database {
         }
         return null;
     }
-    /*
+
     public void SaveWorkout(User user, Workout workout){
         try(Connection conn  = DriverManager.getConnection(DB_URL)){
             PreparedStatement ps = conn.prepareStatement(
@@ -328,7 +328,7 @@ public class Database {
                 PreparedStatement ps2 = conn.prepareStatement(
                         "UPDATE WeightLifting SET WEIGHT = ? AND REPS = ?"
                 );
-                ps.setDouble(1,);
+
             }
             else {
                 ps.setString(4, String.valueOf(Workout.WorkoutType.CARDIO));
@@ -344,7 +344,7 @@ public class Database {
             CardioWorkout cardioWorkout = (CardioWorkout) workout;
         }
 
-    }*/
+    }
 
     //FIXME needs to save stats into userstats table
     public void saveStats(){
