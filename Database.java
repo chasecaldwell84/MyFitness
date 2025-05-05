@@ -62,6 +62,7 @@ public class Database {
                     "CREATE TABLE Workouts (" +
                             "WORKOUT_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
                             "USERNAME VARCHAR(255) NOT NULL, " +
+                            "SESSION_DATE VARCHAR(10) NOT NULL, " +
                             "WORKOUTNAME VARCHAR(255) NOT NULL, "+
                             "WORKOUTTYPE VARCHAR(255) NOT NULL, " +
                             "PRIMARY KEY (WORKOUT_ID), " +
@@ -315,17 +316,18 @@ public class Database {
     }
 
 //    /*
-    public void SaveWorkout(User user, Workout workout){
+    public void SaveWorkout(User user, Workout workout, String sessionDate){
         try(Connection conn  = DriverManager.getConnection(DB_URL)){
             PreparedStatement ps = conn.prepareStatement(
-                    "SELECT * FROM Workouts WHERE USERNAME = ? AND WORKOUT_ID = ? AND WORKOUTNAME = ? AND WORKOUTTYPE = ?"
+                    "SELECT * FROM Workouts WHERE USERNAME = ? AND WORKOUT_ID = ? AND WORKOUTNAME = ? AND SESSION_DATE = ? AND WORKOUTTYPE = ?"
             );
             ps.setString(1, user.getUserName());
             ps.setInt(2, workout.getId());
             ps.setString(3, workout.getWorkoutName());
+            ps.setString(4, sessionDate);
             if(workout.getWorkoutType() == Workout.WorkoutType.LIFT){
                 LiftWorkout lifting = (LiftWorkout) workout;
-                ps.setString(4, String.valueOf(Workout.WorkoutType.LIFT));
+                ps.setString(5, String.valueOf(Workout.WorkoutType.LIFT));
 
                 for(LiftWorkout.LiftSet set : lifting.getSets()){
                     PreparedStatement ps2 = conn.prepareStatement(
@@ -339,7 +341,7 @@ public class Database {
                 ps.executeUpdate();
             }
             else {
-                ps.setString(4, String.valueOf(Workout.WorkoutType.CARDIO));
+                ps.setString(5, String.valueOf(Workout.WorkoutType.CARDIO));
             }
         }
         catch(SQLException e){

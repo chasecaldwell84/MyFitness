@@ -6,6 +6,7 @@ import MyFitness.NavBar;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -217,6 +218,7 @@ public class ExerciseSession extends JPanel {
                     cal.set(Calendar.DAY_OF_MONTH, selectedDay);
                     cal.getTime(); // Force parsing to catch errors
 
+//                    this.date = cal.getTime();
                     java.util.Date selectedDate = cal.getTime();
                     this.setDate(new java.text.SimpleDateFormat("yyyy-MM-dd").format(selectedDate));
                     JOptionPane.showMessageDialog(frame, "Date set to: " + date);
