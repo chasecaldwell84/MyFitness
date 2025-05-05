@@ -314,6 +314,7 @@ public class Database {
         return null;
     }
 
+//    /*
     public void SaveWorkout(User user, Workout workout){
         try(Connection conn  = DriverManager.getConnection(DB_URL)){
             PreparedStatement ps = conn.prepareStatement(
@@ -325,10 +326,17 @@ public class Database {
             if(workout.getWorkoutType() == Workout.WorkoutType.LIFT){
                 LiftWorkout lifting = (LiftWorkout) workout;
                 ps.setString(4, String.valueOf(Workout.WorkoutType.LIFT));
-                PreparedStatement ps2 = conn.prepareStatement(
-                        "UPDATE WeightLifting SET WEIGHT = ? AND REPS = ?"
-                );
 
+                for(LiftWorkout.LiftSet set : lifting.getSets()){
+                    PreparedStatement ps2 = conn.prepareStatement(
+                            "UPDATE WeightLifting SET WEIGHT = ? AND REPS = ?"
+                    );
+                    ps2.setDouble(1,set.getWeight());
+                    ps2.setDouble(2,set.getReps());
+                    ps2.executeUpdate();
+                }
+
+                ps.executeUpdate();
             }
             else {
                 ps.setString(4, String.valueOf(Workout.WorkoutType.CARDIO));
@@ -344,7 +352,7 @@ public class Database {
             CardioWorkout cardioWorkout = (CardioWorkout) workout;
         }
 
-    }
+    }//*/
 
     //FIXME needs to save stats into userstats table
     public void saveStats(){

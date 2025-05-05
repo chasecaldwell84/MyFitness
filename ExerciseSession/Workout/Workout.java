@@ -6,7 +6,7 @@ import MyFitness.NavBar;
 import javax.swing.*;
 import java.awt.*;
 
-public class Workout extends JPanel {
+public abstract class Workout extends JPanel {
 
     public enum WorkoutType {
         LIFT,
