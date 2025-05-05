@@ -1,8 +1,9 @@
 package MyFitness.ExerciseSession;
 
+import MyFitness.Database;
 import MyFitness.ExerciseSession.Workout.*;
 import MyFitness.NavBar;
-import MyFitness.Database;
+//import MyFitness.Database;
 import MyFitness.User.User;
 
 import javax.swing.*;
