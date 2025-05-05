@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 
 public class TrainerPage extends JPanel {
 
+
     private Database db = Database.getInstance();
 
     public TrainerPage(App frame, NavBar navBar, Trainer trainer) {
@@ -83,8 +84,7 @@ public class TrainerPage extends JPanel {
                 }
 
                 try{
-                    int durationInMinutes = Integer.parseInt(duration);
-                    db.saveExercisePlan(planName, exercise, repetitions, Integer.parseInt(duration), trainer.getUserName());
+                    db.saveTrainerPlan(planName, exercise, repetitions, Integer.parseInt(duration), trainer.getUserName());
                     JOptionPane.showMessageDialog(frame, "Plan created successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
                     planNameField.setText("");

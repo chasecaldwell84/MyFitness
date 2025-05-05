@@ -2,7 +2,8 @@ package MyFitness;
 
 import MyFitness.RyanStuff.CalorieTracker;
 import MyFitness.RyanStuff.CreateGoals;
-import MyFitness.RyanStuff.TrainerPage;
+import MyFitness.RyanStuff.PlansPage;
+//import MyFitness.RyanStuff.TrainerPage;
 import MyFitness.User.Admin;
 import MyFitness.User.Settings;
 import MyFitness.User.Trainer;
@@ -12,6 +13,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class NavBar extends JPanel {
+    
     public NavBar(App frame) {
         setLayout(new FlowLayout(FlowLayout.LEFT));
         //NOTE: if we want backButton need to store previous frames in like a stack
@@ -155,6 +157,18 @@ public class NavBar extends JPanel {
             frame.revalidate();
             frame.repaint();
         });
+
+        JButton plansButton = new JButton("Plans");
+        plansButton.addActionListener(e -> {
+            User currentUser = frame.getUser();
+            PlansPage plansPage = new PlansPage(frame, this, currentUser);
+            frame.getContentPane().removeAll();
+            frame.getContentPane().add(this);
+            frame.add(plansPage);
+            frame.revalidate();
+            frame.repaint();
+        });
+
         add(Home);
         add(exerciseButton);
         add(CalorieTracker);
@@ -162,19 +176,6 @@ public class NavBar extends JPanel {
         add(socialButton);
         add(settings);
         add(statistics);
-
-        if(frame.getUser() instanceof Trainer) {
-            JButton createPlanButton = new JButton("Create Plan");
-            createPlanButton.addActionListener(e -> {
-                TrainerPage tp = new TrainerPage(frame, this, (Trainer) frame.getUser());
-                frame.getContentPane().removeAll();
-                frame.getContentPane().add(this);
-                frame.add(tp);
-                frame.setTitle("Create Plan");
-                frame.revalidate();
-                frame.repaint();
-            });
-            add(createPlanButton);
-        }
+        add(plansButton);
     }
 }

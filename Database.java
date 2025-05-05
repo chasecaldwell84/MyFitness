@@ -56,15 +56,15 @@ public class Database {
                             ")"
             );
             stmt.executeUpdate(
-                    "CREATE TABLE ExercisePlans (" +
+                    "CREATE TABLE TrainerPlans (" +
                             "PLAN_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
                             "PLAN_NAME VARCHAR(255) NOT NULL, " +
-                            "EXERCISE VARCHAR(255) NOT NULL, " +
-                            "REPETITIONS VARCHAR(255) NOT NULL, " +
+                            "EXERCISE VARCHAR(225) NOT NULL, " +
+                            "REPETITIONS VARCHAR(225) NOT NULL, " +
                             "DURATION INT NOT NULL, " +
-                            "TRAINER_USERNAME VARCHAR(255) NOT NULL, " +
+                            "TRAINER_USERNAME VARCHAR(225) NOT NULL, " +
                             "PRIMARY KEY (PLAN_ID), " +
-                            "FOREIGN KEY (TRAINER_USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
+                            "FOREIGN KEY (TRAINER_USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE " +
                             ")"
             );
             stmt.close();
@@ -291,15 +291,78 @@ public class Database {
         return null;
     }
 
-    public void saveExercisePlan(String planName, String exercise, String repetitions, int duration, String trainerUsername) throws SQLException {
+    public void saveTrainerPlan(String planName, String exercise, String repetitions, int duration, String trainerUsername) throws SQLException {
         try(Connection conn = DriverManager.getConnection(DB_URL)){
             PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO ExercisePlans (PLAN_NAME, EXERCISE, REPETITIONS, DURATION, TRAINER_USERNAME) VALUES (?, ?, ?, ?, ?)"
+                    "INSERT INTO TrainerPlans (PLAN_NAME, EXERCISE, REPETITIONS, DURATION, TRAINER_USERNAME) VALUES (?, ?, ?, ?, ?)"
             );
             ps.setString(1, planName);
             ps.setString(2, exercise);
             ps.setString(3, repetitions);
             ps.setInt(4, duration);
+            ps.setString(5, trainerUsername);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<String> getTrainerPlanNames(String trainerUsername) {
+        List<String> planNames = new ArrayList<>();
+        try(Connection conn = DriverManager.getConnection(DB_URL)){
+            PreparedStatement ps = conn.prepareStatement(
+                    "SELECT PLAN_NAME FROM TrainerPlans WHERE TRAINER_USERNAME = ?"
+            );
+            ps.setString(1, trainerUsername);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                planNames.add(rs.getString("PLAN_NAME"));
+            }
+
+            ps.close();
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return planNames;
+    }
+
+    public String[] getExercisePlan(String planName, String trainerUsername) throws SQLException {
+        try(Connection conn = DriverManager.getConnection(DB_URL)){
+            PreparedStatement ps = conn.prepareStatement(
+                    "SELECT EXERCISE, REPETITIONS, DURATION FROM TrainerPlans WHERE PLAN_NAME = ? AND TRAINER_USERNAME = ?"
+            );
+            ps.setString(1, planName);
+            ps.setString(2, trainerUsername);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new String[]{
+                        rs.getString("EXERCISE"),
+                        rs.getString("REPETITIONS"),
+                        rs.getString("DURATION")
+                };
+            }
+            ps.close();
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new String[0];
+    }
+
+    public void updateExercisePlan(String planName, String exercise, String repetitions, int duration, String trainerUsername) throws SQLException {
+        try(Connection conn = DriverManager.getConnection(DB_URL)){
+            PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE TrainerPlans SET EXERCISE = ?, REPETITIONS = ?, DURATION = ? " +
+                            "WHERE PLAN_NAME = ? AND TRAINER_USERNAME = ?"
+            );
+            ps.setString(1, exercise);
+            ps.setString(2, repetitions);
+            ps.setInt(3, duration);
+            ps.setString(4, planName);
             ps.setString(5, trainerUsername);
             ps.executeUpdate();
             ps.close();
