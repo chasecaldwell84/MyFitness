@@ -2,6 +2,8 @@ package MyFitness.ExerciseSession;
 
 import MyFitness.ExerciseSession.Workout.*;
 import MyFitness.NavBar;
+import MyFitness.Database;
+import MyFitness.User.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +16,7 @@ public class ExerciseSession extends JPanel {
     String date;
     Set<Workout> workouts;
 
-    public ExerciseSession(JFrame frame, JPanel journal, NavBar navBar) {
+    public ExerciseSession(JFrame frame, JPanel journal, NavBar navBar, User user) {
         this.date = null;
         this.workouts = new HashSet<>();
 
@@ -222,7 +224,19 @@ public class ExerciseSession extends JPanel {
                     java.util.Date selectedDate = cal.getTime();
                     this.setDate(new java.text.SimpleDateFormat("yyyy-MM-dd").format(selectedDate));
                     JOptionPane.showMessageDialog(frame, "Date set to: " + date);
+
+                    workouts.forEach(workout -> {
+                        Database.getInstance().saveWorkout(user, workout, date);
+                    });
+
                     dialog.dispose();
+
+                    frame.getContentPane().removeAll();
+                    frame.getContentPane().add(navBar);
+                    frame.add(journal);
+                    frame.revalidate();
+                    frame.repaint();
+
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(dialog, "Invalid date selected.", "Error", JOptionPane.ERROR_MESSAGE);
                 }

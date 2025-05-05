@@ -62,7 +62,7 @@ public class Database {
                     "CREATE TABLE Workouts (" +
                             "WORKOUT_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
                             "USERNAME VARCHAR(255) NOT NULL, " +
-                            "SESSION_DATE VARCHAR(10) NOT NULL, " +
+                            "SESSION_DATE VARCHAR(225) NOT NULL, " +
                             "WORKOUTNAME VARCHAR(255) NOT NULL, "+
                             "WORKOUTTYPE VARCHAR(255) NOT NULL, " +
                             "PRIMARY KEY (WORKOUT_ID), " +
@@ -316,7 +316,7 @@ public class Database {
     }
 
 //    /*
-    public void SaveWorkout(User user, Workout workout, String sessionDate){
+    public void saveWorkout(User user, Workout workout, String sessionDate){
         try(Connection conn  = DriverManager.getConnection(DB_URL)){
             PreparedStatement ps = conn.prepareStatement(
                     "SELECT * FROM Workouts WHERE USERNAME = ? AND WORKOUT_ID = ? AND WORKOUTNAME = ? AND SESSION_DATE = ? AND WORKOUTTYPE = ?"
@@ -331,18 +331,28 @@ public class Database {
 
                 for(LiftWorkout.LiftSet set : lifting.getSets()){
                     PreparedStatement ps2 = conn.prepareStatement(
-                            "UPDATE WeightLifting SET WEIGHT = ? AND REPS = ?"
+                            "UPDATE WeightLifting SET WEIGHT = ? AND REPS = ? AND WORKOUT_ID = ?"
                     );
                     ps2.setDouble(1,set.getWeight());
                     ps2.setDouble(2,set.getReps());
+                    ps2.setInt(3, workout.getId());
                     ps2.executeUpdate();
                 }
-
-                ps.executeUpdate();
             }
             else {
+                CardioWorkout cardio = (CardioWorkout) workout;
                 ps.setString(5, String.valueOf(Workout.WorkoutType.CARDIO));
+                PreparedStatement ps2 = conn.prepareStatement(
+                        "UPDATE Cardio SET WORKOUT_ID = ? AND DISTANCE = ? AND HOURS = ? AND MINUTES = ? AND SECONDS = ?"
+                );
+                ps2.setInt(1, workout.getId());
+                ps2.setDouble(2, cardio.getDistance());
+                ps2.setDouble(3, cardio.getHours());
+                ps2.setDouble(4, cardio.getMinutes());
+                ps2.setDouble(5, cardio.getSeconds());
+                ps2.executeUpdate();
             }
+            ps.executeUpdate();
         }
         catch(SQLException e){
             e.printStackTrace();

@@ -1,6 +1,7 @@
 package MyFitness;
 
 import MyFitness.ExerciseSession.ExerciseSession;
+import MyFitness.User.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,7 +32,7 @@ public class ExerciseJournal extends JPanel {
         frame.setVisible(true);
     }*/
 
-    public ExerciseJournal(App frame, NavBar navBar) {
+    public ExerciseJournal(App frame, NavBar navBar, User user) {
         frame.setTitle("Exercise Journal");
         setLayout(new GridBagLayout());
 
@@ -54,7 +55,7 @@ public class ExerciseJournal extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 frame.getContentPane().removeAll();
                 frame.add(navBar);
-                frame.add(new ExerciseSession(frame, journal, navBar));
+                frame.add(new ExerciseSession(frame, journal, navBar, user));
                 frame.revalidate();
                 frame.repaint();
             }
