@@ -457,15 +457,11 @@ public class Database {
         else{
             System.out.println("WORKS");
         }
-
         //NOTE: trying to save the same name twice to see what it returns
         GeneralUser test1 = new GeneralUser("John1", "1234");
         GeneralUser test2 = new GeneralUser("John1", "5678");
         db.saveUser(test1);
         db.saveUser(test2);
-
-
-
 
 
     }
