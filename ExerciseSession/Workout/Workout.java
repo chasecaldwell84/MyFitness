@@ -8,6 +8,8 @@ import java.awt.*;
 
 public abstract class Workout extends JPanel {
 
+    public Workout() {}
+
     public enum WorkoutType {
         LIFT,
         CARDIO

@@ -159,7 +159,7 @@ public class ExerciseSession extends JPanel {
             // Months (0–11 in Calendar, displayed as Jan–Dec)
             String[] months = new java.text.DateFormatSymbols().getMonths();
             JComboBox<String> monthBox = new JComboBox<>();
-            monthBox.addItem("Select...");
+            monthBox.addItem(null);
             for (int i = 0; i < 12; i++) {
                 monthBox.addItem(months[i]);
             }
@@ -195,7 +195,7 @@ public class ExerciseSession extends JPanel {
             dc.gridx = 1;
             dialog.add(yearBox, dc);
 
-            // OK and Cancel Buttons
+            // Save and Cancel Buttons
             JButton save = new JButton("Save");
             JButton cancel = new JButton("Cancel");
             dc.gridx = 0; dc.gridy = 3;

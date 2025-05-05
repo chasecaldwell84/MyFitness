@@ -10,9 +10,7 @@ import MyFitness.User.Trainer;
 import MyFitness.User.User;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 public class Database {
@@ -357,27 +355,39 @@ public class Database {
                     LiftWorkout lifting = (LiftWorkout) workout;
 
                     for (LiftWorkout.LiftSet set : lifting.getSets()) {
-                        String updateSql = "UPDATE WeightLifting SET WEIGHT = ?, REPS = ? WHERE WORKOUT_ID = ?";
-                        try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
-                            updateStmt.setDouble(1, set.getWeight());
-                            updateStmt.setDouble(2, set.getReps());
-                            updateStmt.setInt(3, workout.getId());
-                            int rowsAffected = updateStmt.executeUpdate();
+                        boolean updated = false;
 
-                            if (rowsAffected == 0) {
-                                // Insert if update did not affect any rows
-                                String insertSql = "INSERT INTO WeightLifting (WORKOUT_ID, WEIGHT, REPS) VALUES (?, ?, ?)";
-                                try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
-                                    insertStmt.setInt(1, workout.getId());
-                                    insertStmt.setDouble(2, set.getWeight());
-                                    insertStmt.setDouble(3, set.getReps());
-                                    insertStmt.executeUpdate();
+                        if (set.getLiftID() != null) {
+                            String updateSql = "UPDATE WeightLifting SET WEIGHT = ?, REPS = ? WHERE WORKOUT_ID = ? AND WEIGHTLIFTING_ID = ?";
+                            try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                                updateStmt.setDouble(1, set.getWeight());
+                                updateStmt.setDouble(2, set.getReps());
+                                updateStmt.setInt(3, workout.getId());
+                                updateStmt.setInt(4, set.getLiftID());
+                                int rowsAffected = updateStmt.executeUpdate();
+                                updated = rowsAffected > 0;
+                            }
+                        }
+
+                        if (!updated) {
+                            String insertSql = "INSERT INTO WeightLifting (WORKOUT_ID, WEIGHT, REPS) VALUES (?, ?, ?)";
+                            try (PreparedStatement insertStmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
+                                insertStmt.setInt(1, workout.getId());
+                                insertStmt.setDouble(2, set.getWeight());
+                                insertStmt.setDouble(3, set.getReps());
+                                insertStmt.executeUpdate();
+
+                                try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
+                                    if (generatedKeys.next()) {
+                                        int generatedId = generatedKeys.getInt(1);
+                                        set.setLiftID(generatedId);
+                                    }
                                 }
                             }
                         }
                     }
-
-                } else if (workout.getWorkoutType() == Workout.WorkoutType.CARDIO) {
+                }
+                else if (workout.getWorkoutType() == Workout.WorkoutType.CARDIO) {
                     CardioWorkout cardio = (CardioWorkout) workout;
 
                     String updateSql = "UPDATE Cardio SET DISTANCE = ?, HOURS = ?, MINUTES = ?, SECONDS = ? WHERE WORKOUT_ID = ?";
@@ -408,6 +418,70 @@ public class Database {
             e.printStackTrace();
         }
     }
+
+    public Set<Workout> getWorkouts(User user, String sessionDate) {
+        Set<Workout> workouts = new HashSet<>();
+
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            String workoutQuery = "SELECT * FROM Workouts WHERE USERNAME = ? AND SESSION_DATE = ?";
+            try (PreparedStatement ps = conn.prepareStatement(workoutQuery)) {
+                ps.setString(1, user.getUserName());
+                ps.setString(2, sessionDate);
+                ResultSet rs = ps.executeQuery();
+
+                while (rs.next()) {
+                    int workoutId = rs.getInt("WORKOUT_ID");
+                    String workoutName = rs.getString("WORKOUTNAME");
+                    String workoutType = rs.getString("WORKOUTTYPE");
+
+                    if (workoutType.equals("LIFT")) {
+                        LiftWorkout liftWorkout = new LiftWorkout(workoutName);
+                        liftWorkout.setId(workoutId);
+
+                        String liftQuery = "SELECT * FROM WeightLifting WHERE WORKOUT_ID = ?";
+                        try (PreparedStatement liftPs = conn.prepareStatement(liftQuery)) {
+                            liftPs.setInt(1, workoutId);
+                            ResultSet liftRs = liftPs.executeQuery();
+                            while (liftRs.next()) {
+                                double weight = liftRs.getDouble("WEIGHT");
+                                int reps = liftRs.getInt("REPS");
+                                liftWorkout.addSet(new LiftWorkout.LiftSet(weight, reps));
+                            }
+                            liftRs.close();
+                        }
+
+                        workouts.add(liftWorkout);
+                    } else if (workoutType.equals("CARDIO")) {
+                        String cardioQuery = "SELECT * FROM Cardio WHERE WORKOUT_ID = ?";
+                        try (PreparedStatement cardioPs = conn.prepareStatement(cardioQuery)) {
+                            cardioPs.setInt(1, workoutId);
+                            ResultSet cardioRs = cardioPs.executeQuery();
+
+                            if (cardioRs.next()) {
+                                double distance = cardioRs.getDouble("DISTANCE");
+                                int hours = cardioRs.getInt("HOURS");
+                                int minutes = cardioRs.getInt("MINUTES");
+                                int seconds = cardioRs.getInt("SECONDS");
+
+                                CardioWorkout cardioWorkout = new CardioWorkout(workoutName, distance, hours, minutes, seconds);
+                                cardioWorkout.setId(workoutId);
+                                workouts.add(cardioWorkout);
+                            }
+
+                            cardioRs.close();
+                        }
+                    }
+                }
+
+                rs.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return workouts;
+    }
+
 
     //FIXME needs to save stats into userstats table
     public void saveStats(){
