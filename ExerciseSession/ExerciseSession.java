@@ -1,10 +1,15 @@
 package MyFitness.ExerciseSession;
 
+import MyFitness.Database;
 import MyFitness.ExerciseSession.Workout.*;
 import MyFitness.NavBar;
+//import MyFitness.Database;
+import MyFitness.User.User;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,7 +17,7 @@ public class ExerciseSession extends JPanel {
     String date;
     Set<Workout> workouts;
 
-    public ExerciseSession(JFrame frame, JPanel journal, NavBar navBar) {
+    public ExerciseSession(JFrame frame, JPanel journal, NavBar navBar, User user) {
         this.date = null;
         this.workouts = new HashSet<>();
 
@@ -146,8 +151,105 @@ public class ExerciseSession extends JPanel {
         JButton saveSession = new JButton("Save Session");
         saveSession.setPreferredSize(buttonsSize);
         saveSession.addActionListener(e -> {
+            JDialog dialog = new JDialog(frame, "Select Date", true);
+            dialog.setLayout(new GridBagLayout());
+            GridBagConstraints dc = new GridBagConstraints();
+            dc.insets = new Insets(5, 5, 5, 5);
 
+            // Months (0–11 in Calendar, displayed as Jan–Dec)
+            String[] months = new java.text.DateFormatSymbols().getMonths();
+            JComboBox<String> monthBox = new JComboBox<>();
+            monthBox.addItem(null);
+            for (int i = 0; i < 12; i++) {
+                monthBox.addItem(months[i]);
+            }
+
+            // Days (1–31)
+            JComboBox<Integer> dayBox = new JComboBox<>();
+            dayBox.addItem(null);
+            for (int i = 1; i <= 31; i++) {
+                dayBox.addItem(i);
+            }
+
+            // Years (e.g., from currentYear - 5 to currentYear + 5)
+            JComboBox<Integer> yearBox = new JComboBox<>();
+            yearBox.addItem(null);
+            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+            for (int i = currentYear - 5; i <= currentYear + 5; i++) {
+                yearBox.addItem(i);
+            }
+
+            // Add components to dialog
+            dc.gridx = 0; dc.gridy = 0;
+            dialog.add(new JLabel("Month:"), dc);
+            dc.gridx = 1;
+            dialog.add(monthBox, dc);
+
+            dc.gridx = 0; dc.gridy = 1;
+            dialog.add(new JLabel("Day:"), dc);
+            dc.gridx = 1;
+            dialog.add(dayBox, dc);
+
+            dc.gridx = 0; dc.gridy = 2;
+            dialog.add(new JLabel("Year:"), dc);
+            dc.gridx = 1;
+            dialog.add(yearBox, dc);
+
+            // Save and Cancel Buttons
+            JButton save = new JButton("Save");
+            JButton cancel = new JButton("Cancel");
+            dc.gridx = 0; dc.gridy = 3;
+            dialog.add(save, dc);
+            dc.gridx = 1;
+            dialog.add(cancel, dc);
+
+            save.addActionListener(ev -> {
+                int selectedMonthIndex = monthBox.getSelectedIndex() - 1; // Adjust for "Select..."
+                Integer selectedDay = (Integer) dayBox.getSelectedItem();
+                Integer selectedYear = (Integer) yearBox.getSelectedItem();
+
+                if (selectedMonthIndex < 0 || selectedDay == null || selectedYear == null) {
+                    JOptionPane.showMessageDialog(dialog, "Please select month, day, and year.", "Incomplete Input", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                try {
+                    Calendar cal = Calendar.getInstance();
+                    cal.setLenient(false); // Ensure invalid dates throw exceptions
+                    cal.set(Calendar.YEAR, selectedYear);
+                    cal.set(Calendar.MONTH, selectedMonthIndex);
+                    cal.set(Calendar.DAY_OF_MONTH, selectedDay);
+                    cal.getTime(); // Force parsing to catch errors
+
+//                    this.date = cal.getTime();
+                    java.util.Date selectedDate = cal.getTime();
+                    this.setDate(new java.text.SimpleDateFormat("yyyy-MM-dd").format(selectedDate));
+                    JOptionPane.showMessageDialog(frame, "Date set to: " + date);
+
+                    workouts.forEach(workout -> {
+                        Database.getInstance().saveWorkout(user, workout, date);
+                    });
+
+                    dialog.dispose();
+
+                    frame.getContentPane().removeAll();
+                    frame.getContentPane().add(navBar);
+                    frame.add(journal);
+                    frame.revalidate();
+                    frame.repaint();
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(dialog, "Invalid date selected.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+
+            cancel.addActionListener(ev -> dialog.dispose());
+
+            dialog.pack();
+            dialog.setLocationRelativeTo(frame);
+            dialog.setVisible(true);
         });
+
         buttons.add(saveSession);
 
         c.gridy = 2;

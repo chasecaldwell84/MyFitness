@@ -1,5 +1,8 @@
 package MyFitness;
 
+import MyFitness.ExerciseSession.Workout.CardioWorkout;
+import MyFitness.ExerciseSession.Workout.LiftWorkout;
+import MyFitness.ExerciseSession.Workout.Workout;
 import MyFitness.RyanStuff.Goal;
 import MyFitness.User.Admin;
 import MyFitness.User.GeneralUser;
@@ -7,9 +10,7 @@ import MyFitness.User.Trainer;
 import MyFitness.User.User;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 public class Database {
@@ -48,11 +49,44 @@ public class Database {
                     "CREATE TABLE UserGoals (" +
                             "GOAL_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
                             "USERNAME VARCHAR(255) NOT NULL, " +
-                            "GOAL_TYPE VARCHAR(225) NOT NULL, " +
+                            "GOAL_TYPE VARCHAR(255) NOT NULL, " +
                             "GOAL_VALUE INT NOT NULL, " +
-                            "GOAL_LENGTH VARCHAR(225) NOT NULL, " +
+                            "GOAL_LENGTH VARCHAR(255) NOT NULL, " +
                             "PRIMARY KEY (GOAL_ID), " +
                             "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE " +
+                            ")"
+            );
+            stmt.executeUpdate(
+                    "CREATE TABLE Workouts (" +
+                            "WORKOUT_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+                            "USERNAME VARCHAR(255) NOT NULL, " +
+                            "SESSION_DATE VARCHAR(225) NOT NULL, " +
+                            "WORKOUTNAME VARCHAR(255) NOT NULL, "+
+                            "WORKOUTTYPE VARCHAR(255) NOT NULL, " +
+                            "PRIMARY KEY (WORKOUT_ID), " +
+                            "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE " +
+                            ")"
+            );
+            stmt.executeUpdate(
+                    "CREATE TABLE WeightLifting (" +
+                            "WEIGHTLIFTING_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+                            "WORKOUT_ID INTEGER NOT NULL, " +
+                            "WEIGHT DOUBLE PRECISION NOT NULL, " +
+                            "REPS INTEGER NOT NULL, " +
+                            "PRIMARY KEY (WEIGHTLIFTING_ID), " +
+                            "FOREIGN KEY (WORKOUT_ID) REFERENCES Workouts(WORKOUT_ID) ON DELETE CASCADE " +
+                            ")"
+            );
+            stmt.executeUpdate(
+                    "CREATE TABLE Cardio (" +
+                            "CARDIO_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+                            "WORKOUT_ID INTEGER NOT NULL, " +
+                            "DISTANCE DOUBLE PRECISION NOT NULL, " +
+                            "HOURS INTEGER NOT NULL, " +
+                            "MINUTES INTEGER NOT NULL, " +
+                            "SECONDS INTEGER NOT NULL, " +
+                            "PRIMARY KEY(CARDIO_ID), " +
+                            "FOREIGN KEY (WORKOUT_ID) REFERENCES Workouts(WORKOUT_ID) ON DELETE CASCADE " +
                             ")"
             );
             stmt.close();
@@ -278,6 +312,176 @@ public class Database {
         }
         return null;
     }
+
+    public void saveWorkout(User user, Workout workout, String sessionDate){
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+
+            // First, check if the workout already exists in the Workouts table
+            String checkSql = "SELECT 1 FROM Workouts WHERE USERNAME = ? AND WORKOUT_ID = ? AND WORKOUTNAME = ? AND SESSION_DATE = ? AND WORKOUTTYPE = ?";
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+                checkStmt.setString(1, user.getUserName());
+                checkStmt.setInt(2, workout.getId());
+                checkStmt.setString(3, workout.getWorkoutName());
+                checkStmt.setString(4, sessionDate);
+                checkStmt.setString(5, workout.getWorkoutType().name());
+
+                ResultSet rs = checkStmt.executeQuery();
+                boolean exists = rs.next();
+                rs.close();
+
+                if (!exists) {
+                    // Insert into Workouts table
+                    String insertWorkoutSql = "INSERT INTO Workouts (USERNAME, WORKOUTNAME, SESSION_DATE, WORKOUTTYPE) VALUES (?, ?, ?, ?)";
+                    try (PreparedStatement insertStmt = conn.prepareStatement(insertWorkoutSql, Statement.RETURN_GENERATED_KEYS)) {
+                        insertStmt.setString(1, user.getUserName());
+                        insertStmt.setString(2, workout.getWorkoutName());
+                        insertStmt.setString(3, sessionDate);
+                        insertStmt.setString(4, workout.getWorkoutType().name());
+                        insertStmt.executeUpdate();
+
+                        // Get the generated workout ID
+                        try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
+                            if (generatedKeys.next()) {
+                                int generatedId = generatedKeys.getInt(1);
+                                workout.setId(generatedId); // Make sure this method exists
+                            } else {
+                                throw new SQLException("Creating workout failed, no ID obtained.");
+                            }
+                        }
+                    }
+                }
+
+                if (workout.getWorkoutType() == Workout.WorkoutType.LIFT) {
+                    LiftWorkout lifting = (LiftWorkout) workout;
+
+                    for (LiftWorkout.LiftSet set : lifting.getSets()) {
+                        boolean updated = false;
+
+                        if (set.getLiftID() != null) {
+                            String updateSql = "UPDATE WeightLifting SET WEIGHT = ?, REPS = ? WHERE WORKOUT_ID = ? AND WEIGHTLIFTING_ID = ?";
+                            try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                                updateStmt.setDouble(1, set.getWeight());
+                                updateStmt.setDouble(2, set.getReps());
+                                updateStmt.setInt(3, workout.getId());
+                                updateStmt.setInt(4, set.getLiftID());
+                                int rowsAffected = updateStmt.executeUpdate();
+                                updated = rowsAffected > 0;
+                            }
+                        }
+
+                        if (!updated) {
+                            String insertSql = "INSERT INTO WeightLifting (WORKOUT_ID, WEIGHT, REPS) VALUES (?, ?, ?)";
+                            try (PreparedStatement insertStmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
+                                insertStmt.setInt(1, workout.getId());
+                                insertStmt.setDouble(2, set.getWeight());
+                                insertStmt.setDouble(3, set.getReps());
+                                insertStmt.executeUpdate();
+
+                                try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
+                                    if (generatedKeys.next()) {
+                                        int generatedId = generatedKeys.getInt(1);
+                                        set.setLiftID(generatedId);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (workout.getWorkoutType() == Workout.WorkoutType.CARDIO) {
+                    CardioWorkout cardio = (CardioWorkout) workout;
+
+                    String updateSql = "UPDATE Cardio SET DISTANCE = ?, HOURS = ?, MINUTES = ?, SECONDS = ? WHERE WORKOUT_ID = ?";
+                    try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                        updateStmt.setDouble(1, cardio.getDistance());
+                        updateStmt.setDouble(2, cardio.getHours());
+                        updateStmt.setDouble(3, cardio.getMinutes());
+                        updateStmt.setDouble(4, cardio.getSeconds());
+                        updateStmt.setInt(5, workout.getId());
+
+                        int rowsAffected = updateStmt.executeUpdate();
+
+                        if (rowsAffected == 0) {
+                            String insertSql = "INSERT INTO Cardio (WORKOUT_ID, DISTANCE, HOURS, MINUTES, SECONDS) VALUES (?, ?, ?, ?, ?)";
+                            try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                                insertStmt.setInt(1, workout.getId());
+                                insertStmt.setDouble(2, cardio.getDistance());
+                                insertStmt.setDouble(3, cardio.getHours());
+                                insertStmt.setDouble(4, cardio.getMinutes());
+                                insertStmt.setDouble(5, cardio.getSeconds());
+                                insertStmt.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Set<Workout> getWorkouts(User user, String sessionDate) {
+        Set<Workout> workouts = new HashSet<>();
+
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            String workoutQuery = "SELECT * FROM Workouts WHERE USERNAME = ? AND SESSION_DATE = ?";
+            try (PreparedStatement ps = conn.prepareStatement(workoutQuery)) {
+                ps.setString(1, user.getUserName());
+                ps.setString(2, sessionDate);
+                ResultSet rs = ps.executeQuery();
+
+                while (rs.next()) {
+                    int workoutId = rs.getInt("WORKOUT_ID");
+                    String workoutName = rs.getString("WORKOUTNAME");
+                    String workoutType = rs.getString("WORKOUTTYPE");
+
+                    if (workoutType.equals("LIFT")) {
+                        LiftWorkout liftWorkout = new LiftWorkout(workoutName);
+                        liftWorkout.setId(workoutId);
+
+                        String liftQuery = "SELECT * FROM WeightLifting WHERE WORKOUT_ID = ?";
+                        try (PreparedStatement liftPs = conn.prepareStatement(liftQuery)) {
+                            liftPs.setInt(1, workoutId);
+                            ResultSet liftRs = liftPs.executeQuery();
+                            while (liftRs.next()) {
+                                double weight = liftRs.getDouble("WEIGHT");
+                                int reps = liftRs.getInt("REPS");
+                                liftWorkout.addSet(new LiftWorkout.LiftSet(weight, reps));
+                            }
+                            liftRs.close();
+                        }
+
+                        workouts.add(liftWorkout);
+                    } else if (workoutType.equals("CARDIO")) {
+                        String cardioQuery = "SELECT * FROM Cardio WHERE WORKOUT_ID = ?";
+                        try (PreparedStatement cardioPs = conn.prepareStatement(cardioQuery)) {
+                            cardioPs.setInt(1, workoutId);
+                            ResultSet cardioRs = cardioPs.executeQuery();
+
+                            if (cardioRs.next()) {
+                                double distance = cardioRs.getDouble("DISTANCE");
+                                int hours = cardioRs.getInt("HOURS");
+                                int minutes = cardioRs.getInt("MINUTES");
+                                int seconds = cardioRs.getInt("SECONDS");
+
+                                CardioWorkout cardioWorkout = new CardioWorkout(workoutName, distance, hours, minutes, seconds);
+                                cardioWorkout.setId(workoutId);
+                                workouts.add(cardioWorkout);
+                            }
+
+                            cardioRs.close();
+                        }
+                    }
+                }
+
+                rs.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return workouts;
+    }
+
 
     //FIXME needs to save stats into userstats table
     public void saveStats(){

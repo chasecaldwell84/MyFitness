@@ -27,7 +27,7 @@ public class NavBar extends JPanel {
         NavBar thisNavBar = this;
         JButton exerciseButton = new JButton("Exercise Journal");
         exerciseButton.addActionListener(e -> {
-            ExerciseJournal ex = new ExerciseJournal(frame, thisNavBar);
+            ExerciseJournal ex = new ExerciseJournal(frame, thisNavBar, frame.getUser());
             frame.getContentPane().removeAll();
             frame.getContentPane().add(this);
             frame.add(ex);

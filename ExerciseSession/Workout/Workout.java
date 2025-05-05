@@ -1,11 +1,15 @@
 package MyFitness.ExerciseSession.Workout;
 
+import MyFitness.Database;
 import MyFitness.NavBar;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class Workout extends JPanel {
+public abstract class Workout extends JPanel {
+
+    public Workout() {}
+
     public enum WorkoutType {
         LIFT,
         CARDIO
@@ -13,6 +17,17 @@ public class Workout extends JPanel {
 
     protected String workoutName;
     protected WorkoutType workoutType;
+
+    public int getId() {
+        return Id;
+    }
+
+    public void setId(int id) {
+        Id = id;
+    }
+
+    protected int Id;
+    protected Database db = Database.getInstance();
 
     public Workout(JFrame frame, JPanel session, String workoutName) {
         this.workoutName = workoutName;
@@ -22,5 +37,8 @@ public class Workout extends JPanel {
 
     public String getWorkoutName() {
         return workoutName;
+    }
+    public WorkoutType getWorkoutType() {
+        return workoutType;
     }
 }

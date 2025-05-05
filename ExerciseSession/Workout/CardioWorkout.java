@@ -25,6 +25,26 @@ public class CardioWorkout extends Workout {
         }
     }
 
+    public double getDistance() {
+        return distance;
+    }
+    public int getHours(){
+        return duration.hours;
+    }
+    public int getMinutes(){
+        return duration.minutes;
+    }
+    public int getSeconds(){
+        return duration.seconds;
+    }
+
+    public CardioWorkout(String workoutName, double distance, int hours, int minutes, int seconds) {
+        this.workoutName = workoutName;
+        this.distance = distance;
+        this.duration = new CardioDuration(hours, minutes, seconds);
+        this.workoutType = WorkoutType.CARDIO;
+    }
+
     public CardioWorkout(JFrame frame, JPanel session, NavBar navBar, String workoutName) {
         super(frame, session, workoutName);
         this.workoutType = WorkoutType.CARDIO;

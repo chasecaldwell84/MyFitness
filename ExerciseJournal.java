@@ -1,6 +1,10 @@
 package MyFitness;
 
 import MyFitness.ExerciseSession.ExerciseSession;
+import MyFitness.ExerciseSession.Workout.CardioWorkout;
+import MyFitness.ExerciseSession.Workout.LiftWorkout;
+import MyFitness.ExerciseSession.Workout.Workout;
+import MyFitness.User.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,6 +13,10 @@ import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Set;
 
 
 /* TODO: Refactor code completely. Don't use static. Extend JPanel.
@@ -31,7 +39,12 @@ public class ExerciseJournal extends JPanel {
         frame.setVisible(true);
     }*/
 
-    public ExerciseJournal(App frame, NavBar navBar) {
+    private JComboBox<String> monthBox;
+    private JComboBox<Integer> dayBox;
+    private JComboBox<Integer> yearBox;
+    private JTextArea workoutDisplay;
+
+    public ExerciseJournal(App frame, NavBar navBar, User user) {
         frame.setTitle("Exercise Journal");
         setLayout(new GridBagLayout());
 
@@ -39,208 +52,123 @@ public class ExerciseJournal extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(5,5,5,5);
 
-        //Set up Title
-        JLabel title = new JLabel("Exercise Journal", JLabel.CENTER);
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        JLabel title = new JLabel("Exercise Journal");
         title.setFont(new Font("Arial", Font.BOLD, 20));
+        headerPanel.add(title);
+
+        JButton addSession = new JButton("Add Exercise Session");
+        addSession.addActionListener(e -> {
+            frame.getContentPane().removeAll();
+            frame.add(navBar);
+            frame.add(new ExerciseSession(frame, this, navBar, user));
+            frame.revalidate();
+            frame.repaint();
+        });
+        headerPanel.add(addSession);
+
         c.gridx = 0;
         c.gridy = 0;
-        add(title, c);
+        c.gridwidth = 2;
+        c.anchor = GridBagConstraints.CENTER;
+        c.fill = GridBagConstraints.NONE;
+        add(headerPanel, c);
 
-        JPanel journal = this;
 
-        // add exercise session button
-        JButton addSession = new JButton("Add Exercise Session");
-        addSession.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                frame.getContentPane().removeAll();
-                frame.add(navBar);
-                frame.add(new ExerciseSession(frame, journal, navBar));
-                frame.revalidate();
-                frame.repaint();
-            }
-        });
+        // --- Date Dropdowns in One Row (No Labels) ---
+        JPanel datePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
 
-        c.gridy = 1;
-        add(addSession, c);
+        datePanel.add(new JLabel("Date:"));
 
-        JLabel note = new JLabel("This is where Exercise Journal\n stats will be displayed.");
-        note.setFont(new Font("Arial", Font.BOLD, 20));
+        // Month dropdown
+        monthBox = new JComboBox<>();
+        monthBox.addItem(null);
+        for (int i = 0; i < 12; i++) {
+            monthBox.addItem(new DateFormatSymbols().getMonths()[i]);
+        }
+        datePanel.add(monthBox);
+
+        // Day dropdown
+        dayBox = new JComboBox<>();
+        dayBox.addItem(null);
+        for (int i = 1; i <= 31; i++) {
+            dayBox.addItem(i);
+        }
+        datePanel.add(dayBox);
+
+        // Year dropdown
+        yearBox = new JComboBox<>();
+        yearBox.addItem(null);
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        for (int i = currentYear - 5; i <= currentYear + 5; i++) {
+            yearBox.addItem(i);
+        }
+        datePanel.add(yearBox);
+
+        // Add to main layout
+        c.gridx = 0;
         c.gridy = 2;
-        c.insets = new Insets(200, 5, 200, 5);
-        add(note, c);
+        c.gridwidth = 2;
+        c.fill = GridBagConstraints.NONE;
+        c.anchor = GridBagConstraints.CENTER;
+        add(datePanel, c);
 
-        // TODO: Modify functionality of exit button.
-        //NOTE do not need exit button
-        //Create Exit button that shuts program down
-        /*JButton exitButton = new JButton("Exit Exercise Journal");
-        exitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                frame.dispose();
-                System.exit(0);
+
+        // --- Search Button ---
+        JButton searchButton = new JButton("Search Workouts");
+        c.gridx = 0; c.gridy = 5; c.gridwidth = 2;
+        add(searchButton, c);
+
+        // --- Text Area to Display Workouts ---
+        workoutDisplay = new JTextArea(10, 40);
+        workoutDisplay.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(workoutDisplay);
+        c.gridy = 6;
+        add(scrollPane, c);
+
+        // --- Action Listener ---
+        searchButton.addActionListener(ev -> {
+            try {
+                int month = monthBox.getSelectedIndex() - 1; // Adjust for "Select..."
+                Integer day = (Integer) dayBox.getSelectedItem();
+                Integer year = (Integer) yearBox.getSelectedItem();
+
+                if (month < 0 || day == null || year == null) {
+                    throw new Exception();
+                }
+
+                Calendar cal = Calendar.getInstance();
+                cal.set(year, month, day);
+                String formattedDate = new SimpleDateFormat("yyyy-MM-dd").format(cal.getTime());
+
+                Set<Workout> workouts = Database.getInstance().getWorkouts(user, formattedDate);
+                if (workouts.isEmpty()) {
+                    workoutDisplay.setText("No workouts found for " + formattedDate);
+                } else {
+                    StringBuilder sb = new StringBuilder("Workouts on " + formattedDate + ":\n");
+                    for (Workout w : workouts) {
+                        sb.append("- ").append(w.getWorkoutType()).append(": ").append(w.getWorkoutName()).append("\n");
+
+                        if (w instanceof LiftWorkout) {
+                            for (LiftWorkout.LiftSet set : ((LiftWorkout) w).getSets()) {
+                                sb.append("    Weight: ").append(set.getWeight()).append(" lbs, Reps: ").append(set.getReps()).append("\n");
+                            }
+                        } else if (w instanceof CardioWorkout) {
+                            CardioWorkout cw = (CardioWorkout) w;
+                            sb.append("    Distance: ").append(cw.getDistance()).append(" miles, Duration: ")
+                                    .append(cw.getHours()).append("h ")
+                                    .append(cw.getMinutes()).append("m ")
+                                    .append(cw.getSeconds()).append("s\n");
+                        }
+                    }
+                    workoutDisplay.setText(sb.toString());
+                }
+
+            } catch (Exception ex) {
+                workoutDisplay.setText("Please select a valid date.");
             }
         });
-
-        JPanel exitButtonPanel = new JPanel();
-        exitButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        exitButtonPanel.add(exitButton);
-
-
-        c.gridy = 3;
-        c.anchor = GridBagConstraints.LAST_LINE_END;
-        c.insets = new Insets(5, 5, 5, 5);
-        c.weightx = 1;
-        c.weighty = 1;
-        add(exitButtonPanel, c);*/
 
         setVisible(true);
     }
 }
-
-
-//    NOTE: old code below. . .
-
-//    private static void saveSessionToCSV(ExerciseSession session) {
-//        // Write session and workouts to CSV file
-//        try (BufferedWriter writer = new BufferedWriter(new FileWriter("exercise_sessions.csv", true))) {
-//            writer.write(session.toString());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            JOptionPane.showMessageDialog(null, "Error saving to file.", "Error", JOptionPane.ERROR_MESSAGE);
-//        }
-//    }
-//
-//    private void openExerciseSessionDialog( JFrame frame ) {
-//        JDialog sessionDialog = new JDialog(frame, "New Exercise Session", true); // Modal dialog
-//        sessionDialog.setSize(300, 150);
-//        sessionDialog.setLayout(new GridBagLayout());
-//        GridBagConstraints c = new GridBagConstraints();
-//
-//        ExerciseSession session = new ExerciseSession(frame, null);
-//
-//        // Set general padding and spacing
-//        c.insets = new Insets(10, 10, 10, 10);
-//
-//        // Input fields (centered)
-//        JLabel dateLabel = new JLabel("Date: ");
-//        JTextField dateField = new JTextField(7);
-//
-//        c.gridx = 0;
-//        c.gridy = 0;
-//        c.anchor = GridBagConstraints.LINE_END;
-//        sessionDialog.add(dateLabel, c);
-//
-//        c.gridx = 1;
-//        c.gridy = 0;
-//        c.anchor = GridBagConstraints.LINE_START;
-//        sessionDialog.add(dateField, c);
-//
-//        // Add Workout Dialog button
-//        JButton addWorkout = new JButton("Add Workout");
-//        addWorkout.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                openWorkoutDialog(frame, session);
-//            }
-//        });
-//
-//        c.gridx = 0;
-//        c.gridy = 1;
-//        c.anchor = GridBagConstraints.LINE_END;
-//        sessionDialog.add(addWorkout, c);
-//
-//        // Submit button (bottom left)
-//        JButton submitButton = new JButton("Save Session");
-//        submitButton.addActionListener(e -> {
-//            String date = dateField.getText();
-//            session.setDate(date);
-//            saveSessionToCSV(session);
-//            JOptionPane.showMessageDialog(sessionDialog, "Date: " + date,
-//                    "Session Saved", JOptionPane.INFORMATION_MESSAGE);
-//            sessionDialog.dispose(); // Close the dialog
-//        });
-//
-//        c.gridx = 1;
-//        c.gridy = 1;
-//        c.anchor = GridBagConstraints.LINE_START;
-//        sessionDialog.add(submitButton, c);
-//
-//        sessionDialog.setLocationRelativeTo(this); // Centers the dialog
-//        sessionDialog.setVisible(true);
-//    }
-//
-//    private void openWorkoutDialog( JFrame frame,  ExerciseSession session) {
-//        JDialog workoutDialog = new JDialog(frame, "New Workout", true);
-//        workoutDialog.setSize(250, 150);
-//        workoutDialog.setLayout(new GridBagLayout());
-//        GridBagConstraints c = new GridBagConstraints();
-//
-//        JLabel workoutLabel = new JLabel("Workout: ");
-//        JTextField workoutField = new JTextField(10);
-//
-//        c.gridx = 0;
-//        c.gridy = 0;
-//        c.anchor = GridBagConstraints.LINE_END;
-//        workoutDialog.add(workoutLabel, c);
-//        c.gridx = 1;
-//        c.anchor = GridBagConstraints.LINE_START;
-//        workoutDialog.add(workoutField, c);
-//
-//        JLabel weightLabel = new JLabel("Working Weight: ");
-//        JTextField weightField = new JTextField(10);
-//        c.gridx = 0;
-//        c.gridy = 1;
-//        c.anchor = GridBagConstraints.LINE_END;
-//        workoutDialog.add(weightLabel, c);
-//        c.gridx = 1;
-//        c.anchor = GridBagConstraints.LINE_START;
-//        workoutDialog.add(weightField, c);
-//
-//        JLabel repsLabel = new JLabel("Repetitions: ");
-//        JTextField repsField = new JTextField(10);
-//        c.gridx = 0;
-//        c.gridy = 2;
-//        c.anchor = GridBagConstraints.LINE_END;
-//        workoutDialog.add(repsLabel, c);
-//        c.gridx = 1;
-//        c.anchor = GridBagConstraints.LINE_START;
-//        workoutDialog.add(repsField, c);
-//
-//        // Buttons panel
-//        JPanel buttonPanel = new JPanel();
-//        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));  // Align buttons to the right
-//
-//        // Add Button
-//        JButton addButton = new JButton("Add");
-//        addButton.addActionListener(e -> {
-//            String workout = workoutField.getText();
-//            String weight = weightField.getText();
-//            String reps = repsField.getText();
-//
-//            // Validate input (optional)
-//            if (!workout.isEmpty() && !weight.isEmpty() && !reps.isEmpty()) {
-////                session.addWorkout(new Workout(workout, Double.parseDouble(weight), Integer.parseInt(reps)));
-//                JOptionPane.showMessageDialog(workoutDialog,
-//                        "Workout: " + workout + "\nWeight: " + weight + "\nReps: " + reps,
-//                        "Workout Saved", JOptionPane.INFORMATION_MESSAGE);
-//                workoutDialog.dispose(); // Close dialog after saving
-//            } else {
-//                JOptionPane.showMessageDialog(workoutDialog, "Please fill in all fields.",
-//                        "Missing Information", JOptionPane.ERROR_MESSAGE);
-//            }
-//        });
-//        buttonPanel.add(addButton);
-//
-//        // Cancel Button
-//        JButton cancelButton = new JButton("Cancel");
-//        cancelButton.addActionListener(e -> workoutDialog.dispose());  // Close dialog without saving
-//        buttonPanel.add(cancelButton);
-//
-//        // Add button panel to the dialog
-//        c.gridx = 0;
-//        c.gridy = 3;
-//        c.gridwidth = 2;
-//        c.anchor = GridBagConstraints.LINE_END;
-//        workoutDialog.add(buttonPanel, c);
-//
-//        workoutDialog.setLocationRelativeTo(this);
-//        workoutDialog.setVisible(true);
-//    }
