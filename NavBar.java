@@ -3,7 +3,6 @@ package MyFitness;
 import MyFitness.RyanStuff.CalorieTracker;
 import MyFitness.RyanStuff.CreateGoals;
 import MyFitness.User.Admin;
-import MyFitness.User.Settings;
 import MyFitness.User.Trainer;
 import MyFitness.User.User;
 import MyFitness.Trainer.*;
