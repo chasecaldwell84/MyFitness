@@ -170,7 +170,7 @@ public class Login extends JDialog {
         }
         scanner.close();
     }*/
-    public void authenicating(String username, String password) throws FileNotFoundException {
+    /*public void authenicating(String username, String password) throws FileNotFoundException {
         User user1 = db.findByUsername(username);
 
         if(user1 != null && user1.getPassword() != null && user1.getPassword().equals(password)){
@@ -199,6 +199,22 @@ public class Login extends JDialog {
             JOptionPane.showMessageDialog(this, "You have an incorrect username/password");
         }
 
+    }*/
+    // a new improved authenicating function, if it not work please use above that version
+    public void authenicating(String username, String password) throws FileNotFoundException {
+        User foundUser = db.findByUsername(username);
+
+        if (foundUser != null && foundUser.getPassword().equals(password)) {
+            Authenticated = true;
+            user = foundUser;
+
+            JOptionPane.showMessageDialog(this, "You have successfully logged in.");
+            dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, "Incorrect username or password.");
+            Authenticated = false;
+        }
     }
+
 
     }
