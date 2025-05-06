@@ -21,7 +21,8 @@ public class NavBar extends JPanel {
         Home.addActionListener(e -> {
             frame.getContentPane().removeAll();
             frame.getContentPane().add(this);
-            frame.add(new JLabel("Home Page"));
+            HomePage home = new HomePage(frame);
+            frame.add(home);
             frame.revalidate();
             frame.repaint();
         });
@@ -62,27 +63,48 @@ public class NavBar extends JPanel {
 
         JButton socialButton = new JButton("Social");
         socialButton.addActionListener(e -> {
-            JPanel socialPanel = new JPanel(new GridLayout(3, 1, 10, 10));
+            JPanel socialPanel = new JPanel();
+            socialPanel.setLayout(new BoxLayout(socialPanel, BoxLayout.Y_AXIS));
+            socialPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-            JButton addFriendButton = new JButton("Add Friend");
-            JButton sendChallengeButton = new JButton("Send Challenge");
-            JButton viewChallengesButton = new JButton("View Challenges");
+            JLabel titleLabel = new JLabel("Social Dashboard");
+            titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+            titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            socialPanel.add(titleLabel);
+            socialPanel.add(Box.createVerticalStrut(20));
+
+            JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 15, 15));
+            JButton addFriendButton = new JButton("➕ Add Friend");
+            JButton viewFriendsButton = new JButton("👥 View Friends");
+            JButton sendChallengeButton = new JButton("🏁 Send Challenge");
+            JButton viewChallengesButton = new JButton("📋 View Challenges");
+            JButton browseGroupsButton = new JButton("🌐 Browse Groups");
+
+            // Add hover tooltips
+            addFriendButton.setToolTipText("Find and add a new friend");
+            viewFriendsButton.setToolTipText("See your current friends list");
+            sendChallengeButton.setToolTipText("Send a challenge to a friend");
+            viewChallengesButton.setToolTipText("View all incoming challenges");
+            browseGroupsButton.setToolTipText("Explore available fitness and social groups");
+
+            buttonPanel.add(addFriendButton);
+            buttonPanel.add(viewFriendsButton);
+            buttonPanel.add(sendChallengeButton);
+            buttonPanel.add(viewChallengesButton);
+
+            socialPanel.add(buttonPanel);
+            socialPanel.add(Box.createVerticalStrut(15));
 
             addFriendButton.addActionListener(ae -> {
                 String friendUsername = JOptionPane.showInputDialog(frame, "Enter friend's username:");
-                if (friendUsername == null || friendUsername.trim().isEmpty()) {
-                    return;
-                }
+                if (friendUsername == null || friendUsername.trim().isEmpty()) return;
 
                 FriendManager fm = frame.getFriendManager();
                 User currentUser = frame.getUser();
 
-                // Find the friend by username from all known users (you'll need a way to access them)
-                // For now, assume you have access to a list of all users:
                 User friend = frame.getAllUsers().stream()
                         .filter(u -> u.getUserName().equalsIgnoreCase(friendUsername.trim()))
-                        .findFirst()
-                        .orElse(null);
+                        .findFirst().orElse(null);
 
                 if (friend == null) {
                     JOptionPane.showMessageDialog(frame, "User not found.");
@@ -91,7 +113,19 @@ public class NavBar extends JPanel {
 
                 fm.addFriend(currentUser, friend);
                 JOptionPane.showMessageDialog(frame, friend.getUserName() + " added as a friend!");
-                JOptionPane.showMessageDialog(frame, "Added Friend");
+            });
+
+            viewFriendsButton.addActionListener(ae -> {
+                java.util.List<User> friends = frame.getFriendManager().getFriends(frame.getUser());
+                if (friends.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "No friends found.", "Your Friends", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    StringBuilder list = new StringBuilder();
+                    for (User friend : friends) {
+                        list.append(friend.getUserName()).append("\n");
+                    }
+                    JOptionPane.showMessageDialog(frame, list.toString(), "Your Friends", JOptionPane.INFORMATION_MESSAGE);
+                }
             });
 
             sendChallengeButton.addActionListener(ae -> {
@@ -105,15 +139,14 @@ public class NavBar extends JPanel {
 
             viewChallengesButton.addActionListener(ae -> {
                 java.util.List<String> challenges = frame.getFriendManager().getChallenges(frame.getUser());
-                JOptionPane.showMessageDialog(frame, String.join("\n", challenges), "Your Challenges", JOptionPane.INFORMATION_MESSAGE);
+                if (challenges.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "No challenges available.", "Your Challenges", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(frame, String.join("\n", challenges), "Your Challenges", JOptionPane.INFORMATION_MESSAGE);
+                }
             });
 
-            socialPanel.add(addFriendButton);
-            socialPanel.add(sendChallengeButton);
-            socialPanel.add(viewChallengesButton);
-
             frame.getContentPane().removeAll();
-
             frame.getContentPane().add(this);
             frame.add(socialPanel);
             frame.setTitle("Social Menu");
