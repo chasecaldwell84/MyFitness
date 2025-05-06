@@ -105,8 +105,8 @@ public class Database {
                 PreparedStatement ps = conn.prepareStatement(
                         "UPDATE Users SET PASSWORD = ? WHERE USERNAME = ?"
                 );
-                ps.setString(1, user.getUserName());
-                ps.setString(2, user.getPassword());
+                ps.setString(1, user.getPassword());
+                ps.setString(2, user.getUserName());
                 ps.executeUpdate();
                 ps.close();
             }
