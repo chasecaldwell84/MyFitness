@@ -117,12 +117,15 @@ public class Database {
                 );
                 ps.setString(1, user.getUserName());
                 ps.setString(2, user.getPassword());
+                //Dannis fix that for signup
                 if (user instanceof Admin) {
                     ps.setString(3, "admin");
                 } else if (user instanceof Trainer) {
                     ps.setString(3, "trainer");
+                } else if (user instanceof GeneralUser) {
+                    ps.setString(3, "user");
                 } else {
-                    ps.setString(3, "general");
+                    ps.setString(3, "general");//useless just in case
                 }
                 ps.executeUpdate();
                 ps.close();
