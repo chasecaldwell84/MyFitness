@@ -5,6 +5,7 @@ import MyFitness.User.GeneralUser;
 import MyFitness.User.Trainer;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.nio.file.*;
 import java.util.List;
@@ -16,6 +17,8 @@ public class SignUp extends JDialog {
     private JComboBox<String> roleSelector;
     private JButton submitButton;
 
+    private Font loginTitleFont = new Font("Arial", Font.BOLD, 40);
+
     public SignUp() {
         setTitle("Sign-Up");
         setSize(350, 300);
@@ -23,36 +26,44 @@ public class SignUp extends JDialog {
         setModal(true);
         setLocationRelativeTo(null);
 
+        JPanel titlePanel = new JPanel();
+        JLabel titleLabel = new JLabel("Sign-Up");
+        titleLabel.setFont(loginTitleFont);
+        titleLabel.setBounds(160, 20, 80, 40);
+        titlePanel.setSize(350,60);
+        titlePanel.add(titleLabel);
+        add(titlePanel);
+
         JLabel usernameLabel = new JLabel("Username:");
-        usernameLabel.setBounds(20, 20, 80, 25);
+        usernameLabel.setBounds(20, 60, 80, 25);
         add(usernameLabel);
         usernameField = new JTextField();
-        usernameField.setBounds(120, 20, 180, 25);
+        usernameField.setBounds(120, 60, 180, 25);
         add(usernameField);
 
         JLabel passwordLabel = new JLabel("Password:");
-        passwordLabel.setBounds(20, 60, 80, 25);
+        passwordLabel.setBounds(20, 100, 80, 25);
         add(passwordLabel);
         passwordField = new JPasswordField();
-        passwordField.setBounds(120, 60, 180, 25);
+        passwordField.setBounds(120, 100, 180, 25);
         add(passwordField);
 
         JLabel passwordDoubleLabel = new JLabel("Confirm Password:");
-        passwordDoubleLabel.setBounds(20, 100, 120, 25);
+        passwordDoubleLabel.setBounds(20, 140, 120, 25);
         add(passwordDoubleLabel);
         passwordDoubleField = new JPasswordField();
-        passwordDoubleField.setBounds(140, 100, 160, 25);
+        passwordDoubleField.setBounds(140, 140, 160, 25);
         add(passwordDoubleField);
 
         JLabel roleLabel = new JLabel("Role:");
-        roleLabel.setBounds(20, 140, 80, 25);
+        roleLabel.setBounds(20, 180, 80, 25);
         add(roleLabel);
         roleSelector = new JComboBox<>(new String[]{"user", "trainer"});
-        roleSelector.setBounds(120, 140, 180, 25);
+        roleSelector.setBounds(120, 180, 180, 25);
         add(roleSelector);
 
         submitButton = new JButton("Sign Up");
-        submitButton.setBounds(120, 190, 100, 30);
+        submitButton.setBounds(120, 230, 100, 30);
         submitButton.addActionListener(e -> handleSignUp());
         add(submitButton);
     }
