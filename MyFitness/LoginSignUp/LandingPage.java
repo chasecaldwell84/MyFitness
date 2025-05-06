@@ -56,9 +56,9 @@ public class LandingPage extends JFrame {
             if(loginPanel.getAuthenticated()){
                 loginPanel.dispose();
                 app.setUser(loginPanel.getUser());
-
                 dispose();
                 app.setVisible(true);
+                app.getNavBar().showHomePage(app);
             }
         });
 

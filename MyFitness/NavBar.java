@@ -12,10 +12,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class NavBar extends JPanel {
+
     public NavBar(App frame) {
         setLayout(new FlowLayout(FlowLayout.LEFT));
+
         //NOTE: if we want backButton need to store previous frames in like a stack
         /*JButton backButton = new JButton("Back");*/
+
 
         JButton Home = new JButton("Home");
         Home.addActionListener(e -> {
@@ -194,5 +197,14 @@ public class NavBar extends JPanel {
         add(socialButton);
         add(settings);
         add(statistics);
+    }
+
+    public void showHomePage(App frame){
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(this);
+        HomePage home = new HomePage(frame);
+        frame.add(home);
+        frame.revalidate();
+        frame.repaint();
     }
 }
