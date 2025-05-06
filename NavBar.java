@@ -19,7 +19,8 @@ public class NavBar extends JPanel {
         Home.addActionListener(e -> {
             frame.getContentPane().removeAll();
             frame.getContentPane().add(this);
-            frame.add(new JLabel("Home Page"));
+            HomePage home = new HomePage(frame);
+            frame.add(home);
             frame.revalidate();
             frame.repaint();
         });
