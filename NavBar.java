@@ -75,12 +75,14 @@ public class NavBar extends JPanel {
             JButton viewFriendsButton = new JButton("👥 View Friends");
             JButton sendChallengeButton = new JButton("🏁 Send Challenge");
             JButton viewChallengesButton = new JButton("📋 View Challenges");
+            JButton browseGroupsButton = new JButton("🌐 Browse Groups");
 
             // Add hover tooltips
             addFriendButton.setToolTipText("Find and add a new friend");
             viewFriendsButton.setToolTipText("See your current friends list");
             sendChallengeButton.setToolTipText("Send a challenge to a friend");
             viewChallengesButton.setToolTipText("View all incoming challenges");
+            browseGroupsButton.setToolTipText("Explore available fitness and social groups");
 
             buttonPanel.add(addFriendButton);
             buttonPanel.add(viewFriendsButton);
