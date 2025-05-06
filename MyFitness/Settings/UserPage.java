@@ -134,25 +134,30 @@ public class UserPage extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String newPassword = JOptionPane.showInputDialog(
+            String newPassword = "";
+            newPassword = JOptionPane.showInputDialog(
                     frame,
                     "Enter New Password:",
                     "Change Password",
                     JOptionPane.PLAIN_MESSAGE
             );
+            if(newPassword == null){
+                newPassword = "";
+            }
+            if (!newPassword.isBlank()){
+                int confirmation = JOptionPane.showConfirmDialog(
+                        frame,
+                        "Confirm Password Change:",
+                        "Confirmation",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
 
-            int confirmation = JOptionPane.showConfirmDialog(
-                    frame,
-                    "Confirm Password Change:",
-                    "Confirmation",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            if (confirmation == JOptionPane.YES_OPTION) {
-                viewedUser.setPassword(newPassword);
-                if(!passwordLabel.getText().equals("(HIDDEN)")){
-                    passwordLabel.setText(viewedUser.getPassword());
+                if (confirmation == JOptionPane.YES_OPTION) {
+                    viewedUser.setPassword(newPassword);
+                    if (!passwordLabel.getText().equals("(HIDDEN)")) {
+                        passwordLabel.setText(viewedUser.getPassword());
+                    }
                 }
             }
         }
