@@ -2,9 +2,6 @@ package MyFitness;
 
 import MyFitness.User.User;
 import java.util.*;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.List;
 
 public class FriendManager {

@@ -4,12 +4,14 @@ import MyFitness.ExerciseSession.Workout.CardioWorkout;
 import MyFitness.ExerciseSession.Workout.LiftWorkout;
 import MyFitness.ExerciseSession.Workout.Workout;
 import MyFitness.RyanStuff.Goal;
+import MyFitness.Statistics.Statistic;
 import MyFitness.User.Admin;
 import MyFitness.User.GeneralUser;
 import MyFitness.User.Trainer;
 import MyFitness.User.User;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.*;
 
 
@@ -491,8 +493,9 @@ public class Database {
 
     }
     //FIXME needs to return stats
-    public void getStats(){
-
+    public List<Statistic> getAllStats(String username){
+        List<Statistic> stats = new ArrayList<>();
+        return stats;
     }
 
 

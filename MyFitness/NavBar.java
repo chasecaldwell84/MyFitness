@@ -1,9 +1,11 @@
 package MyFitness;
 
+import MyFitness.Settings.AdminPage;
 import MyFitness.RyanStuff.CalorieTracker;
 import MyFitness.RyanStuff.CreateGoals;
+import MyFitness.Settings.UserPage;
+import MyFitness.Statistics.StatisticsPage;
 import MyFitness.User.Admin;
-import MyFitness.User.Settings;
 import MyFitness.User.User;
 
 import javax.swing.*;
@@ -129,7 +131,7 @@ public class NavBar extends JPanel {
             frame.getContentPane().add(this);
 
             if(frame.getUser() instanceof Admin) {
-                AdminPage adminPage = new AdminPage();
+                AdminPage adminPage = new AdminPage(frame);
                 frame.add(adminPage);
             }
             else {
