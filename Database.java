@@ -11,7 +11,6 @@ import MyFitness.User.Trainer;
 import MyFitness.User.User;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.*;
 
 
