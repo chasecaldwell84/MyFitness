@@ -2,10 +2,7 @@ package MyFitness;
 
 import MyFitness.RyanStuff.CalorieTracker;
 import MyFitness.RyanStuff.CreateGoals;
-import MyFitness.User.Admin;
-import MyFitness.User.Settings;
-import MyFitness.User.Trainer;
-import MyFitness.User.User;
+import MyFitness.User.*;
 import MyFitness.Trainer.*;
 
 import javax.swing.*;
@@ -146,6 +143,7 @@ public class NavBar extends JPanel {
         JButton classDashboardButton = new JButton("Class Dashboard");
         classDashboardButton.addActionListener(e -> {
             frame.getContentPane().removeAll();
+            frame.setTitle("Class Dashboard");
 
             if (frame.getUser() instanceof Trainer) {
                 Trainer trainer = (Trainer) frame.getUser();
@@ -154,7 +152,7 @@ public class NavBar extends JPanel {
                 trainerPanel.setLayout(new BoxLayout(trainerPanel, BoxLayout.Y_AXIS));
                 trainerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-                JLabel title = new JLabel("Class Dashboard(Trainer)");
+                JLabel title = new JLabel("Class Dashboard (Trainer)");
                 title.setFont(new Font("Arial", Font.BOLD, 24));
                 title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -195,6 +193,7 @@ public class NavBar extends JPanel {
                 frame.add(newBar, BorderLayout.NORTH);
                 frame.add(trainerPanel);
             } else {
+                User user = frame.getUser();  // should be GeneralUser
                 JPanel userPanel = new JPanel();
                 userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
                 userPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -203,12 +202,35 @@ public class NavBar extends JPanel {
                 label.setFont(new Font("Arial", Font.BOLD, 24));
                 label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-                JLabel msg = new JLabel("You can browse or join classes here (feature TBD)");
-                msg.setAlignmentX(Component.CENTER_ALIGNMENT);
+                JButton addClassBtn = new JButton("Add Class");
+                addClassBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+                addClassBtn.addActionListener(ae -> {
+                    frame.getContentPane().removeAll();
+                    NavBar newBar = new NavBar(frame);
+                    newBar.setLoggedInUser(this.getLoggedInUser());
+                    frame.add(newBar, BorderLayout.NORTH);
+                    frame.add(new AddClassPanel(frame, (GeneralUser) user));
+                    frame.revalidate();
+                    frame.repaint();
+                });
+
+                JButton seeMyClassBtn = new JButton("See My Class");
+                seeMyClassBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+                seeMyClassBtn.addActionListener(ae -> {
+                    frame.getContentPane().removeAll();
+                    NavBar newBar = new NavBar(frame);
+                    newBar.setLoggedInUser(this.getLoggedInUser());
+                    frame.add(newBar, BorderLayout.NORTH);
+                    frame.add(new SeeMyClassPanel(frame, (GeneralUser) user));
+                    frame.revalidate();
+                    frame.repaint();
+                });
 
                 userPanel.add(label);
                 userPanel.add(Box.createVerticalStrut(20));
-                userPanel.add(msg);
+                userPanel.add(addClassBtn);
+                userPanel.add(Box.createVerticalStrut(10));
+                userPanel.add(seeMyClassBtn);
 
                 NavBar newBar = new NavBar(frame);
                 newBar.setLoggedInUser(this.getLoggedInUser());
@@ -216,7 +238,6 @@ public class NavBar extends JPanel {
                 frame.add(userPanel);
             }
 
-            frame.setTitle("Class Dashboard");
             frame.revalidate();
             frame.repaint();
         });

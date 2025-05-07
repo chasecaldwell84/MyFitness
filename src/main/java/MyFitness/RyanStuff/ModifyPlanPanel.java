@@ -1,3 +1,4 @@
+
 package MyFitness.RyanStuff;
 
 import MyFitness.App;
@@ -22,8 +23,9 @@ public class ModifyPlanPanel extends JPanel {
     private final JTextField lengthField = new JTextField(5);
     private final JTextField weeksField = new JTextField(5);
     private final JTextField exerciseField = new JTextField(10);
-    private final JTextField repsField = new JTextField(10);
+    private final JTextField instructionField = new JTextField(10);
     private final JTextField durationField = new JTextField(10);
+    private final JTextArea planDescArea = new JTextArea(3, 20);
 
     private final int classId;
     private final String trainerUsername;
@@ -60,7 +62,7 @@ public class ModifyPlanPanel extends JPanel {
         add(new JLabel("Existing Plans for This Class:"), c);
 
         JScrollPane scrollPane = new JScrollPane(planList);
-        scrollPane.setPreferredSize(new Dimension(300, 100));
+        scrollPane.setPreferredSize(new Dimension(400, 100));
         c.gridy = 11;
         add(scrollPane, c);
 
@@ -69,27 +71,37 @@ public class ModifyPlanPanel extends JPanel {
                 String selected = planList.getSelectedValue();
                 if (selected != null) {
                     String[] parts = selected.split("\\|");
-                    if (parts.length == 3) {
+                    if (parts.length == 4) {
                         exerciseField.setText(parts[0].split(":")[1].trim());
-                        repsField.setText(parts[1].split(":")[1].trim());
+                        instructionField.setText(parts[1].split(":")[1].trim());
                         durationField.setText(parts[2].split(":")[1].trim());
+                        planDescArea.setText(parts[3].split(":")[1].trim());
                     }
                 }
             }
         });
 
         addLabelAndField("Exercise:", exerciseField, c, 12);
-        addLabelAndField("Repetitions:", repsField, c, 13);
-        addLabelAndField("Duration:", durationField, c, 14);
+        addLabelAndField("Instruction(eg. 3 sets of 12 reps):", instructionField, c, 13);
+        addLabelAndField("Duration(mins):", durationField, c, 14);
+
+        JLabel descLabel = new JLabel("Plan Description:");
+        c.gridx = 0; c.gridy = 15;
+        add(descLabel, c);
+        c.gridx = 1;
+        JScrollPane descScrollPane = new JScrollPane(planDescArea);
+        planDescArea.setLineWrap(true);
+        planDescArea.setWrapStyleWord(true);
+        add(descScrollPane, c);
 
         JButton savePlanButton = new JButton("Save Plan");
         savePlanButton.addActionListener(this::savePlan);
-        c.gridx = 1; c.gridy = 15;
+        c.gridx = 1; c.gridy = 16;
         add(savePlanButton, c);
 
         JButton deletePlanButton = new JButton("Delete Plan");
         deletePlanButton.addActionListener(this::deletePlan);
-        c.gridy = 16;
+        c.gridy = 17;
         add(deletePlanButton, c);
 
         loadClassInfo();
@@ -143,21 +155,23 @@ public class ModifyPlanPanel extends JPanel {
         planListModel.clear();
         List<String[]> plans = db.getPlansForClass(classId);
         for (String[] plan : plans) {
-            planListModel.addElement("Exercise: " + plan[0] + " | Reps: " + plan[1] + " | Duration: " + plan[2]);
+            planListModel.addElement("Exercise: " + plan[0] + " | Instruction: " + plan[1] + " | Duration(mins): " + plan[2] + " | Description: " + plan[3]);
         }
     }
 
     private void savePlan(ActionEvent e) {
         try {
             String exercise = exerciseField.getText().trim();
-            String reps = repsField.getText().trim();
+            String instruction = instructionField.getText().trim();
             int duration = Integer.parseInt(durationField.getText().trim());
+            String description = planDescArea.getText().trim();
+
             String[] existing = db.getExercisePlan(exercise, trainerUsername);
 
             if (existing[0] != null) {
-                db.updateExercisePlan(exercise, exercise, reps, duration, trainerUsername);
+                db.updateExercisePlan(exercise, exercise, instruction, duration, trainerUsername, description);
             } else {
-                db.savePlanToClass(classId, exercise, reps, duration);
+                db.savePlanToClass(classId, exercise, instruction, duration, description);
             }
             JOptionPane.showMessageDialog(this, "Plan saved/updated!");
             loadPlanList();
@@ -176,8 +190,9 @@ public class ModifyPlanPanel extends JPanel {
             db.deleteExercisePlan(exercise, trainerUsername);
             JOptionPane.showMessageDialog(this, "Plan deleted.");
             exerciseField.setText("");
-            repsField.setText("");
+            instructionField.setText("");
             durationField.setText("");
+            planDescArea.setText("");
             loadPlanList();
         }
     }

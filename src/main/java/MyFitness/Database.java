@@ -126,14 +126,23 @@ public class Database {
                             "PLAN_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
                             "CLASS_ID INTEGER NOT NULL, " +
                             "EXERCISE_NAME VARCHAR(255) NOT NULL, " +
-                            "REPETITIONS VARCHAR(255), " +
+                            "INSTRUCTION VARCHAR(255), " +
                             "DURATION INT, " +
+                            "DESCRIPTION VARCHAR(1000), " +
                             "PRIMARY KEY (PLAN_ID), " +
                             "FOREIGN KEY (CLASS_ID) REFERENCES WorkoutClasses(CLASS_ID) ON DELETE CASCADE" +
                             ")"
             );
 
-
+            stmt.executeUpdate(
+                    "CREATE TABLE ClassMembers (" +
+                            "CLASS_ID INTEGER NOT NULL, " +
+                            "USERNAME VARCHAR(255) NOT NULL, " +
+                            "PRIMARY KEY (CLASS_ID, USERNAME), " +
+                            "FOREIGN KEY (CLASS_ID) REFERENCES WorkoutClasses(CLASS_ID) ON DELETE CASCADE, " +
+                            "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
+                            ")"
+            );
 
             stmt.close();
         }
@@ -199,7 +208,7 @@ public class Database {
                 else if(Objects.equals(rs.getString("USERTYPE"), "trainer")){
                     users.add(new Trainer(rs.getString("USERNAME"), rs.getString("PASSWORD")));
                 }
-                else if(Objects.equals(rs.getString("USERTYPE"), "general")){
+                else if(Objects.equals(rs.getString("USERTYPE"), "user")){
                     users.add( new GeneralUser(rs.getString("USERNAME"), rs.getString("PASSWORD")));
                 }
                 else{
@@ -388,62 +397,80 @@ public class Database {
 
     // class stuff
     public List<Map<String, Object>> getAllClasses() {
-        List<Map<String, Object>> classList = new ArrayList<>();
+        List<Map<String, Object>> classes = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM WorkoutClasses");
+
             while (rs.next()) {
-                Map<String, Object> classData = new HashMap<>();
-                classData.put("CLASS_ID", rs.getInt("CLASS_ID"));
-                classData.put("TRAINER_USERNAME", rs.getString("TRAINER_USERNAME"));
-                classData.put("TITLE", rs.getString("TITLE"));
-                classData.put("DESCRIPTION", rs.getString("DESCRIPTION"));
-                classData.put("DATETIME", rs.getString("DATETIME"));
-                classData.put("SEATS", rs.getInt("SEATS"));
-                classData.put("DAYS", rs.getString("DAYS"));
-                classData.put("SESSION_LENGTH", rs.getInt("SESSION_LENGTH"));
-                classData.put("NUM_WEEKS", rs.getInt("NUM_WEEKS"));
-                classList.add(classData);
+                Map<String, Object> row = new HashMap<>();
+                int classId = rs.getInt("CLASS_ID");
+                row.put("CLASS_ID", classId);
+                row.put("TITLE", rs.getString("TITLE"));
+                row.put("TRAINER_USERNAME", rs.getString("TRAINER_USERNAME"));
+                row.put("SEATS", rs.getInt("SEATS"));
+                row.put("DESCRIPTION", rs.getString("DESCRIPTION"));
+
+
+                // Count current enrollment
+                PreparedStatement countPs = conn.prepareStatement("SELECT COUNT(*) FROM ClassMembers WHERE CLASS_ID = ?");
+                countPs.setInt(1, classId);
+                ResultSet countRs = countPs.executeQuery();
+                int current = 0;
+                if (countRs.next()) {
+                    current = countRs.getInt(1);
+                }
+                row.put("CURRENT_ENROLLMENT", current);
+
+                countRs.close();
+                countPs.close();
+
+                classes.add(row);
             }
+
             rs.close();
             stmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return classList;
+        return classes;
     }
 
+
     //savePlanToClass
-    public void savePlanToClass(int classId, String exerciseName, String reps, int duration) {
+    public void savePlanToClass(int classId, String exerciseName, String instruction, int duration, String notes) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO ClassPlans (CLASS_ID, EXERCISE_NAME, REPETITIONS, DURATION) VALUES (?, ?, ?, ?)"
+                    "INSERT INTO ClassPlans (CLASS_ID, EXERCISE_NAME, INSTRUCTION, DURATION, DESCRIPTION) VALUES (?, ?, ?, ?, ?)"
             );
             ps.setInt(1, classId);
             ps.setString(2, exerciseName);
-            ps.setString(3, reps);
+            ps.setString(3, instruction);
             ps.setInt(4, duration);
+            ps.setString(5, notes);
             ps.executeUpdate();
             ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
     //get plans for class
     public List<String[]> getPlansForClass(int classId) {
         List<String[]> plans = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement(
-                    "SELECT EXERCISE_NAME, REPETITIONS, DURATION FROM ClassPlans WHERE CLASS_ID = ?"
+                    "SELECT EXERCISE_NAME, INSTRUCTION, DURATION, DESCRIPTION FROM ClassPlans WHERE CLASS_ID = ?"
             );
             ps.setInt(1, classId);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String[] row = new String[3];
+                String[] row = new String[4];
                 row[0] = rs.getString("EXERCISE_NAME");
-                row[1] = rs.getString("REPETITIONS");
+                row[1] = rs.getString("INSTRUCTION");
                 row[2] = String.valueOf(rs.getInt("DURATION"));
+                row[3] = rs.getString("DESCRIPTION");
                 plans.add(row);
             }
             rs.close();
@@ -455,10 +482,10 @@ public class Database {
     }
 
     public String[] getExercisePlan(String planName, String trainerUsername) {
-        String[] result = new String[3]; // Exercise, Reps, Duration
+        String[] result = new String[4];
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement(
-                    "SELECT EXERCISE_NAME, REPETITIONS, DURATION FROM ClassPlans " +
+                    "SELECT EXERCISE_NAME, INSTRUCTION, DURATION, DESCRIPTION FROM ClassPlans " +
                             "WHERE EXERCISE_NAME = ? AND CLASS_ID IN (SELECT CLASS_ID FROM WorkoutClasses WHERE TRAINER_USERNAME = ?)"
             );
             ps.setString(1, planName);
@@ -466,8 +493,9 @@ public class Database {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 result[0] = rs.getString("EXERCISE_NAME");
-                result[1] = rs.getString("REPETITIONS");
+                result[1] = rs.getString("INSTRUCTION");
                 result[2] = String.valueOf(rs.getInt("DURATION"));
+                result[3] = rs.getString("DESCRIPTION");
             }
             rs.close();
             ps.close();
@@ -477,17 +505,18 @@ public class Database {
         return result;
     }
 
-    public void updateExercisePlan(String planName, String exercise, String reps, int duration, String trainerUsername) {
+    public void updateExercisePlan(String planName, String exercise, String instruction, int duration, String notes, String trainerUsername) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE ClassPlans SET EXERCISE_NAME = ?, REPETITIONS = ?, DURATION = ? " +
+                    "UPDATE ClassPlans SET EXERCISE_NAME = ?, INSTRUCTION = ?, DURATION = ?, DESCRIPTION = ? " +
                             "WHERE EXERCISE_NAME = ? AND CLASS_ID IN (SELECT CLASS_ID FROM WorkoutClasses WHERE TRAINER_USERNAME = ?)"
             );
             ps.setString(1, exercise);
-            ps.setString(2, reps);
+            ps.setString(2, instruction);
             ps.setInt(3, duration);
-            ps.setString(4, planName);
-            ps.setString(5, trainerUsername);
+            ps.setString(4, notes);
+            ps.setString(5, planName);
+            ps.setString(6, trainerUsername);
             ps.executeUpdate();
             ps.close();
         } catch (SQLException e) {
@@ -578,12 +607,12 @@ public class Database {
         return null;
     }
 
-    public void deleteExercisePlan(String planName, String trainerUsername) {
+    public void deleteExercisePlan(String exercise, String trainerUsername) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement(
                     "DELETE FROM ClassPlans WHERE EXERCISE_NAME = ? AND CLASS_ID IN (SELECT CLASS_ID FROM WorkoutClasses WHERE TRAINER_USERNAME = ?)"
             );
-            ps.setString(1, planName);
+            ps.setString(1, exercise);
             ps.setString(2, trainerUsername);
             ps.executeUpdate();
             ps.close();
@@ -617,6 +646,177 @@ public class Database {
         }
         return classList;
     }
+
+    public List<Integer> getClassIdsJoinedByUser(String username) {
+        List<Integer> classIds = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            PreparedStatement ps = conn.prepareStatement("SELECT CLASS_ID FROM ClassMembers WHERE USERNAME = ?");
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                classIds.add(rs.getInt("CLASS_ID"));
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return classIds;
+    }
+
+    public String getJoinedClassInfo(int classId) {
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM WorkoutClasses WHERE CLASS_ID = ?");
+            ps.setInt(1, classId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return "Class ID: " + rs.getInt("CLASS_ID") + "\n"
+                        + "Title: " + rs.getString("TITLE") + "\n"
+                        + "Description: " + rs.getString("DESCRIPTION") + "\n"
+                        + "Start: " + rs.getTimestamp("START_TIME") + "\n"
+                        + "Seats: " + rs.getInt("SEATS") + "\n"
+                        + "Days: " + rs.getString("DAYS") + "\n"
+                        + "Length: " + rs.getInt("SESSION_LENGTH") + "\n"
+                        + "Weeks: " + rs.getInt("DURATION_WEEKS") + "\n"
+                        + "Trainer: " + rs.getString("TRAINER_USERNAME");
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "No info found.";
+    }
+
+    public List<String> getJoinedClassInfo(String username) {
+        List<String> infoList = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            PreparedStatement ps = conn.prepareStatement(
+                    "SELECT * FROM WorkoutClasses WHERE CLASS_ID IN (" +
+                            "SELECT CLASS_ID FROM ClassMembers WHERE USERNAME = ?)"
+            );
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                String info = "Class ID: " + rs.getInt("CLASS_ID") +
+                        " | Title: " + rs.getString("TITLE") +
+                        " | Trainer: " + rs.getString("TRAINER_USERNAME") +
+                        " | Seats: " + rs.getInt("SEATS") +
+                        " | Description: " + rs.getString("DESCRIPTION");
+                infoList.add(info);
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return infoList;
+    }
+
+
+    public String joinClass(String username, int classId) {
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+
+            // Already joined check
+            PreparedStatement checkStmt = conn.prepareStatement(
+                    "SELECT * FROM ClassMembers WHERE CLASS_ID = ? AND USERNAME = ?"
+            );
+            checkStmt.setInt(1, classId);
+            checkStmt.setString(2, username);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next()) return "already_joined";
+            rs.close();
+            checkStmt.close();
+
+            // Seat availability check
+            PreparedStatement seatStmt = conn.prepareStatement(
+                    "SELECT SEATS FROM WorkoutClasses WHERE CLASS_ID = ?"
+            );
+            seatStmt.setInt(1, classId);
+            ResultSet seatRs = seatStmt.executeQuery();
+            if (!seatRs.next()) return "class_not_found";
+            int totalSeats = seatRs.getInt("SEATS");
+            seatRs.close();
+            seatStmt.close();
+
+            // Enrollment count
+            PreparedStatement countStmt = conn.prepareStatement(
+                    "SELECT COUNT(*) AS COUNT FROM ClassMembers WHERE CLASS_ID = ?"
+            );
+            countStmt.setInt(1, classId);
+            ResultSet countRs = countStmt.executeQuery();
+            countRs.next();
+            int currentCount = countRs.getInt("COUNT");
+            countRs.close();
+            countStmt.close();
+
+            if (currentCount >= totalSeats) return "class_full";
+
+            // Insert into ClassMembers
+            PreparedStatement insertStmt = conn.prepareStatement(
+                    "INSERT INTO ClassMembers (CLASS_ID, USERNAME) VALUES (?, ?)"
+            );
+            insertStmt.setInt(1, classId);
+            insertStmt.setString(2, username);
+            insertStmt.executeUpdate();
+            insertStmt.close();
+
+            return "success";
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "db_error";
+        }
+    }
+
+
+
+    public int getEnrollmentCount(int classId) {
+        int count = 0;
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM ClassMembers WHERE CLASS_ID = ?");
+            ps.setInt(1, classId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+                System.out.println("Enrollment count for class " + classId + ": " + count);
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    public String getClassPlanForUser(int classId) {
+        StringBuilder planBuilder = new StringBuilder();
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            PreparedStatement ps = conn.prepareStatement(
+                    "SELECT EXERCISE_NAME, INSTRUCTION, DURATION, DESCRIPTION FROM ClassPlans WHERE CLASS_ID = ?"
+            );
+            ps.setInt(1, classId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                planBuilder.append("Exercise: ").append(rs.getString("EXERCISE_NAME")).append("\n")
+                        .append("Instruction: ").append(rs.getString("INSTRUCTION")).append("\n")
+                        .append("Duration: ").append(rs.getInt("DURATION")).append(" min\n")
+                        .append("Description: ").append(rs.getString("DESCRIPTION")).append("\n\n");
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "Error retrieving class plan.";
+        }
+        return planBuilder.length() > 0 ? planBuilder.toString() : "No plan found for this class.";
+    }
+
+
+
+
+
+
 
 
 
