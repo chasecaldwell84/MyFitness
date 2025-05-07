@@ -89,6 +89,35 @@ public class Database {
                             "FOREIGN KEY (WORKOUT_ID) REFERENCES Workouts(WORKOUT_ID) ON DELETE CASCADE " +
                             ")"
             );
+            stmt.executeUpdate(
+                    "CREATE TABLE Friendships (" +
+                            "USER1 VARCHAR(255) NOT NULL, " +
+                            "USER2 VARCHAR(255) NOT NULL, " +
+                            "PRIMARY KEY (USER1, USER2), " +
+                            "FOREIGN KEY (USER1) REFERENCES Users(USERNAME) ON DELETE CASCADE, " +
+                            "FOREIGN KEY (USER2) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
+                            ")"
+            );
+
+            stmt.executeUpdate(
+                    "CREATE TABLE Challenges (" +
+                            "SENDER VARCHAR(255) NOT NULL, " +
+                            "RECIPIENT VARCHAR(255) NOT NULL, " +
+                            "MESSAGE VARCHAR(255) NOT NULL, " +
+                            "TIMESTAMP TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                            "FOREIGN KEY (SENDER) REFERENCES Users(USERNAME) ON DELETE CASCADE, " +
+                            "FOREIGN KEY (RECIPIENT) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
+                            ")"
+            );
+
+            stmt.executeUpdate(
+                    "CREATE TABLE GroupMemberships (" +
+                            "GROUPNAME VARCHAR(255) NOT NULL, " +
+                            "USERNAME VARCHAR(255) NOT NULL, " +
+                            "PRIMARY KEY (GROUPNAME, USERNAME), " +
+                            "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
+                            ")"
+            );
             stmt.close();
         }
         catch(SQLException e){
