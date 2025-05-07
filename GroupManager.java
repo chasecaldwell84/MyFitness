@@ -1,39 +1,84 @@
 package MyFitness;
 
 import MyFitness.User.User;
+import java.sql.*;
 import java.util.*;
 
 public class GroupManager {
-    private final Map<String, Set<User>> groups = new HashMap<>();
-
-    public void createGroup(String groupName) {
-        groups.putIfAbsent(groupName, new HashSet<>());
-    }
+    private final Database db = Database.getInstance();
 
     public void joinGroup(User user, String groupName) {
-        createGroup(groupName);
-        groups.get(groupName).add(user);
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO GroupMemberships (GROUPNAME, USERNAME) VALUES (?, ?)");
+            ps.setString(1, groupName);
+            ps.setString(2, user.getUserName());
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void leaveGroup(User user, String groupName) {
-        Set<User> members = groups.get(groupName);
-        if (members != null) {
-            members.remove(user);
-            if (members.isEmpty()) {
-                groups.remove(groupName);
-            }
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("DELETE FROM GroupMemberships WHERE GROUPNAME = ? AND USERNAME = ?");
+            ps.setString(1, groupName);
+            ps.setString(2, user.getUserName());
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
     public Set<String> getAllGroupNames() {
-        return new HashSet<>(groups.keySet());
+        Set<String> groupNames = new HashSet<>();
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("SELECT DISTINCT GROUPNAME FROM GroupMemberships");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                groupNames.add(rs.getString("GROUPNAME"));
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return groupNames;
     }
 
     public Set<User> getMembers(String groupName) {
-        return groups.getOrDefault(groupName, new HashSet<>());
+        Set<User> members = new HashSet<>();
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("SELECT USERNAME FROM GroupMemberships WHERE GROUPNAME = ?");
+            ps.setString(1, groupName);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                String username = rs.getString("USERNAME");
+                User user = db.findByUsername(username);
+                if (user != null) members.add(user);
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return members;
     }
 
     public boolean isUserInGroup(User user, String groupName) {
-        return groups.getOrDefault(groupName, Collections.emptySet()).contains(user);
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("SELECT 1 FROM GroupMemberships WHERE GROUPNAME = ? AND USERNAME = ?");
+            ps.setString(1, groupName);
+            ps.setString(2, user.getUserName());
+            ResultSet rs = ps.executeQuery();
+            boolean result = rs.next();
+            rs.close();
+            ps.close();
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
