@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import MyFitness.LoginSignUp.LandingPage;
 
 public class UserPage extends JPanel {
 
@@ -59,33 +60,56 @@ public class UserPage extends JPanel {
                 BorderFactory.createLineBorder(Color.BLACK, 5)
         ));
 
-
-
-        JPanel buttonPanel = new JPanel();
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
+        buttonPanel.setPreferredSize(new Dimension(500, 80));
 
         JButton changeUserButton = new JButton("Change Username");
         showPassword = new JButton("Show Password");
-        showPassword.addActionListener(new showPassword());
-        buttonPanel.add(changeUserButton);
-        buttonPanel.add(showPassword);
+        JButton signOutButton = new JButton("Sign Out");
 
-        add(titlePanel,BorderLayout.NORTH);
-        add(userSettingsPanel,BorderLayout.CENTER);
+        showPassword.addActionListener(new showPassword());
+
+        signOutButton.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to sign out?",
+                    "Confirm Sign Out",
+                    JOptionPane.YES_NO_OPTION
+            );
+            if (confirm == JOptionPane.YES_OPTION) {
+                frame.dispose();
+                frame.setUser(null);
+                SwingUtilities.invokeLater(() -> {
+                    LandingPage lp = new LandingPage(new App());
+                    lp.setVisible(true);
+                });
+            }
+        });
+
+        changeUserButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        showPassword.setAlignmentX(Component.CENTER_ALIGNMENT);
+        signOutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        buttonPanel.add(changeUserButton);
+        buttonPanel.add(Box.createVerticalStrut(10));
+        buttonPanel.add(showPassword);
+        buttonPanel.add(Box.createVerticalStrut(10));
+        buttonPanel.add(signOutButton);
+
+        add(titlePanel, BorderLayout.NORTH);
+        add(userSettingsPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
         setVisible(true);
     }
 
     static class showPassword implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
             if(passwordLabel.getText().equals("(HIDDEN)")){
-                System.out.println("show");
                 passwordLabel.setText(frame.getUser().getPassword());
                 showPassword.setText("Hide Password");
             }
             else {
-                System.out.println("hide");
                 passwordLabel.setText("(HIDDEN)");
                 showPassword.setText("Show Password");
             }
@@ -93,5 +117,4 @@ public class UserPage extends JPanel {
             frame.repaint();
         }
     }
-
 }
