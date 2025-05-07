@@ -1,9 +1,8 @@
 package MyFitness;
 
 import MyFitness.LoginSignUp.LandingPage;
+import MyFitness.LoginSignUp.Login;
 import MyFitness.User.Admin;
-
-import java.io.File;
 
 public class Main {
     public static void main(String[] args) {
@@ -16,6 +15,9 @@ public class Main {
         App app = new App();
         LandingPage lp = new LandingPage(app);
         lp.setVisible(true);
+        Login login = new Login(app);
+        //login.setVisible(true);
+
         /*NOTE: Thinking about trainer problem
         *  We could have it where you can sign up to be a trainer on the landing page
         *  Or we could have it where you login as a user and inside of the app there is an option to become a trainer
