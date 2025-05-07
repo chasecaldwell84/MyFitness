@@ -6,9 +6,10 @@ import java.awt.*;
 public class HomePage extends JPanel {
     public HomePage(App frame) {
         setLayout(new BorderLayout());
+        setBackground(new Color(250, 250, 250));
         setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
 
-        // Top Image Banner with OS-aware pathing
+        // Logo banner
         ImageIcon logoIcon;
         String operatingSystem = System.getProperty("os.name");
         if (operatingSystem.startsWith("Windows")) {
@@ -20,46 +21,54 @@ public class HomePage extends JPanel {
         JLabel banner = new JLabel(new ImageIcon(scaled));
         banner.setHorizontalAlignment(SwingConstants.CENTER);
 
-        JLabel welcomeLabel = new JLabel("Welcome to MyFitness, " + frame.getUser().getUserName() + "!");
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 36));
-        welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        // Welcome message
+        JLabel welcomeLabel = new JLabel("Welcome, " + frame.getUser().getUserName() + "!", SwingConstants.CENTER);
+        welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 36));
+        welcomeLabel.setForeground(new Color(33, 37, 41));
 
-        JLabel subtitle = new JLabel("Your all in one fitness, health, and social experience.");
-        subtitle.setFont(new Font("Arial", Font.ITALIC, 20));
-        subtitle.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel subtitle = new JLabel("Your all-in-one health, fitness, and social experience.", SwingConstants.CENTER);
+        subtitle.setFont(new Font("Segoe UI", Font.ITALIC, 18));
+        subtitle.setForeground(new Color(100, 100, 100));
 
-        JPanel buttonGrid = new JPanel(new GridLayout(2, 3, 30, 30));
-        buttonGrid.add(createIconButton("💪 Workouts", "Log your exercise and strength sessions"));
-        buttonGrid.add(createIconButton("🍎 Nutrition", "Track calories and macros"));
-        buttonGrid.add(createIconButton("🎯 Goals", "Set and crush health goals"));
-        buttonGrid.add(createIconButton("🌐 Social", "Connect and compete with friends"));
-        buttonGrid.add(createIconButton("📊 Stats", "View your performance stats"));
-        buttonGrid.add(createIconButton("⚙️ Settings", "Edit your profile and preferences"));
+        // Feature buttons
+        JPanel buttonGrid = new JPanel(new GridLayout(2, 3, 25, 25));
+        buttonGrid.setOpaque(false);
+        buttonGrid.setBorder(BorderFactory.createEmptyBorder(30, 20, 30, 20));
 
-        JPanel centerCombined = new JPanel();
-        centerCombined.setLayout(new BoxLayout(centerCombined, BoxLayout.Y_AXIS));
-        centerCombined.add(Box.createVerticalStrut(20));
-        centerCombined.add(welcomeLabel);
-        centerCombined.add(Box.createVerticalStrut(30));
-        centerCombined.add(buttonGrid);
-        centerCombined.add(Box.createVerticalStrut(20));
+        buttonGrid.add(createIconButton("💪 Workouts", "Log your exercise sessions"));
+        buttonGrid.add(createIconButton("🍎 Nutrition", "Track calories and meals"));
+        buttonGrid.add(createIconButton("🎯 Goals", "Set and achieve fitness targets"));
+        buttonGrid.add(createIconButton("🌐 Social", "Connect and compete with others"));
+        buttonGrid.add(createIconButton("📊 Stats", "View your health trends"));
+        buttonGrid.add(createIconButton("⚙️ Settings", "Update your preferences"));
 
-        JPanel bottom = new JPanel(new BorderLayout());
-        bottom.add(subtitle, BorderLayout.NORTH);
+        // Layout combining
+        JPanel center = new JPanel();
+        center.setOpaque(false);
+        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
+        center.add(Box.createVerticalStrut(20));
+        center.add(welcomeLabel);
+        center.add(Box.createVerticalStrut(10));
+        center.add(subtitle);
+        center.add(Box.createVerticalStrut(30));
+        center.add(buttonGrid);
 
         add(banner, BorderLayout.NORTH);
-        add(centerCombined, BorderLayout.CENTER);
-        add(bottom, BorderLayout.SOUTH);
+        add(center, BorderLayout.CENTER);
     }
 
     private JButton createIconButton(String text, String tooltip) {
         JButton button = new JButton(text);
-        button.setFont(new Font("Arial", Font.PLAIN, 20));
+        button.setFont(new Font("Segoe UI", Font.PLAIN, 20));
         button.setToolTipText(tooltip);
         button.setFocusPainted(false);
-        button.setPreferredSize(new Dimension(220, 100));
-        button.setBackground(new Color(220, 240, 255));
-        button.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+        button.setBackground(new Color(235, 245, 255));
+        button.setForeground(new Color(40, 40, 40));
+        button.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        ));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return button;
     }
 }
