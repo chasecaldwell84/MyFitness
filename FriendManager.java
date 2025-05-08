@@ -83,6 +83,21 @@ public class FriendManager {
         }
         return challenges;
     }
+
+    public void removeFriend(User user, User friend) {
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("DELETE FROM Friendships WHERE (USER1 = ? AND USER2 = ?) OR (USER1 = ? AND USER2 = ?)");
+            ps.setString(1, user.getUserName());
+            ps.setString(2, friend.getUserName());
+            ps.setString(3, friend.getUserName());
+            ps.setString(4, user.getUserName());
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
 
 
