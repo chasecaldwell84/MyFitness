@@ -63,7 +63,7 @@ public class LandingPage extends JFrame {
         });
 
         JButton signUp = new JButton("Sign Up");
-        SignUp signUpPanel = new SignUp();
+        SignUp signUpPanel = new SignUp("Sign-Up",false);
 
         signUp.addActionListener(e -> {
             signUpPanel.setVisible(true);
