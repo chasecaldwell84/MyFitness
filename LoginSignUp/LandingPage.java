@@ -27,7 +27,7 @@ public class LandingPage extends JFrame {
         else {
             logoIcon = new ImageIcon("resources/images/MyFitnessLogoChose1.jpg");
         }
-        Image image = logoIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+        Image image = logoIcon.getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH);
         JLabel logoLabel = new JLabel(new ImageIcon(image));
 
         GridBagConstraints logoConstraints = new GridBagConstraints();
@@ -48,7 +48,7 @@ public class LandingPage extends JFrame {
         add(title, c);
 
         JButton login = new JButton("Login");
-        Login loginPanel = new Login();
+        Login loginPanel = new Login(app);
         /*loginPanel.setLayout(new FlowLayout(FlowLayout.LEFT));*/
         //login.setBounds(150, 235, 100, 30);
         login.addActionListener(e -> {
