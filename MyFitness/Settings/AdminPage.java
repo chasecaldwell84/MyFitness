@@ -2,6 +2,8 @@ package MyFitness.Settings;
 
 import MyFitness.App;
 import MyFitness.Database;
+import MyFitness.LoginSignUp.SignUp;
+import MyFitness.User.Admin;
 import MyFitness.User.User;
 
 import javax.swing.*;
@@ -11,12 +13,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class AdminPage extends JPanel {
     static private final Database db = Database.getInstance();
     private ArrayList<String> users;
-    private ArrayList<String> userPasswords;
 
 
     private App frame;
@@ -91,6 +93,14 @@ public class AdminPage extends JPanel {
         viewButton.addActionListener(new viewUser(this));
         buttonPanel.add(viewButton);
 
+        JButton addUserButton = new JButton("Add User");
+        addUserButton.addActionListener(new addUser());
+        buttonPanel.add(addUserButton);
+
+        JButton deleteUserButton = new JButton("Delete User");
+        deleteUserButton.addActionListener(new deleteUser());
+        buttonPanel.add(deleteUserButton);
+
         add(titlePanel,BorderLayout.NORTH);
         add(listPanel,BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
@@ -101,12 +111,11 @@ public class AdminPage extends JPanel {
         List<User> allUsers = db.getAllUsers();
 
         users = new ArrayList<String>();
-        userPasswords = new ArrayList<String>();
 
         allUsers.forEach(user -> {
             users.add(user.getUserName());
-            userPasswords.add(user.getPassword());
         });
+        users.sort(Comparator.naturalOrder());
     }
 
     private class viewUser implements ActionListener {
@@ -120,12 +129,102 @@ public class AdminPage extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
 
+            if(userList.getSelectedValue() == null){
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "No User Selected.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
             String username = userList.getSelectedValue();
             UserPage userPage = new UserPage(frame,db.findByUsername(username),adminPage);
             frame.getContentPane().remove(adminPage);
             frame.getContentPane().add(userPage);
             frame.revalidate();
             frame.repaint();
+
+        }
+    }
+
+    private class addUser implements ActionListener {
+
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            SignUp signupWindow = new SignUp("Create User",true);
+            signupWindow.setVisible(true);
+            readUsers();
+            userList.setListData(users.toArray(new String[0]));
+
+
+        }
+    }
+
+    private class deleteUser implements  ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e){
+
+            String selectedUserName = userList.getSelectedValue();
+            if(db.findByUsername(selectedUserName) == frame.getUser()){
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "Cannot delete self",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+           else if(db.findByUsername(selectedUserName) instanceof Admin){
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "Cannot delete admin",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            String confirmDelete = "";
+            confirmDelete = JOptionPane.showInputDialog(
+                    frame,
+                    "Type 'DELETE' to Confirm:",
+                    "Delete  " + selectedUserName,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+
+            if(confirmDelete != null && confirmDelete.equals("DELETE")) {
+                int confirmation = JOptionPane.showConfirmDialog(
+                        frame,
+                        "Are you sure you want to delete this user?",
+                        "Delete " + selectedUserName,
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+                if(confirmation == JOptionPane.YES_OPTION) {
+                    db.delete(selectedUserName);
+                    readUsers();
+                    userList.setListData(users.toArray(new String[0]));
+                    JOptionPane.showMessageDialog(
+                            frame,
+                            "User " + selectedUserName + " was successfully deleted.",
+                            "User Deleted",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                }
+            }
+            else if(confirmDelete != null){
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "Input did not match 'DELETE', delete failed.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+
 
         }
     }
