@@ -41,7 +41,7 @@ public class NavBar extends JPanel {
             frame.repaint();
 
         });
-        JButton CalorieTracker = new JButton("Calorie Tracker");
+        JButton CalorieTracker = new JButton("Stats Tracker");
         CalorieTracker.addActionListener(e -> {
             CalorieTracker calorieTrackerPannel = new CalorieTracker(frame);
             frame.getContentPane().removeAll();
