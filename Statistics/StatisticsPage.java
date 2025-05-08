@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import MyFitness.Database;
 
@@ -23,6 +24,8 @@ public class StatisticsPage extends JPanel {
     public static boolean[][] selectedStat;
     public static List<Statistic> allStats;
 
+    private JList<String> statsList;
+    private JScrollPane statsScrollPane;
     private JPanel infoPanel;
     private JPanel titlePanel;
     private JPanel buttonPanel;
@@ -68,6 +71,10 @@ public class StatisticsPage extends JPanel {
             infoPanel = new JPanel();
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 
+            statsList = new JList<>();
+            statsList.setFont(App.statsFont);
+            statsScrollPane = new JScrollPane(statsList);
+            infoPanel.add(statsScrollPane,BorderLayout.CENTER);
             updateStatsPanel();
             infoPanel.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createEmptyBorder(45, 45, 90, 45),
@@ -80,8 +87,8 @@ public class StatisticsPage extends JPanel {
             JButton filterButton = new JButton("Filter");
             filterButton.addActionListener(new openFilterUI(this));
 
-            buttonPanel.add(experienceButton);
             buttonPanel.add(filterButton);
+            buttonPanel.add(experienceButton);
 
             add(titlePanel, BorderLayout.NORTH);
             add(infoPanel, BorderLayout.CENTER);
@@ -93,7 +100,6 @@ public class StatisticsPage extends JPanel {
     }
 
     public void updateStatsGUI(){
-        infoPanel.removeAll();
         updateStatsPanel();
         infoPanel.repaint();
         revalidate();
@@ -101,18 +107,18 @@ public class StatisticsPage extends JPanel {
     }
 
     private void updateStatsPanel() {
+
+        List<String> metrics = new ArrayList<>();
+
         for (int cat = 1; cat < StatLabels.length; cat++) {
             for (int i = 0; i < StatLabels[cat].length; i++) {
                 if(selectedStat[cat][i]) {
-                    String metric = StatLabels[cat][i];
-                    infoPanel.add(Box.createVerticalStrut(10));
-                    JLabel avgLabel = new JLabel(metric + ": ");
-                    avgLabel.setFont(App.boldLabelFontLarge);
-                    avgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-                    infoPanel.add(avgLabel);
+                    String metric = StatLabels[cat][i] + ": ";
+                    metrics.add(metric);
                 }
             }
         }
+        statsList.setListData(metrics.toArray(new String[0]));
     }
 
     class openFilterUI implements ActionListener {
