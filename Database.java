@@ -220,7 +220,10 @@ public class Database {
                 else if(Objects.equals(rs.getString("USERTYPE"), "trainer")){
                     return new Trainer(rs.getString("USERNAME"), rs.getString("PASSWORD"));
                 }
-                else if(Objects.equals(rs.getString("USERTYPE"), "general")){
+                /*else if(Objects.equals(rs.getString("USERTYPE"), "general")){
+                    return new GeneralUser(rs.getString("USERNAME"), rs.getString("PASSWORD"));
+                }*/
+                else if(Objects.equals(rs.getString("USERTYPE"), "user")){
                     return new GeneralUser(rs.getString("USERNAME"), rs.getString("PASSWORD"));
                 }
                 else{
