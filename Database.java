@@ -118,6 +118,40 @@ public class Database {
                             "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
                             ")"
             );
+
+            stmt.executeUpdate(
+                        "CREATE TABLE TrainerClasses (" +
+                            "CLASSNAME VARCHAR(255) PRIMARY KEY, " +
+                            "TRAINER VARCHAR(255), " +
+                            "DATE VARCHAR(255), " +
+                            "TIME VARCHAR(255), " +
+                                "DESCRIPTION VARCHAR(1000)"
+            );
+            stmt.executeUpdate(
+                    "CREATE TABLE ClassRequests (" +
+                            "CLASSNAME VARCHAR(255), " +
+                            "USERNAME VARCHAR(255)"
+
+            );
+            stmt.executeUpdate(
+                        "CREATE TABLE GroupChallenges (" +
+                            "GROUPNAME VARCHAR(255), " +
+                            "SENDER VARCHAR(255), " +
+                            "MESSAGE VARCHAR(255)"
+
+
+            );
+
+            stmt.executeUpdate(
+                    "CREATE TABLE GroupMessages (" +
+                            "GROUPNAME VARCHAR(255), " +
+                            "SENDER VARCHAR(255), " +
+                            "RECIPIENT VARCHAR(255)," +
+                            "MESSAGE VARCHAR(255)"
+
+            );
+
+
             stmt.close();
         }
         catch(SQLException e){
@@ -512,6 +546,56 @@ public class Database {
         }
 
         return workouts;
+    }
+
+    public String[] getTrainerClasses(String trainerName) {
+        List<String> classes = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("SELECT CLASSNAME FROM TrainerClasses WHERE TRAINER = ?");
+            ps.setString(1, trainerName);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                classes.add(rs.getString("CLASSNAME"));
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return classes.toArray(new String[0]);
+    }
+
+    public String getClassDescription(String className) {
+        StringBuilder sb = new StringBuilder();
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM TrainerClasses WHERE CLASSNAME = ?");
+            ps.setString(1, className);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                sb.append("Class: ").append(rs.getString("CLASSNAME")).append("\n")
+                        .append("Trainer: ").append(rs.getString("TRAINER")).append("\n")
+                        .append("Date: ").append(rs.getString("DATE")).append("\n")
+                        .append("Time: ").append(rs.getString("TIME")).append("\n")
+                        .append("Description: ").append(rs.getString("DESCRIPTION"));
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+
+    public void requestJoinClass(String username, String className) {
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO ClassRequests (CLASSNAME, USERNAME) VALUES (?, ?)");
+            ps.setString(1, className);
+            ps.setString(2, username);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 
