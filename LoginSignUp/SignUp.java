@@ -1,6 +1,7 @@
 package MyFitness.LoginSignUp;
 
 import MyFitness.Database;
+import MyFitness.User.Admin;
 import MyFitness.User.GeneralUser;
 import MyFitness.User.Trainer;
 
@@ -19,15 +20,15 @@ public class SignUp extends JDialog {
 
     private Font loginTitleFont = new Font("Arial", Font.BOLD, 40);
 
-    public SignUp() {
-        setTitle("Sign-Up");
+    public SignUp(String windowTitle,boolean adminCreateUser){
+        setTitle(windowTitle);
         setSize(350, 300);
         setLayout(null);
         setModal(true);
         setLocationRelativeTo(null);
 
         JPanel titlePanel = new JPanel();
-        JLabel titleLabel = new JLabel("Sign-Up");
+        JLabel titleLabel = new JLabel(windowTitle);
         titleLabel.setFont(loginTitleFont);
         titleLabel.setBounds(160, 20, 80, 40);
         titlePanel.setSize(350,60);
@@ -58,17 +59,24 @@ public class SignUp extends JDialog {
         JLabel roleLabel = new JLabel("Role:");
         roleLabel.setBounds(20, 180, 80, 25);
         add(roleLabel);
-        roleSelector = new JComboBox<>(new String[]{"user", "trainer"});
+        String[] roleList;
+        if(adminCreateUser){
+            roleList = new String[]{"User", "Trainer","Admin"};
+        }
+        else{
+            roleList = new String[]{"User", "Trainer"};
+        }
+        roleSelector = new JComboBox<>(roleList);
         roleSelector.setBounds(120, 180, 180, 25);
         add(roleSelector);
 
-        submitButton = new JButton("Sign Up");
+        submitButton = new JButton(windowTitle);
         submitButton.setBounds(120, 230, 100, 30);
-        submitButton.addActionListener(e -> handleSignUp());
+        submitButton.addActionListener(e -> handleSignUp(windowTitle));
         add(submitButton);
     }
 
-    private void handleSignUp() {
+    private void handleSignUp(String windowTitle) {
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword());
         String passwordDouble = new String(passwordDoubleField.getPassword());
@@ -90,11 +98,14 @@ public class SignUp extends JDialog {
         // Save to Derby database
         if ("User".equals(role)) {
             db.saveUser(new GeneralUser(username, password));
-        } else {
-            db.saveUser(new Trainer(username, password));
+        } else if("Admin".equals(role)) {
+            db.saveUser(new Admin(username, password));
+        }
+        else{
+            db.saveUser(new Trainer(username,password));
         }
 
-        JOptionPane.showMessageDialog(this, "Sign-up successful!");
+        JOptionPane.showMessageDialog(this,  (windowTitle + " successful!"));
         dispose();
     }
 

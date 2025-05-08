@@ -157,6 +157,9 @@ public class Database {
                 else if(Objects.equals(rs.getString("USERTYPE"), "general")){
                     users.add( new GeneralUser(rs.getString("USERNAME"), rs.getString("PASSWORD")));
                 }
+                else if(Objects.equals(rs.getString("USERTYPE"), "user")){
+                    users.add( new GeneralUser(rs.getString("USERNAME"), rs.getString("PASSWORD")));
+                }
                 else{
                     throw new SQLException();
                 }
@@ -187,6 +190,9 @@ public class Database {
                 else if(Objects.equals(rs.getString("USERTYPE"), "general")){
                     return new GeneralUser(rs.getString("USERNAME"), rs.getString("PASSWORD"));
                 }
+                else if(Objects.equals(rs.getString("USERTYPE"), "user")){
+                    return new GeneralUser(rs.getString("USERNAME"), rs.getString("PASSWORD"));
+                }
                 else{
                     throw new SQLException();
                 }
@@ -211,6 +217,7 @@ public class Database {
             e.printStackTrace();
         }
     }
+
     /*
     * Saves goal to a specific user or updates goal for that specific user if
     * the type, and length matches
@@ -423,7 +430,7 @@ public class Database {
         }
     }
 
-    public Set<Workout> getWorkouts(User user, String sessionDate) {
+    public Set<Workout> getWorkouts(User user, String sessionDate){
         Set<Workout> workouts = new HashSet<>();
 
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
@@ -594,6 +601,5 @@ public class Database {
         GeneralUser test2 = new GeneralUser("John1", "5678");
         db.saveUser(test1);
         db.saveUser(test2);
-
     }*/
 }

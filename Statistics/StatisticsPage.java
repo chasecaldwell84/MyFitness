@@ -14,10 +14,10 @@ import MyFitness.Database;
 public class StatisticsPage extends JPanel {
 
     static final String[][] StatLabels = {
-            {"Sleep", "Workout", "Calories"},
-            {"Average Sleep","Total Sleep"},
+            {"Sleep & Calories", "Workout", "Classes & Goals"},
+            {"Average Sleep","Total Sleep","Total Calories Consumed", "Average Calories Consumed"},
             {"Total Workout Time", "Average Workout Length","Total Reps", "Average Reps", "Total Miles Ran","Average Miles Ran"},
-            {"Total Calories Burned", "Average Calories Burned","Total Calories Consumed", "Average Calories Consumed"}
+            {"Classes Attended","Total Class Hours","Average Class Hours","Goals Started","Goals Completed"}
     };
 
     public static boolean[][] selectedStat;
@@ -79,11 +79,9 @@ public class StatisticsPage extends JPanel {
             experienceButton.addActionListener(new openExperienceUI());
             JButton filterButton = new JButton("Filter");
             filterButton.addActionListener(new openFilterUI(this));
-            JButton exportButton = new JButton("Export");
 
             buttonPanel.add(experienceButton);
             buttonPanel.add(filterButton);
-            buttonPanel.add(exportButton);
 
             add(titlePanel, BorderLayout.NORTH);
             add(infoPanel, BorderLayout.CENTER);
@@ -107,7 +105,7 @@ public class StatisticsPage extends JPanel {
             for (int i = 0; i < StatLabels[cat].length; i++) {
                 if(selectedStat[cat][i]) {
                     String metric = StatLabels[cat][i];
-                    infoPanel.add(Box.createVerticalStrut(20));
+                    infoPanel.add(Box.createVerticalStrut(10));
                     JLabel avgLabel = new JLabel(metric + ": ");
                     avgLabel.setFont(App.boldLabelFontLarge);
                     avgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

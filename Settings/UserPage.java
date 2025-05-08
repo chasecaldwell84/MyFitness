@@ -1,12 +1,17 @@
 package MyFitness.Settings;
 
 import MyFitness.App;
+import MyFitness.Database;
 import MyFitness.User.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 public class UserPage extends JPanel {
 
@@ -14,6 +19,7 @@ public class UserPage extends JPanel {
     private AdminPage adminPage;
 
     public JLabel passwordLabel;
+    public JLabel usernameLabel;
     public JButton showPassword;
 
     private User viewedUser;
@@ -53,7 +59,7 @@ public class UserPage extends JPanel {
         JLabel userTypeTitle = new JLabel("User Type");
         JLabel passwordTitle = new JLabel("Password");
 
-        JLabel usernameLabel = new JLabel(viewedUser.getUserName());
+        usernameLabel = new JLabel(viewedUser.getUserName());
         JLabel userTypeLabel = new JLabel(viewedUser.getClass().getSimpleName());
         passwordLabel = new JLabel("(HIDDEN)");
 
@@ -90,6 +96,13 @@ public class UserPage extends JPanel {
 
         JPanel buttonPanel = new JPanel();
 
+        /*
+        if(!(viewedUser instanceof Admin) || (viewedUser.getUserName().equals(frame.getUser().getUserName()))) {
+            JButton changeUsernameButton = new JButton("Change Username");
+            changeUsernameButton.addActionListener(new changeUsername());
+            buttonPanel.add(changeUsernameButton);
+        }
+*/
         if(frame.getUser() instanceof Admin && !((viewedUser instanceof Admin) && !(viewedUser.getUserName().equals(frame.getUser().getUserName())))){
             JButton changePasswordButton = new JButton("Change Password");
             changePasswordButton.addActionListener(new changePassword());
@@ -102,7 +115,6 @@ public class UserPage extends JPanel {
             JButton backButton = new JButton("Back");
             backButton.addActionListener(new backToAdminPage(this));
             buttonPanel.add(backButton);
-
         }
 
         add(titlePanel,BorderLayout.NORTH);
@@ -134,29 +146,105 @@ public class UserPage extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String newPassword = JOptionPane.showInputDialog(
+            String newPassword = "";
+            newPassword = JOptionPane.showInputDialog(
                     frame,
                     "Enter New Password:",
                     "Change Password",
                     JOptionPane.PLAIN_MESSAGE
             );
-
-            int confirmation = JOptionPane.showConfirmDialog(
-                    frame,
-                    "Confirm Password Change:",
-                    "Confirmation",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            if (confirmation == JOptionPane.YES_OPTION) {
-                viewedUser.setPassword(newPassword);
-                if(!passwordLabel.getText().equals("(HIDDEN)")){
-                    passwordLabel.setText(viewedUser.getPassword());
+            if(newPassword != null && !newPassword.isBlank()){
+                if(newPassword.equals(viewedUser.getPassword())){
+                    JOptionPane.showMessageDialog(
+                            frame,
+                            "New Password cannot be identical.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                    return;
                 }
+                int confirmation = JOptionPane.showConfirmDialog(
+                        frame,
+                        "Confirm Password Change:",
+                        "Confirmation",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                if (confirmation == JOptionPane.YES_OPTION) {
+                    viewedUser.setPassword(newPassword);
+                    Database.getInstance().saveUser(viewedUser);
+                    if (!passwordLabel.getText().equals("(HIDDEN)")) {
+                        passwordLabel.setText(viewedUser.getPassword());
+                    }
+                }
+            }
+            else if(newPassword != null && newPassword.isBlank()){
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "New Password cannot be blank.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
             }
         }
     }
+
+    private class changeUsername implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String newUsername = "";
+            newUsername = JOptionPane.showInputDialog(
+                    frame,
+                    "Enter New Username:",
+                    "Change Username",
+                    JOptionPane.PLAIN_MESSAGE
+            );
+            if (newUsername != null && !newUsername.isBlank()){
+                if(newUsername.equals(viewedUser.getUserName())){
+                    JOptionPane.showMessageDialog(
+                            frame,
+                            "Username is the same.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+                else if(isUsernameExists(newUsername)){
+                    JOptionPane.showMessageDialog(
+                            frame,
+                            "Username is taken.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+                else {
+                    int confirmation = JOptionPane.showConfirmDialog(
+                            frame,
+                            "Confirm Username Change:",
+                            "Confirmation",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.WARNING_MESSAGE
+                    );
+
+                    if (confirmation == JOptionPane.YES_OPTION) {
+                        viewedUser.setUserName(newUsername);
+                        Database.getInstance().saveUser(viewedUser);
+                        usernameLabel.setText(viewedUser.getUserName());
+                    }
+                }
+            }
+            else if(newUsername != null && newUsername.isBlank()){
+                JOptionPane.showMessageDialog(
+                        frame,
+                        "New username cannot be blank.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }
+
     private class backToAdminPage implements ActionListener {
 
         UserPage userPage;
@@ -172,6 +260,10 @@ public class UserPage extends JPanel {
             frame.revalidate();
             frame.repaint();
         }
+    }
+
+    private boolean isUsernameExists(String username) {
+        return Database.getInstance().findByUsername(username) != null;
     }
 
 }
