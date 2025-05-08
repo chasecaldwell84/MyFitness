@@ -11,6 +11,7 @@ public class Main {
         db.saveUser(new Admin("Michael", "1234"));
         db.saveUser(new Admin("Jeremy", "1234"));
         db.saveUser(new Admin("Ryan", "1234"));
+        db.saveUser(new Admin("LarryAdmin", "321"));
 
         App app = new App();
         LandingPage lp = new LandingPage(app);
@@ -48,7 +49,7 @@ public class Main {
         //cg.setVisible(true);
 
         //NOTE testing
-        /*MyFitness.App app2 = new MyFitness.App();
+        /*App app2 = new App();
         app2.setVisible(true);*/
         /*Scanner sc = new Scanner(System.in);
         String input;

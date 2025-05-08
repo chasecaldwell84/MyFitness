@@ -2,7 +2,6 @@ package MyFitness.LoginSignUp;
 
 import MyFitness.App;
 import MyFitness.Database;
-import MyFitness.User.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,31 +48,19 @@ public class LandingPage extends JFrame {
         add(title, c);
 
         JButton login = new JButton("Login");
+        Login loginPanel = new Login();
         /*loginPanel.setLayout(new FlowLayout(FlowLayout.LEFT));*/
         //login.setBounds(150, 235, 100, 30);
-        //Dannis changed
         login.addActionListener(e -> {
-            Login loginPanel = new Login();
             loginPanel.setVisible(true);
-
-            if (loginPanel.getAuthenticated()) {
+            if(loginPanel.getAuthenticated()){
                 loginPanel.dispose();
-                User user = loginPanel.getUser();
-                app.setUser(user);
-
-                dispose();  // Close the landing page
-
-                if (user instanceof MyFitness.User.Trainer) {
-                    app.showTrainerMainPage();
-                } /*else if (user instanceof MyFitness.User.Admin) {
-                    app.showAdminPage(); // if we have
-                } */else {
-                    app.showUserPage();
-                }
+                app.setUser(loginPanel.getUser());
+                dispose();
                 app.setVisible(true);
+                app.getNavBar().showHomePage(app);
             }
         });
-
 
         JButton signUp = new JButton("Sign Up");
         SignUp signUpPanel = new SignUp();

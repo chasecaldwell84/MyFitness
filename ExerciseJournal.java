@@ -15,15 +15,15 @@ import java.util.Set;
 
 
 /* TODO: Refactor code completely. Don't use static. Extend JPanel.
- *   Configure so that the user can input a lift or cardio workout. Configure so
- *   that input is more strict and won't be as prone to user error.  */
+*   Configure so that the user can input a lift or cardio workout. Configure so
+*   that input is more strict and won't be as prone to user error.  */
 
 /* TODO UPDATE: Mostly done with this phase of refactoring. No longer using
- *   static. Now extending JPanel. Is now configured to enter a lift or cardio
- *   workout. Still need to make input more strict and less prone to user error.
- *   While the initial version of ExerciseJournal could write to a csv, this
- *   version does not yet write to any file or database. Will be implementing
- *   later. Once functionality is finished, make the UI look better. */
+*   static. Now extending JPanel. Is now configured to enter a lift or cardio
+*   workout. Still need to make input more strict and less prone to user error.
+*   While the initial version of ExerciseJournal could write to a csv, this
+*   version does not yet write to any file or database. Will be implementing
+*   later. Once functionality is finished, make the UI look better. */
 
 public class ExerciseJournal extends JPanel {
 
@@ -52,6 +52,9 @@ public class ExerciseJournal extends JPanel {
         title.setFont(new Font("Arial", Font.BOLD, 20));
         headerPanel.add(title);
 
+        JPanel journal = this;
+
+        // add exercise session button
         JButton addSession = new JButton("Add Exercise Session");
         addSession.addActionListener(e -> {
             frame.getContentPane().removeAll();

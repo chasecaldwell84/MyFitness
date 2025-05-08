@@ -152,8 +152,8 @@ public class Login extends JDialog {
             if(TypeInput.isEmpty()){
                 JOptionPane.showMessageDialog(this, "SYSTEM ERROR Not assigned type");
             }
-            else if(TypeInput.equals("MyFitness.User")){
-                user = new MyFitness.User(username, password);
+            else if(TypeInput.equals("User")){
+                user = new User(username, password);
             }
             else if(TypeInput.equals("Trainer")){
                 user = new Trainer(username, password);
@@ -200,84 +200,7 @@ public class Login extends JDialog {
         }
 
     }*/
-    //below is for accessing direectly cvs files.
-    /*public void authenicating(String username, String password) throws FileNotFoundException {
-        Scanner scanner = null;
-        try {
-            String operatingSystem = System.getProperty("os.name");
-            File file;
 
-            if (operatingSystem.startsWith("Windows")) {
-                file = new File("./src/main/java/MyFitness/resources/UserAuth.csv");
-            } else {
-                file = new File("resources/UserAuth.csv");
-            }
-
-            if (!file.exists()) {
-                JOptionPane.showMessageDialog(this, "User database not found: " + file.getPath());
-                return;
-            }
-
-            scanner = new Scanner(file);
-
-            if (!scanner.hasNextLine()) {
-                JOptionPane.showMessageDialog(this, "UserAuth.csv is empty.");
-                return;
-            }
-
-            String[] headers = scanner.nextLine().split(",");
-            int usernameIndex = -1, passwordIndex = -1, typeIndex = -1;
-
-            for (int i = 0; i < headers.length; i++) {
-                String column = headers[i].trim().toLowerCase();
-                if (column.equals("username")) usernameIndex = i;
-                if (column.equals("password")) passwordIndex = i;
-                if (column.equals("type")) typeIndex = i;
-            }
-
-            if (usernameIndex == -1 || passwordIndex == -1 || typeIndex == -1) {
-                JOptionPane.showMessageDialog(this, "Invalid CSV header format.");
-                return;
-            }
-
-            while (scanner.hasNextLine()) {
-                String[] values = scanner.nextLine().split(",");
-                if (values.length < Math.max(usernameIndex, Math.max(passwordIndex, typeIndex)) + 1) continue;
-
-                String csvUser = values[usernameIndex].trim();
-                String csvPass = values[passwordIndex].trim();
-                String csvType = values[typeIndex].trim();
-
-                if (csvUser.equals(username) && csvPass.equals(password)) {
-                    Authenticated = true;
-                    switch (csvType) {
-                        case "GeneralUser":
-                            user = new GeneralUser(username, password);
-                            break;
-                        case "Trainer":
-                            user = new Trainer(username, password);
-                            break;
-                        case "Admin":
-                            user = new Admin(username, password);
-                            break;
-                    }
-                    break;
-                }
-            }
-
-            if (Authenticated) {
-                JOptionPane.showMessageDialog(this, "You have successfully logged in.");
-                dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "Incorrect username or password.");
-            }
-
-        } catch (FileNotFoundException e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-        } finally {
-            if (scanner != null) scanner.close();
-        }
-    }*/
     public void authenicating(String username, String password) throws FileNotFoundException {
         User foundUser = db.findByUsername(username);
 
@@ -296,4 +219,4 @@ public class Login extends JDialog {
 
 
 
-}
+    }

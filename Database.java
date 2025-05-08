@@ -4,6 +4,7 @@ import MyFitness.ExerciseSession.Workout.CardioWorkout;
 import MyFitness.ExerciseSession.Workout.LiftWorkout;
 import MyFitness.ExerciseSession.Workout.Workout;
 import MyFitness.RyanStuff.Goal;
+import MyFitness.Statistics.Statistic;
 import MyFitness.User.Admin;
 import MyFitness.User.GeneralUser;
 import MyFitness.User.Trainer;
@@ -16,15 +17,6 @@ import java.util.*;
 public class Database {
     private static final String DB_URL = "jdbc:derby:Database;create=true";
     private static Database instance;
-    private List<User> allUsers = new ArrayList<>();
-    public void loadUsers() {
-        allUsers.clear();
-        allUsers.addAll(getAllUsers());
-        System.out.println("Reloaded users: " + allUsers.size());
-    }
-
-
-
 
     public static Database getInstance() {
         if (instance == null) {
@@ -33,8 +25,8 @@ public class Database {
         return instance;
     }
     /*
-     * Creates or connects to database, makes tables Users, UserStats, UserGoals
-     */
+    * Creates or connects to database, makes tables Users, UserStats, UserGoals
+    */
     public Database() {
         try(Connection conn = DriverManager.getConnection(DB_URL)){
             Statement stmt = conn.createStatement();
@@ -58,9 +50,9 @@ public class Database {
                     "CREATE TABLE UserGoals (" +
                             "GOAL_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
                             "USERNAME VARCHAR(255) NOT NULL, " +
-                            "GOAL_TYPE VARCHAR(255) NOT NULL, " +
+                            "GOAL_TYPE VARCHAR(225) NOT NULL, " +
                             "GOAL_VALUE INT NOT NULL, " +
-                            "GOAL_LENGTH VARCHAR(255) NOT NULL, " +
+                            "GOAL_LENGTH VARCHAR(225) NOT NULL, " +
                             "PRIMARY KEY (GOAL_ID), " +
                             "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE " +
                             ")"
@@ -143,8 +135,8 @@ public class Database {
         }
     }
     /*
-     * saves new user or updates user in database
-     */
+    * saves new user or updates user in database
+    */
     public void saveUser(User user){
         try(Connection conn = DriverManager.getConnection(DB_URL)) {
             if(user.getUserName() != null && findByUsername(user.getUserName()) != null){
@@ -163,7 +155,6 @@ public class Database {
                 );
                 ps.setString(1, user.getUserName());
                 ps.setString(2, user.getPassword());
-                //Dannis fix that for signup
                 if (user instanceof Admin) {
                     ps.setString(3, "admin");
                 } else if (user instanceof Trainer) {
@@ -171,7 +162,7 @@ public class Database {
                 } else if (user instanceof GeneralUser) {
                     ps.setString(3, "user");
                 } else {
-                    ps.setString(3, "general");//useless just in case
+                    ps.setString(3, "general");
                 }
                 ps.executeUpdate();
                 ps.close();
@@ -215,8 +206,8 @@ public class Database {
         return users;
     }
     /*
-     * finds user based off of username returns password and username
-     */
+    * finds user based off of username returns password and username
+    */
     public User findByUsername(String username) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM Users WHERE USERNAME = ?");
@@ -229,7 +220,7 @@ public class Database {
                 else if(Objects.equals(rs.getString("USERTYPE"), "trainer")){
                     return new Trainer(rs.getString("USERNAME"), rs.getString("PASSWORD"));
                 }
-                else if(Objects.equals(rs.getString("USERTYPE"), "user")){//fix
+                else if(Objects.equals(rs.getString("USERTYPE"), "general")){
                     return new GeneralUser(rs.getString("USERNAME"), rs.getString("PASSWORD"));
                 }
                 else{
@@ -244,8 +235,8 @@ public class Database {
         return null;
     }
     /*
-     * Deletes user based off of username
-     */
+    * Deletes user based off of username
+    */
     public void delete(String username) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement("DELETE FROM Users WHERE USERNAME = ?");
@@ -257,9 +248,9 @@ public class Database {
         }
     }
     /*
-     * Saves goal to a specific user or updates goal for that specific user if
-     * the type, and length matches
-     */
+    * Saves goal to a specific user or updates goal for that specific user if
+    * the type, and length matches
+    */
     public void saveGoal(User user, Goal goal){
         try(Connection conn = DriverManager.getConnection(DB_URL)){
             PreparedStatement ps = conn.prepareStatement(
@@ -307,8 +298,8 @@ public class Database {
         }
     }
     /*
-     * Returns all of the goals for one user
-     */
+    * Returns all of the goals for one user
+    */
     public List<Goal> findGoalsByUser(User user) {
         List<Goal> goals = new ArrayList<>();
 
@@ -337,8 +328,8 @@ public class Database {
         return goals;
     }
     /*
-     * finds the goal based off of its type aka weight,sleep,calories
-     */
+    * finds the goal based off of its type aka weight,sleep,calories
+    */
     public Goal findByGoalType(String goalType){
         try(Connection conn = DriverManager.getConnection(DB_URL)){
             PreparedStatement ps = conn.prepareStatement("SELECT " +
@@ -795,8 +786,9 @@ public class Database {
 
     }
     //FIXME needs to return stats
-    public void getStats(){
-
+    public List<Statistic> getAllStats(String username){
+        List<Statistic> stats = new ArrayList<>();
+        return stats;
     }
 
 
