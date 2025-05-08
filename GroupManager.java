@@ -81,4 +81,31 @@ public class GroupManager {
         }
         return false;
     }
+
+    public void postGroupChallenge(String group, String sender, String message) {
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO GroupChallenges (GROUPNAME, SENDER, MESSAGE) VALUES (?, ?, ?)");
+            ps.setString(1, group);
+            ps.setString(2, sender);
+            ps.setString(3, message);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendGroupMessage(String group, String from, String to, String message) {
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO GroupMessages (GROUPNAME, SENDER, RECIPIENT, MESSAGE) VALUES (?, ?, ?, ?)");
+            ps.setString(1, group);
+            ps.setString(2, from);
+            ps.setString(3, to);
+            ps.setString(4, message);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
