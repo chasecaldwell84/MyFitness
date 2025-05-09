@@ -188,7 +188,7 @@ public class StatisticsPage extends JPanel {
             if(workout instanceof CardioWorkout){
 
                 //Create Running Hour stat
-                double cardioSec = ((CardioWorkout) workout).getSeconds()/360.0;
+                double cardioSec = ((CardioWorkout) workout).getSeconds()/3600.0;
                 double cardioMin = ((CardioWorkout) workout).getMinutes()/60.0;
                 double cardioHour = ((CardioWorkout) workout).getHours();
                 double cardioTime = cardioSec+cardioHour+cardioMin;

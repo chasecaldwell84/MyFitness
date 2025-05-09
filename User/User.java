@@ -1,7 +1,5 @@
 package MyFitness.User;
 
-import MyFitness.App;
-
 import javax.swing.*;
 
 /*Note this will be helpful when wanting to have a trainer look at users in the class

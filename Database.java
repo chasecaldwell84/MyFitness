@@ -3,7 +3,6 @@ package MyFitness;
 import MyFitness.ExerciseSession.Workout.CardioWorkout;
 import MyFitness.ExerciseSession.Workout.LiftWorkout;
 import MyFitness.ExerciseSession.Workout.Workout;
-import MyFitness.RyanStuff.CalorieReport;
 import MyFitness.RyanStuff.Goal;
 import MyFitness.RyanStuff.SleepReport;
 import MyFitness.RyanStuff.WeightReport;

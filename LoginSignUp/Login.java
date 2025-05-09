@@ -1,16 +1,11 @@
 package MyFitness.LoginSignUp;
 
 import MyFitness.Database;
-import MyFitness.User.Admin;
-import MyFitness.User.GeneralUser;
-import MyFitness.User.Trainer;
 import MyFitness.User.User;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
 
 public class Login extends JDialog {
     private Database db = Database.getInstance();

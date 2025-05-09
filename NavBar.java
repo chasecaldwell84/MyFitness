@@ -2,7 +2,6 @@ package MyFitness;
 
 import MyFitness.RyanStuff.StatsTracker;
 import MyFitness.Settings.AdminPage;
-import MyFitness.RyanStuff.StatsTracker;
 import MyFitness.RyanStuff.CreateGoals;
 import MyFitness.Settings.UserPage;
 import MyFitness.Statistics.StatisticsPage;
