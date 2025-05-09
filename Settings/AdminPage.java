@@ -110,15 +110,15 @@ public class AdminPage extends JPanel {
         });
         buttonPanel.add(signOutButton);
 
-        JButton viewButton = new JButton("View MyFitness.User");
+        JButton viewButton = new JButton("View User");
         viewButton.addActionListener(new viewUser(this));
         buttonPanel.add(viewButton);
 
-        JButton addUserButton = new JButton("Add MyFitness.User");
+        JButton addUserButton = new JButton("Add User");
         addUserButton.addActionListener(new addUser());
         buttonPanel.add(addUserButton);
 
-        JButton deleteUserButton = new JButton("Delete MyFitness.User");
+        JButton deleteUserButton = new JButton("Delete User");
         deleteUserButton.addActionListener(new deleteUser());
         buttonPanel.add(deleteUserButton);
 
@@ -153,7 +153,7 @@ public class AdminPage extends JPanel {
             if(userList.getSelectedValue() == null){
                 JOptionPane.showMessageDialog(
                         frame,
-                        "No MyFitness.User Selected.",
+                        "No User Selected.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE
                 );
@@ -175,7 +175,7 @@ public class AdminPage extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            SignUp signupWindow = new SignUp("Create MyFitness.User",true);
+            SignUp signupWindow = new SignUp("Create User",true);
             signupWindow.setVisible(true);
             readUsers();
             userList.setListData(users.toArray(new String[0]));
@@ -232,7 +232,7 @@ public class AdminPage extends JPanel {
                     JOptionPane.showMessageDialog(
                             frame,
                             "User " + selectedUserName + " was successfully deleted.",
-                            "MyFitness.User Deleted",
+                            "User Deleted",
                             JOptionPane.INFORMATION_MESSAGE
                     );
                 }
