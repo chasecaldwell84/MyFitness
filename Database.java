@@ -33,8 +33,8 @@ public class Database {
         return instance;
     }
     /*
-    * Creates or connects to database, makes tables Users, UserStats, UserGoals
-    */
+     * Creates or connects to database, makes tables Users, UserStats, UserGoals
+     */
     public Database() {
         try(Connection conn = DriverManager.getConnection(DB_URL)){
             Statement stmt = conn.createStatement();
@@ -163,8 +163,8 @@ public class Database {
         }
     }
     /*
-    * saves new user or updates user in database
-    */
+     * saves new user or updates user in database
+     */
     public void saveUser(User user){
         try(Connection conn = DriverManager.getConnection(DB_URL)) {
             if(user.getUserName() != null && findByUsername(user.getUserName()) != null){
@@ -238,8 +238,8 @@ public class Database {
         return users;
     }
     /*
-    * finds user based off of username returns password and username
-    */
+     * finds user based off of username returns password and username
+     */
     public User findByUsername(String username) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM Users WHERE USERNAME = ?");
@@ -270,8 +270,8 @@ public class Database {
         return null;
     }
     /*
-    * Deletes user based off of username
-    */
+     * Deletes user based off of username
+     */
     public void delete(String username) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement("DELETE FROM Users WHERE USERNAME = ?");
@@ -284,9 +284,9 @@ public class Database {
     }
 
     /*
-    * Saves goal to a specific user or updates goal for that specific user if
-    * the type, and length matches
-    */
+     * Saves goal to a specific user or updates goal for that specific user if
+     * the type, and length matches
+     */
     public void saveGoal(User user, Goal goal){
         try(Connection conn = DriverManager.getConnection(DB_URL)){
             PreparedStatement ps = conn.prepareStatement(
@@ -334,8 +334,8 @@ public class Database {
         }
     }
     /*
-    * Returns all of the goals for one user
-    */
+     * Returns all of the goals for one user
+     */
     public List<Goal> findGoalsByUser(User user) {
         List<Goal> goals = new ArrayList<>();
 
@@ -364,8 +364,8 @@ public class Database {
         return goals;
     }
     /*
-    * finds the goal based off of its type aka weight,sleep,calories
-    */
+     * finds the goal based off of its type aka weight,sleep,calories
+     */
     public Goal findByGoalType(String goalType){
         try(Connection conn = DriverManager.getConnection(DB_URL)){
             PreparedStatement ps = conn.prepareStatement("SELECT " +
@@ -495,7 +495,7 @@ public class Database {
         }
     }
 
-    public Set<Workout> getWorkouts(User user, String sessionDate){
+    public Set<Workout> getWorkoutsByDate(User user, String sessionDate){
         Set<Workout> workouts = new HashSet<>();
 
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
@@ -503,6 +503,68 @@ public class Database {
             try (PreparedStatement ps = conn.prepareStatement(workoutQuery)) {
                 ps.setString(1, user.getUserName());
                 ps.setString(2, sessionDate);
+                ResultSet rs = ps.executeQuery();
+
+                while (rs.next()) {
+                    int workoutId = rs.getInt("WORKOUT_ID");
+                    String workoutName = rs.getString("WORKOUTNAME");
+                    String workoutType = rs.getString("WORKOUTTYPE");
+
+                    if (workoutType.equals("LIFT")) {
+                        LiftWorkout liftWorkout = new LiftWorkout(workoutName);
+                        liftWorkout.setId(workoutId);
+
+                        String liftQuery = "SELECT * FROM WeightLifting WHERE WORKOUT_ID = ?";
+                        try (PreparedStatement liftPs = conn.prepareStatement(liftQuery)) {
+                            liftPs.setInt(1, workoutId);
+                            ResultSet liftRs = liftPs.executeQuery();
+                            while (liftRs.next()) {
+                                double weight = liftRs.getDouble("WEIGHT");
+                                int reps = liftRs.getInt("REPS");
+                                liftWorkout.addSet(new LiftWorkout.LiftSet(weight, reps));
+                            }
+                            liftRs.close();
+                        }
+
+                        workouts.add(liftWorkout);
+                    } else if (workoutType.equals("CARDIO")) {
+                        String cardioQuery = "SELECT * FROM Cardio WHERE WORKOUT_ID = ?";
+                        try (PreparedStatement cardioPs = conn.prepareStatement(cardioQuery)) {
+                            cardioPs.setInt(1, workoutId);
+                            ResultSet cardioRs = cardioPs.executeQuery();
+
+                            if (cardioRs.next()) {
+                                double distance = cardioRs.getDouble("DISTANCE");
+                                int hours = cardioRs.getInt("HOURS");
+                                int minutes = cardioRs.getInt("MINUTES");
+                                int seconds = cardioRs.getInt("SECONDS");
+
+                                CardioWorkout cardioWorkout = new CardioWorkout(workoutName, distance, hours, minutes, seconds);
+                                cardioWorkout.setId(workoutId);
+                                workouts.add(cardioWorkout);
+                            }
+
+                            cardioRs.close();
+                        }
+                    }
+                }
+
+                rs.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return workouts;
+    }
+
+    public Set<Workout> getAllWorkouts(User user){
+        Set<Workout> workouts = new HashSet<>();
+
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            String workoutQuery = "SELECT * FROM Workouts WHERE USERNAME = ?";
+            try (PreparedStatement ps = conn.prepareStatement(workoutQuery)) {
+                ps.setString(1, user.getUserName());
                 ResultSet rs = ps.executeQuery();
 
                 while (rs.next()) {
@@ -978,7 +1040,7 @@ public class Database {
 
 
 
-    
+
 
 
     public void saveSleep(User user, SleepReport sleepReport) {
@@ -989,7 +1051,7 @@ public class Database {
             ps.setString(1, user.getUserName());
             ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
+            /*if (rs.next()) {
                 int existingStatsId = rs.getInt("SLEEP_ID");
 
                 PreparedStatement update = conn.prepareStatement(
@@ -1001,24 +1063,24 @@ public class Database {
                 update.executeUpdate();
 
                 update.close();
-            } else {
-                PreparedStatement insert = conn.prepareStatement(
-                        "INSERT INTO Sleep (USERNAME, SLEEPHOURS, SLEEPMINUTES) VALUES (?, ?, ?)",
-                        Statement.RETURN_GENERATED_KEYS
-                );
-                insert.setString(1, user.getUserName());
-                insert.setInt(2, sleepReport.getHours());
-                insert.setInt(3, sleepReport.getMinutes());
-                insert.executeUpdate();
+            } else {*/
+            PreparedStatement insert = conn.prepareStatement(
+                    "INSERT INTO Sleep (USERNAME, SLEEPHOURS, SLEEPMINUTES) VALUES (?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+            );
+            insert.setString(1, user.getUserName());
+            insert.setInt(2, sleepReport.getHours());
+            insert.setInt(3, sleepReport.getMinutes());
+            insert.executeUpdate();
 
-                ResultSet keys = insert.getGeneratedKeys();
-                if (keys.next()) {
-                    sleepReport.setID(keys.getInt(1));
-                }
-
-                keys.close();
-                insert.close();
+            ResultSet keys = insert.getGeneratedKeys();
+            if (keys.next()) {
+                sleepReport.setID(keys.getInt(1));
             }
+
+            keys.close();
+            insert.close();
+
 
             rs.close();
             ps.close();
