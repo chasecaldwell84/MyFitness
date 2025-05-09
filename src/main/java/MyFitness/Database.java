@@ -4,6 +4,7 @@ import MyFitness.ExerciseSession.Workout.CardioWorkout;
 import MyFitness.ExerciseSession.Workout.LiftWorkout;
 import MyFitness.ExerciseSession.Workout.Workout;
 import MyFitness.RyanStuff.Goal;
+import MyFitness.Statistics.Statistic;
 import MyFitness.User.Admin;
 import MyFitness.User.GeneralUser;
 import MyFitness.User.Trainer;
@@ -113,6 +114,7 @@ public class Database {
                                 "DAYS VARCHAR(255), " +
                                 "SESSION_LENGTH INT, " +
                                 "NUM_WEEKS INT, " +
+                                "IS_SELF_PACED BOOLEAN DEFAULT FALSE, " +
                                 "PRIMARY KEY (CLASS_ID), " +
                                 "FOREIGN KEY (TRAINER_USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
                                 ")"
@@ -374,11 +376,11 @@ public class Database {
 
     //class stuff
     public void saveClass(String trainerUsername, String title, String description, String dateTime,
-                          int seats, String days, int sessionLength, int numWeeks) {
+                          int seats, String days, int sessionLength, int numWeeks, boolean isSelfPaced) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement(
                     "INSERT INTO WorkoutClasses (TRAINER_USERNAME, TITLE, DESCRIPTION, DATETIME, SEATS, DAYS, SESSION_LENGTH, NUM_WEEKS) " +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
             ps.setString(1, trainerUsername);
             ps.setString(2, title);
@@ -388,6 +390,7 @@ public class Database {
             ps.setString(6, days);
             ps.setInt(7, sessionLength);
             ps.setInt(8, numWeeks);
+            ps.setBoolean(9, isSelfPaced);
             ps.executeUpdate();
             ps.close();
         } catch (SQLException e) {
@@ -995,9 +998,11 @@ public class Database {
 
     }
     //FIXME needs to return stats
-    public void getStats(){
-
+    public List<Statistic> getAllStats(String username){
+        List<Statistic> stats = new ArrayList<>();
+        return stats;
     }
+
 
 
     /*public static void main(String[] args) {

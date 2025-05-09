@@ -1,9 +1,12 @@
+
 package MyFitness;
 
 import MyFitness.RyanStuff.CalorieTracker;
 import MyFitness.RyanStuff.CreateGoals;
-import MyFitness.User.*;
+import MyFitness.Settings.*;
+import MyFitness.Statistics.StatisticsPage;
 import MyFitness.Trainer.*;
+import MyFitness.User.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +29,8 @@ public class NavBar extends JPanel {
         Home.addActionListener(e -> {
             frame.getContentPane().removeAll();
             frame.getContentPane().add(this);
-            frame.add(new JLabel("Home Page"));
+            HomePage home = new HomePage(frame);
+            frame.add(home);
             frame.revalidate();
             frame.repaint();
         });
@@ -42,7 +46,7 @@ public class NavBar extends JPanel {
             frame.repaint();
         });
 
-        JButton CalorieTracker = new JButton("Calorie Tracker");
+        JButton CalorieTracker = new JButton("Stats Tracker");
         CalorieTracker.addActionListener(e -> {
             CalorieTracker calorieTrackerPannel = new CalorieTracker(frame);
             frame.getContentPane().removeAll();
@@ -64,11 +68,34 @@ public class NavBar extends JPanel {
 
         JButton socialButton = new JButton("Social");
         socialButton.addActionListener(e -> {
-            JPanel socialPanel = new JPanel(new GridLayout(3, 1, 10, 10));
+            JPanel socialPanel = new JPanel();
+            socialPanel.setLayout(new BoxLayout(socialPanel, BoxLayout.Y_AXIS));
+            socialPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-            JButton addFriendButton = new JButton("Add Friend");
-            JButton sendChallengeButton = new JButton("Send Challenge");
-            JButton viewChallengesButton = new JButton("View Challenges");
+            JLabel titleLabel = new JLabel("Social Dashboard");
+            titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+            titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            socialPanel.add(titleLabel);
+            socialPanel.add(Box.createVerticalStrut(20));
+
+            JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 15, 15));
+            JButton addFriendButton = new JButton("➕ Add Friend");
+            JButton viewFriendsButton = new JButton("👥 View Friends");
+            JButton sendChallengeButton = new JButton("🏁 Send Challenge");
+            JButton viewChallengesButton = new JButton("📋 View Challenges");
+
+            addFriendButton.setToolTipText("Find and add a new friend");
+            viewFriendsButton.setToolTipText("See your current friends list");
+            sendChallengeButton.setToolTipText("Send a challenge to a friend");
+            viewChallengesButton.setToolTipText("View all incoming challenges");
+
+            buttonPanel.add(addFriendButton);
+            buttonPanel.add(viewFriendsButton);
+            buttonPanel.add(sendChallengeButton);
+            buttonPanel.add(viewChallengesButton);
+
+            socialPanel.add(buttonPanel);
+            socialPanel.add(Box.createVerticalStrut(15));
 
             addFriendButton.addActionListener(ae -> {
                 String friendUsername = JOptionPane.showInputDialog(frame, "Enter friend's username:");
@@ -76,10 +103,10 @@ public class NavBar extends JPanel {
 
                 FriendManager fm = frame.getFriendManager();
                 User currentUser = frame.getUser();
+
                 User friend = frame.getAllUsers().stream()
                         .filter(u -> u.getUserName().equalsIgnoreCase(friendUsername.trim()))
-                        .findFirst()
-                        .orElse(null);
+                        .findFirst().orElse(null);
 
                 if (friend == null) {
                     JOptionPane.showMessageDialog(frame, "User not found.");
@@ -88,6 +115,19 @@ public class NavBar extends JPanel {
 
                 fm.addFriend(currentUser, friend);
                 JOptionPane.showMessageDialog(frame, friend.getUserName() + " added as a friend!");
+            });
+
+            viewFriendsButton.addActionListener(ae -> {
+                java.util.List<User> friends = frame.getFriendManager().getFriends(frame.getUser());
+                if (friends.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "No friends found.", "Your Friends", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    StringBuilder list = new StringBuilder();
+                    for (User friend : friends) {
+                        list.append(friend.getUserName()).append("\n");
+                    }
+                    JOptionPane.showMessageDialog(frame, list.toString(), "Your Friends", JOptionPane.INFORMATION_MESSAGE);
+                }
             });
 
             sendChallengeButton.addActionListener(ae -> {
@@ -101,12 +141,12 @@ public class NavBar extends JPanel {
 
             viewChallengesButton.addActionListener(ae -> {
                 java.util.List<String> challenges = frame.getFriendManager().getChallenges(frame.getUser());
-                JOptionPane.showMessageDialog(frame, String.join("\n", challenges), "Your Challenges", JOptionPane.INFORMATION_MESSAGE);
+                if (challenges.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "No challenges available.", "Your Challenges", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(frame, String.join("\n", challenges), "Your Challenges", JOptionPane.INFORMATION_MESSAGE);
+                }
             });
-
-            socialPanel.add(addFriendButton);
-            socialPanel.add(sendChallengeButton);
-            socialPanel.add(viewChallengesButton);
 
             frame.getContentPane().removeAll();
             frame.getContentPane().add(this);
@@ -122,7 +162,7 @@ public class NavBar extends JPanel {
             frame.getContentPane().removeAll();
             frame.getContentPane().add(this);
             if (frame.getUser() instanceof Admin) {
-                frame.add(new AdminPage());
+                frame.add(new AdminPage(frame));
             } else {
                 frame.add(new UserPage(frame));
             }
@@ -144,14 +184,11 @@ public class NavBar extends JPanel {
         classDashboardButton.addActionListener(e -> {
             frame.getContentPane().removeAll();
             frame.setTitle("Class Dashboard");
-
             if (frame.getUser() instanceof Trainer) {
                 Trainer trainer = (Trainer) frame.getUser();
-
                 JPanel trainerPanel = new JPanel();
                 trainerPanel.setLayout(new BoxLayout(trainerPanel, BoxLayout.Y_AXIS));
                 trainerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
                 JLabel title = new JLabel("Class Dashboard (Trainer)");
                 title.setFont(new Font("Arial", Font.BOLD, 24));
                 title.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -159,12 +196,9 @@ public class NavBar extends JPanel {
                 JButton createClass = new JButton("Create New Class");
                 createClass.setAlignmentX(Component.CENTER_ALIGNMENT);
                 createClass.addActionListener(ae -> {
-                    CreateClassPage createPage = new CreateClassPage(frame, trainer);
-                    NavBar newBar = new NavBar(frame);
-                    newBar.setLoggedInUser(this.getLoggedInUser());
                     frame.getContentPane().removeAll();
-                    frame.add(newBar, BorderLayout.NORTH);
-                    frame.add(createPage);
+                    frame.add(new NavBar(frame), BorderLayout.NORTH);
+                    frame.add(new CreateClassPage(frame, trainer));
                     frame.revalidate();
                     frame.repaint();
                 });
@@ -172,12 +206,9 @@ public class NavBar extends JPanel {
                 JButton viewClasses = new JButton("View My Classes");
                 viewClasses.setAlignmentX(Component.CENTER_ALIGNMENT);
                 viewClasses.addActionListener(ae -> {
-                    TrainerClassesPage classesPage = new TrainerClassesPage(frame, trainer);
-                    NavBar newBar = new NavBar(frame);
-                    newBar.setLoggedInUser(this.getLoggedInUser());
                     frame.getContentPane().removeAll();
-                    frame.add(newBar, BorderLayout.NORTH);
-                    frame.add(classesPage);
+                    frame.add(new NavBar(frame), BorderLayout.NORTH);
+                    frame.add(new TrainerClassesPage(frame, trainer));
                     frame.revalidate();
                     frame.repaint();
                 });
@@ -187,17 +218,13 @@ public class NavBar extends JPanel {
                 trainerPanel.add(createClass);
                 trainerPanel.add(Box.createVerticalStrut(10));
                 trainerPanel.add(viewClasses);
-
-                NavBar newBar = new NavBar(frame);
-                newBar.setLoggedInUser(this.getLoggedInUser());
-                frame.add(newBar, BorderLayout.NORTH);
+                frame.add(new NavBar(frame), BorderLayout.NORTH);
                 frame.add(trainerPanel);
             } else {
-                User user = frame.getUser();  // should be GeneralUser
+                GeneralUser user = (GeneralUser) frame.getUser();
                 JPanel userPanel = new JPanel();
                 userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
                 userPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
                 JLabel label = new JLabel("Class Dashboard (User)");
                 label.setFont(new Font("Arial", Font.BOLD, 24));
                 label.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -206,10 +233,8 @@ public class NavBar extends JPanel {
                 addClassBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
                 addClassBtn.addActionListener(ae -> {
                     frame.getContentPane().removeAll();
-                    NavBar newBar = new NavBar(frame);
-                    newBar.setLoggedInUser(this.getLoggedInUser());
-                    frame.add(newBar, BorderLayout.NORTH);
-                    frame.add(new AddClassPanel(frame, (GeneralUser) user));
+                    frame.add(new NavBar(frame), BorderLayout.NORTH);
+                    frame.add(new AddClassPanel(frame, user));
                     frame.revalidate();
                     frame.repaint();
                 });
@@ -218,10 +243,8 @@ public class NavBar extends JPanel {
                 seeMyClassBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
                 seeMyClassBtn.addActionListener(ae -> {
                     frame.getContentPane().removeAll();
-                    NavBar newBar = new NavBar(frame);
-                    newBar.setLoggedInUser(this.getLoggedInUser());
-                    frame.add(newBar, BorderLayout.NORTH);
-                    frame.add(new SeeMyClassPanel(frame, (GeneralUser) user));
+                    frame.add(new NavBar(frame), BorderLayout.NORTH);
+                    frame.add(new SeeMyClassPanel(frame, user));
                     frame.revalidate();
                     frame.repaint();
                 });
@@ -231,13 +254,9 @@ public class NavBar extends JPanel {
                 userPanel.add(addClassBtn);
                 userPanel.add(Box.createVerticalStrut(10));
                 userPanel.add(seeMyClassBtn);
-
-                NavBar newBar = new NavBar(frame);
-                newBar.setLoggedInUser(this.getLoggedInUser());
-                frame.add(newBar, BorderLayout.NORTH);
+                frame.add(new NavBar(frame), BorderLayout.NORTH);
                 frame.add(userPanel);
             }
-
             frame.revalidate();
             frame.repaint();
         });
@@ -250,5 +269,13 @@ public class NavBar extends JPanel {
         add(socialButton);
         add(settings);
         add(statistics);
+    }
+    public void showHomePage(App frame){
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(this);
+        HomePage home = new HomePage(frame);
+        frame.add(home);
+        frame.revalidate();
+        frame.repaint();
     }
 }

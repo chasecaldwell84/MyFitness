@@ -92,13 +92,13 @@ public class ChallengeSender extends JPanel {
     }
 
    /* public static void main(String[] args) {
-        // test 
+        // test
         SwingUtilities.invokeLater(() -> {
-            MyFitness.User chase = new MyFitness.MyFitness.User.GeneralUser("chase", "pass123");
-            MyFitness.User ryan = new MyFitness.MyFitness.User.GeneralUser("ryan", "pass456");
-            MyFitness.User michael = new MyFitness.MyFitness.User.GeneralUser("michael", "pass789");
+            User chase = new MyFitness.User.GeneralUser("chase", "pass123");
+            User ryan = new MyFitness.User.GeneralUser("ryan", "pass456");
+            User michael = new MyFitness.User.GeneralUser("michael", "pass789");
 
-            MyFitness.FriendManager fm = new MyFitness.FriendManager();
+            FriendManager fm = new FriendManager();
             fm.addFriend(chase, ryan);
             fm.addFriend(chase, michael);
 
@@ -106,7 +106,7 @@ public class ChallengeSender extends JPanel {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(600, 300);
             frame.setLocationRelativeTo(null);
-            frame.add(new MyFitness.ChallengeSender(fm, chase));
+            frame.add(new ChallengeSender(fm, chase));
             frame.setVisible(true);
         });
     }*/

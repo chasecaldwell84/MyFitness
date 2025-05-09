@@ -31,7 +31,7 @@ public class CreateClassPage extends JPanel {
         titleLabel.setFont(App.titleFont);
 
         JPanel formPanel = new JPanel();
-        formPanel.setLayout(new GridLayout(9, 2, 10, 10));
+        formPanel.setLayout(new GridLayout(10, 2, 10, 10));
 
         JTextField titleField = new JTextField();
         JTextField descriptionField = new JTextField();
@@ -51,6 +51,8 @@ public class CreateClassPage extends JPanel {
             daysPanel.add(cb);
         }
 
+        JCheckBox selfPacedBox = new JCheckBox("This is a Self-Paced Class");
+
         formPanel.add(new JLabel("Class Title:"));
         formPanel.add(titleField);
         formPanel.add(new JLabel("Description:"));
@@ -67,6 +69,8 @@ public class CreateClassPage extends JPanel {
         formPanel.add(seatsField);
         formPanel.add(new JLabel("Class Days:"));
         formPanel.add(daysPanel);
+        formPanel.add(new JLabel("Self-Paced Option:"));
+        formPanel.add(selfPacedBox);
 
         JButton createButton = new JButton("Create Class");
         createButton.addActionListener(e -> {
@@ -77,6 +81,7 @@ public class CreateClassPage extends JPanel {
             String lengthStr = lengthField.getText().trim();
             String weeksStr = weeksField.getText().trim();
             String seatsStr = seatsField.getText().trim();
+            boolean isSelfPaced = selfPacedBox.isSelected();
 
             StringBuilder days = new StringBuilder();
             for (JCheckBox cb : dayCheckboxes) {
@@ -119,22 +124,18 @@ public class CreateClassPage extends JPanel {
 
             String dateTime = parsedDate.toString() + " " + time;
             String daysStr = days.toString();
-            // Placeholder: save class (extend your DB schema if needed)
+
             Database.getInstance().saveClass(
                     trainer.getUserName(),
-                    title,                 // String
-                    desc,                  // String
-                    dateTime,              // String
+                    title,
+                    desc,
+                    dateTime,
                     seats,
                     daysStr,
-                    length,                // int
-                    weeks                  // int
+                    length,
+                    weeks,
+                    isSelfPaced
             );
-
-
-
-
-            // TODO: update saveClass to accept daysStr, length, weeks if needed
 
             JOptionPane.showMessageDialog(this, "Class created successfully!");
 

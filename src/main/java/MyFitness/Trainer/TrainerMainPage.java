@@ -24,18 +24,19 @@ public class TrainerMainPage extends JPanel {
     }
 
     private void createGUI() {
-        JLabel titleLabel = new JLabel("Trainer Dashboard", SwingConstants.CENTER);
-        titleLabel.setFont(App.titleFont);
+        JLabel titleLabel = new JLabel("Class Dashboard (Trainer)", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));  // match NavBar styling
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);  // ensure proper centering
 
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
-        titlePanel.add(Box.createVerticalStrut(50));
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));  // spacing from navbar
         titlePanel.add(titleLabel);
+        titlePanel.add(Box.createVerticalStrut(20));
 
-        // Class Management Buttons
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 100, 20, 100));
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(0, 100, 20, 100));
 
         JButton createClassButton = new JButton("Create New Class");
         JButton viewMyClassesButton = new JButton("View My Classes");
@@ -43,39 +44,31 @@ public class TrainerMainPage extends JPanel {
         createClassButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         viewMyClassesButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        centerPanel.add(Box.createVerticalStrut(30));
         centerPanel.add(createClassButton);
         centerPanel.add(Box.createVerticalStrut(20));
         centerPanel.add(viewMyClassesButton);
 
         createClassButton.addActionListener(e -> {
-            CreateClassPage createClassPage = new CreateClassPage(frame, trainer);
             frame.getContentPane().removeAll();
             frame.add(new NavBar(frame), BorderLayout.NORTH);
-            frame.add(createClassPage);
+            frame.add(new CreateClassPage(frame, trainer));
             frame.revalidate();
             frame.repaint();
         });
 
         viewMyClassesButton.addActionListener(e -> {
-            TrainerClassesPage trainerClassesPage = new TrainerClassesPage(frame, trainer);
             frame.getContentPane().removeAll();
             frame.add(new NavBar(frame), BorderLayout.NORTH);
-            frame.add(trainerClassesPage);
+            frame.add(new TrainerClassesPage(frame, trainer));
             frame.revalidate();
             frame.repaint();
         });
 
-        // Reuse user settings panel
-        JPanel bottomPanel = new JPanel();
-        JButton changeUsernameButton = new JButton("Change Username");
-        JButton showPasswordButton = new JButton("Show Password");
-
-        bottomPanel.add(changeUsernameButton);
-        bottomPanel.add(showPasswordButton);
-
+        // Final layout
+        setLayout(new BorderLayout());
         add(titlePanel, BorderLayout.NORTH);
         add(centerPanel, BorderLayout.CENTER);
-        add(bottomPanel, BorderLayout.SOUTH);
     }
+
+
 }

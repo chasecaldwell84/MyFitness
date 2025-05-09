@@ -26,6 +26,8 @@ public class ModifyPlanPanel extends JPanel {
     private final JTextField instructionField = new JTextField(10);
     private final JTextField durationField = new JTextField(10);
     private final JTextArea planDescArea = new JTextArea(3, 20);
+    private String selectedExerciseName = null;
+
 
     private final int classId;
     private final String trainerUsername;
@@ -72,7 +74,8 @@ public class ModifyPlanPanel extends JPanel {
                 if (selected != null) {
                     String[] parts = selected.split("\\|");
                     if (parts.length == 4) {
-                        exerciseField.setText(parts[0].split(":")[1].trim());
+                        selectedExerciseName = parts[0].split(":")[1].trim(); // 👈 track original name
+                        exerciseField.setText(selectedExerciseName);
                         instructionField.setText(parts[1].split(":")[1].trim());
                         durationField.setText(parts[2].split(":")[1].trim());
                         planDescArea.setText(parts[3].split(":")[1].trim());
@@ -80,6 +83,7 @@ public class ModifyPlanPanel extends JPanel {
                 }
             }
         });
+
 
         addLabelAndField("Exercise:", exerciseField, c, 12);
         addLabelAndField("Instruction(eg. 3 sets of 12 reps):", instructionField, c, 13);
@@ -166,20 +170,38 @@ public class ModifyPlanPanel extends JPanel {
             int duration = Integer.parseInt(durationField.getText().trim());
             String description = planDescArea.getText().trim();
 
-            String[] existing = db.getExercisePlan(exercise, trainerUsername);
+            boolean existsInClass = false;
 
-            if (existing[0] != null) {
-                db.updateExercisePlan(exercise, exercise, instruction, duration, trainerUsername, description);
+            for (int i = 0; i < planListModel.getSize(); i++) {
+                String entry = planListModel.getElementAt(i);
+                if (entry.startsWith("Exercise: " + exercise + " ")) {
+                    existsInClass = true;
+                    break;
+                }
+            }
+
+            if (existsInClass) {
+                db.updateExercisePlan(exercise, exercise, instruction, duration, description, trainerUsername);
             } else {
                 db.savePlanToClass(classId, exercise, instruction, duration, description);
             }
+
             JOptionPane.showMessageDialog(this, "Plan saved/updated!");
+
+            // Clear fields after save
+            exerciseField.setText("");
+            instructionField.setText("");
+            durationField.setText("");
+            planDescArea.setText("");
+            selectedExerciseName = null;
+
             loadPlanList();
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Invalid input or error saving plan", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
     private void deletePlan(ActionEvent e) {
         String selected = planList.getSelectedValue();
