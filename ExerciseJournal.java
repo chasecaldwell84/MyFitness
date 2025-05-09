@@ -13,27 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Set;
 
-
-/* TODO: Refactor code completely. Don't use static. Extend JPanel.
-*   Configure so that the user can input a lift or cardio workout. Configure so
-*   that input is more strict and won't be as prone to user error.  */
-
-/* TODO UPDATE: Mostly done with this phase of refactoring. No longer using
-*   static. Now extending JPanel. Is now configured to enter a lift or cardio
-*   workout. Still need to make input more strict and less prone to user error.
-*   While the initial version of ExerciseJournal could write to a csv, this
-*   version does not yet write to any file or database. Will be implementing
-*   later. Once functionality is finished, make the UI look better. */
-
 public class ExerciseJournal extends JPanel {
-
-    /*public static void main(String[] args){
-        JFrame frame = new JFrame("Exercise Journal");
-        ExerciseJournal exerciseJournal = new ExerciseJournal(frame);
-        frame.add(exerciseJournal);
-        frame.setVisible(true);
-    }*/
-
     private JComboBox<String> monthBox;
     private JComboBox<Integer> dayBox;
     private JComboBox<Integer> yearBox;
@@ -42,6 +22,9 @@ public class ExerciseJournal extends JPanel {
     public ExerciseJournal(App frame, NavBar navBar, User user) {
         frame.setTitle("Exercise Journal");
         setLayout(new GridBagLayout());
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
 
         GridBagConstraints c = new GridBagConstraints();
@@ -52,22 +35,26 @@ public class ExerciseJournal extends JPanel {
         title.setFont(new Font("Arial", Font.BOLD, 20));
         headerPanel.add(title);
 
-        JButton addSession = new JButton("Add Exercise Session");
-        addSession.addActionListener(e -> {
-            frame.getContentPane().removeAll();
-            frame.add(navBar);
-            frame.add(new ExerciseSession(frame, this, navBar, user));
-            frame.revalidate();
-            frame.repaint();
-        });
-        headerPanel.add(addSession);
-
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.CENTER;
         c.fill = GridBagConstraints.NONE;
         add(headerPanel, c);
+
+
+        JPanel sessionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        JButton addSession = new JButton("Add Exercise Session");
+        addSession.addActionListener(e -> {
+            frame.getContentPane().removeAll();
+            frame.add(navBar);
+            frame.add(new ExerciseSession(frame, this, navBar));
+            frame.revalidate();
+            frame.repaint();
+        });
+        sessionPanel.add(addSession);
+        c.gridy++;
+        add(sessionPanel, c);
 
 
         // --- Date Dropdowns in One Row (No Labels) ---
@@ -100,25 +87,23 @@ public class ExerciseJournal extends JPanel {
         }
         datePanel.add(yearBox);
 
+        // --- Search Button ---
+        JButton searchButton = new JButton("Search Workouts");
+        datePanel.add(searchButton);
+
         // Add to main layout
         c.gridx = 0;
-        c.gridy = 2;
+        c.gridy++;
         c.gridwidth = 2;
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.CENTER;
         add(datePanel, c);
 
-
-        // --- Search Button ---
-        JButton searchButton = new JButton("Search Workouts");
-        c.gridx = 0; c.gridy = 5; c.gridwidth = 2;
-        add(searchButton, c);
-
         // --- Text Area to Display Workouts ---
-        workoutDisplay = new JTextArea(10, 40);
+        workoutDisplay = new JTextArea(40, 40);
         workoutDisplay.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(workoutDisplay);
-        c.gridy = 6;
+        c.gridy++;
         add(scrollPane, c);
 
         // --- Action Listener ---
