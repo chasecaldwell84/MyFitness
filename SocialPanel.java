@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 public class SocialPanel extends JPanel {
     public SocialPanel(App frame) {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -28,7 +29,7 @@ public class SocialPanel extends JPanel {
         JButton sendChallengeButton = styledButton("🏁 Send Challenge");
         JButton viewChallengesButton = styledButton("📋 View Challenges");
         JButton manageGroupsButton = styledButton("🌐 Manage Groups");
-        JButton manageClassesButton = styledButton("📚 Manage Classes");
+        //JButton manageClassesButton = styledButton("📚 Manage Classes");
 
         //JLabel statusLabel = new JLabel(" ");
         //statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -44,7 +45,7 @@ public class SocialPanel extends JPanel {
         sendChallengeButton.setToolTipText("Send a challenge to a friend");
         viewChallengesButton.setToolTipText("View all incoming challenges");
         manageGroupsButton.setToolTipText("Explore available fitness and social groups");
-        manageClassesButton.setToolTipText("Explore available fitness and social classes");
+        //manageClassesButton.setToolTipText("Explore available fitness and social classes");
 
         // Add buttons
         buttonPanel.add(addFriendButton);
@@ -52,13 +53,13 @@ public class SocialPanel extends JPanel {
         buttonPanel.add(sendChallengeButton);
         buttonPanel.add(viewChallengesButton);
         buttonPanel.add(manageGroupsButton);
-        buttonPanel.add(manageClassesButton);
+        //buttonPanel.add(manageClassesButton);
 
         this.add(buttonPanel);
         this.add(Box.createVerticalStrut(15));
         this.add(statusLabel);
 
-        this.add(buttonPanel, BorderLayout.CENTER);
+        //this.add(buttonPanel, BorderLayout.CENTER);
 
 
         addFriendButton.addActionListener(ae -> {
@@ -101,13 +102,13 @@ public class SocialPanel extends JPanel {
 
                 if (chosen != null) {
                     fm.addFriend(currentUser, chosen);
-                    statusLabel.setText(selected + " added as a friend!");
-                    // frame.setContentPane( new SocialPanel(frame, navbar));
-                   // frame.getContentPane().removeAll();
+                    JOptionPane.showMessageDialog(frame, selected + " added as a friend!", "Friend Added", JOptionPane.INFORMATION_MESSAGE);
+                    //frame.setContentPane( new SocialPanel(frame, navbar));
+                    // frame.getContentPane().removeAll();
                     //frame.add(navbar, BorderLayout.NORTH);
                     //frame.add(new SocialPanel(frame), BorderLayout.CENTER);
-                   // frame.revalidate();
-                   // frame.repaint();
+                    // frame.revalidate();
+                    // frame.repaint();
                 }
             }
         });
@@ -190,16 +191,19 @@ public class SocialPanel extends JPanel {
             if (selectedFriend != null) {
                 String challengeText = JOptionPane.showInputDialog(frame, "Enter your challenge:");
 
-                if (challengeText != null && !challengeText.trim().isEmpty()) {
-                    User recipient = friends.stream()
-                            .filter(f -> f.getUserName().equals(selectedFriend))
-                            .findFirst().orElse(null);
-                    if (recipient != null) {
-                        fm.sendChallenge(currentUser, recipient, challengeText.trim());
-                        JOptionPane.showMessageDialog(frame, "Challenge sent to " + selectedFriend + "!");
+                if (challengeText != null) {
+                    challengeText = challengeText.trim();
+                    if (!challengeText.isEmpty()) {
+                        User recipient = friends.stream()
+                                .filter(f -> f.getUserName().equals(selectedFriend))
+                                .findFirst().orElse(null);
+                        if (recipient != null) {
+                            fm.sendChallenge(currentUser, recipient, challengeText);
+                            JOptionPane.showMessageDialog(frame, "Challenge sent to " + selectedFriend + "!");
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Challenge cannot be empty.");
                     }
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Challenge cannot be empty.");
                 }
             }
         });
@@ -218,51 +222,45 @@ public class SocialPanel extends JPanel {
             User currentUser = frame.getUser();
 
             String[] groupOptions = {"Create Group", "View Available Groups", "View My Groups"};
-            String action = (String) JOptionPane.showInputDialog(frame, "Select an action:", "Group Options",
-                    JOptionPane.PLAIN_MESSAGE, null, groupOptions, groupOptions[0]);
+            int choice = JOptionPane.showOptionDialog(frame, "Choose a group action:", "Group Options",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, groupOptions, groupOptions[0]);
 
-            if (action == null) return;
+            if (choice == JOptionPane.CLOSED_OPTION) return;
+            String action = groupOptions[choice];
 
             switch (action) {
                 case "Create Group":
                     String newGroupName = JOptionPane.showInputDialog(frame, "Enter new group name:");
-                    if (newGroupName != null && !newGroupName.trim().isEmpty()) {
-                        gm.joinGroup(currentUser, newGroupName.trim());
-                        JOptionPane.showMessageDialog(frame, "Group '" + newGroupName + "' created. You are now the owner.");
-                    }
+                    if (newGroupName == null || newGroupName.trim().isEmpty()) return;
+                    String groupDesc = JOptionPane.showInputDialog(frame, "Enter group description:");
+                    if (groupDesc == null) groupDesc = "";
+                    gm.createGroup(currentUser, newGroupName.trim(), groupDesc.trim());
+                    JOptionPane.showMessageDialog(frame, "Group '" + newGroupName + "' created. You are now the owner.");
                     break;
 
                 case "View Available Groups":
                     Set<String> allGroups = gm.getAllGroupNames();
-                    String[] availableOptions = allGroups.toArray(new String[0]);
-                    String selectedGroup = (String) JOptionPane.showInputDialog(
-                            frame, "Select group to join or view:", "Available Groups",
-                            JOptionPane.PLAIN_MESSAGE, null, availableOptions,
-                            availableOptions.length > 0 ? availableOptions[0] : null
-                    );
-                    if (selectedGroup != null) {
-                        if (!gm.isUserInGroup(currentUser, selectedGroup)) {
-                            int confirm = JOptionPane.showConfirmDialog(frame,
-                                    "You are not in this group. Join now?",
-                                    "Join Group",
-                                    JOptionPane.YES_NO_OPTION);
-                            if (confirm == JOptionPane.YES_OPTION) {
-                                gm.joinGroup(currentUser, selectedGroup);
-                                JOptionPane.showMessageDialog(frame, "Joined group: " + selectedGroup);
-                            }
-                        } else {
-                            Set<User> members = gm.getMembers(selectedGroup);
-                            StringBuilder sb = new StringBuilder("Members in " + selectedGroup + ":\n");
-                            for (User member : members) {
-                                sb.append("• ").append(member.getUserName());
-                                if (!member.getUserName().equals(currentUser.getUserName())) {
-                                    sb.append("  [Message] [Challenge]");
-                                } else {
-                                    sb.append("  (You)");
-                                }
-                                sb.append("\n");
-                            }
-                            JOptionPane.showMessageDialog(frame, sb.toString());
+                    Set<String> availableGroups = new HashSet<>();
+                    for (String group : allGroups) {
+                        if (!gm.isGroupOwner(currentUser, group)) {
+                            availableGroups.add(group);
+                        }
+                    }
+                    String[] availableOptions = availableGroups.toArray(new String[0]);
+                    int choiceAG = JOptionPane.showOptionDialog(
+                            frame, "Select a group to view or join:", "Available Groups",
+                            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, availableOptions, availableOptions[0]);
+
+                    if (choiceAG == JOptionPane.CLOSED_OPTION) return;
+                    String selectedGroup = availableOptions[choiceAG];
+                    if (!gm.isUserInGroup(currentUser, selectedGroup)) {
+                        String description = gm.getGroupDescription(selectedGroup);
+                        int confirm = JOptionPane.showConfirmDialog(frame,
+                                "Group: " + selectedGroup + "\n\nDescription:\n" + description + "\n\nJoin this group?",
+                                "Join Group", JOptionPane.YES_NO_OPTION);
+                        if (confirm == JOptionPane.YES_OPTION) {
+                            gm.requestToJoinGroup(currentUser, selectedGroup);
+                            JOptionPane.showMessageDialog(frame, "Join request sent to group owner.");
                         }
                     }
                     break;
@@ -277,107 +275,106 @@ public class SocialPanel extends JPanel {
                         return;
                     }
                     String[] myOptions = myGroups.toArray(new String[0]);
-                    String mySelected = (String) JOptionPane.showInputDialog(
-                            frame, "Select a group to manage:", "My Groups",
-                            JOptionPane.PLAIN_MESSAGE, null, myOptions, myOptions[0]
-                    );
-                    if (mySelected != null) {
-                        Set<User> members = gm.getMembers(mySelected);
-                        JPanel memberPanel = new JPanel();
-                        memberPanel.setLayout(new BoxLayout(memberPanel, BoxLayout.Y_AXIS));
+                    int choiceMG = JOptionPane.showOptionDialog(frame, "Select a group to manage:", "My Groups",
+                            JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, myOptions, myOptions[0]);
 
-                        JTextField challengeField = new JTextField();
-                        JButton postChallengeBtn = new JButton("Post Challenge to Group");
-                        postChallengeBtn.addActionListener(e -> {
-                            String msg = challengeField.getText().trim();
-                            if (!msg.isEmpty()) {
-                                gm.postGroupChallenge(mySelected, currentUser.getUserName(), msg);
-                                JOptionPane.showMessageDialog(frame, "Challenge posted to group!");
-                            }
-                        });
+                    if (choiceMG == JOptionPane.CLOSED_OPTION) return;
+                    String mySelected = myOptions[choiceMG];
+                    JPanel memberPanel = new JPanel();
+                    memberPanel.setLayout(new BoxLayout(memberPanel, BoxLayout.Y_AXIS));
 
-                        memberPanel.add(new JLabel("Group Challenge:"));
-                        memberPanel.add(challengeField);
-                        memberPanel.add(postChallengeBtn);
+                    JTextField challengeField = new JTextField();
+                    JButton postChallengeBtn = new JButton("Post Challenge to Group");
+                    postChallengeBtn.addActionListener(e -> {
+                        String msg = challengeField.getText().trim();
+                        if (!msg.isEmpty()) {
+                            gm.postGroupChallenge(mySelected, currentUser.getUserName(), msg);
+                            JOptionPane.showMessageDialog(frame, "Challenge posted to group!");
+                        }
+                    });
 
-                        for (User m : members) {
-                            JPanel row = new JPanel(new BorderLayout());
-                            row.add(new JLabel(m.getUserName()), BorderLayout.WEST);
-                            if (!m.getUserName().equals(currentUser.getUserName())) {
-                                JButton messageBtn = new JButton("Message");
-                                messageBtn.addActionListener(e -> {
-                                    String msg = JOptionPane.showInputDialog(frame, "Send message to " + m.getUserName() + ":");
-                                    if (msg != null && !msg.trim().isEmpty()) {
-                                        gm.sendGroupMessage(mySelected, currentUser.getUserName(), m.getUserName(), msg);
-                                        JOptionPane.showMessageDialog(frame, "Message sent to " + m.getUserName());
-                                    }
+                    memberPanel.add(new JLabel("Group Challenge:"));
+                    memberPanel.add(challengeField);
+                    memberPanel.add(postChallengeBtn);
+
+                    Set<User> members = gm.getMembers(mySelected);
+                    for (User m : members) {
+                        JPanel row = new JPanel(new BorderLayout());
+                        String name = m.getUserName();
+                        if (gm.isGroupOwner(m, mySelected)) name += " (Owner)";
+                        row.add(new JLabel(name), BorderLayout.WEST);
+
+                        if (!m.getUserName().equals(currentUser.getUserName()) && gm.isGroupOwner(currentUser, mySelected)) {
+                            JButton messageBtn = new JButton("Message");
+                            messageBtn.addActionListener(ev -> {
+                                String msg = JOptionPane.showInputDialog(frame, "Send message to " + m.getUserName() + ":");
+                                if (msg != null && !msg.trim().isEmpty()) {
+                                    gm.sendGroupMessage(mySelected, currentUser.getUserName(), m.getUserName(), msg);
+                                    JOptionPane.showMessageDialog(frame, "Message sent to " + m.getUserName());
+                                }
+                            });
+
+                            JButton kickBtn = new JButton("Kick");
+                            kickBtn.addActionListener(ev -> {
+                                int confirm = JOptionPane.showConfirmDialog(frame, "Kick " + m.getUserName() + "?", "Confirm", JOptionPane.YES_NO_OPTION);
+                                if (confirm == JOptionPane.YES_OPTION) {
+                                    gm.leaveGroup(m, mySelected);
+                                    JOptionPane.showMessageDialog(frame, m.getUserName() + " was removed.");
+                                }
+                            });
+
+                            JPanel actions = new JPanel();
+                            actions.add(messageBtn);
+                            actions.add(kickBtn);
+                            row.add(actions, BorderLayout.EAST);
+                        }
+                        memberPanel.add(row);
+                    }
+
+                    if (gm.isGroupOwner(currentUser, mySelected)) {
+                        List<User> requests = gm.getJoinRequests(mySelected);
+                        if (!requests.isEmpty()) {
+                            memberPanel.add(new JLabel("Pending Join Requests:"));
+                            for (User req : requests) {
+                                JPanel reqRow = new JPanel();
+                                JLabel userLabel = new JLabel(req.getUserName());
+                                JButton approve = new JButton("Approve");
+                                JButton reject = new JButton("Reject");
+
+                                approve.addActionListener(ev -> {
+                                    gm.approveJoinRequest(req, mySelected);
+                                    JOptionPane.showMessageDialog(frame, req.getUserName() + " approved!");
                                 });
-                                JButton kickBtn = new JButton("Kick");
-                                kickBtn.addActionListener(e -> {
-                                    int confirm = JOptionPane.showConfirmDialog(frame, "Kick " + m.getUserName() + "?", "Confirm", JOptionPane.YES_NO_OPTION);
-                                    if (confirm == JOptionPane.YES_OPTION) {
-                                        gm.leaveGroup(m, mySelected);
-                                        JOptionPane.showMessageDialog(frame, m.getUserName() + " was removed.");
-                                    }
+                                reject.addActionListener(ev -> {
+                                    gm.rejectJoinRequest(req, mySelected);
+                                    JOptionPane.showMessageDialog(frame, req.getUserName() + " rejected.");
                                 });
-                                JPanel actions = new JPanel();
-                                actions.add(messageBtn);
-                                actions.add(kickBtn);
-                                row.add(actions, BorderLayout.EAST);
+
+                                reqRow.add(userLabel);
+                                reqRow.add(approve);
+                                reqRow.add(reject);
+                                memberPanel.add(reqRow);
                             }
-                            memberPanel.add(row);
                         }
 
-                        JOptionPane.showMessageDialog(frame, memberPanel, "Group Members: " + mySelected, JOptionPane.PLAIN_MESSAGE);
+                        JButton deleteBtn = new JButton("Delete Group");
+                        deleteBtn.addActionListener(e -> {
+                            int confirm = JOptionPane.showConfirmDialog(frame, "Delete group '" + mySelected + "'?", "Confirm", JOptionPane.YES_NO_OPTION);
+                            if (confirm == JOptionPane.YES_OPTION) {
+                                gm.deleteGroup(mySelected);
+                                JOptionPane.showMessageDialog(frame, "Group deleted.");
+                            }
+                        });
+                        memberPanel.add(Box.createVerticalStrut(10));
+                        memberPanel.add(deleteBtn);
                     }
+
+                    JOptionPane.showMessageDialog(frame, memberPanel, "Group Members: " + mySelected, JOptionPane.PLAIN_MESSAGE);
                     break;
             }
         });
 
-        manageClassesButton.addActionListener(ae -> {
-            java.util.List<User> users = Database.getInstance().getAllUsers();
-            List<Trainer> trainers = new ArrayList<>();
-            for (User u : users) if (u instanceof Trainer) trainers.add((Trainer) u);
-
-            if (trainers.isEmpty()) {
-                JOptionPane.showMessageDialog(frame, "No trainer classes available.", "Manage Classes", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-
-            String[] trainerNames = trainers.stream().map(Trainer::getUserName).toArray(String[]::new);
-            String selectedTrainer = (String) JOptionPane.showInputDialog(frame, "Choose Trainer:", "Trainer Selection", JOptionPane.PLAIN_MESSAGE, null, trainerNames, trainerNames[0]);
-
-            if (selectedTrainer != null) {
-                String[] availableClasses = Database.getInstance().getTrainerClasses(selectedTrainer);
-
-                if (availableClasses.length == 0) {
-                    JOptionPane.showMessageDialog(frame, "No classes offered by this trainer.");
-                    return;
-                }
-
-                String selectedClass = (String) JOptionPane.showInputDialog(frame, "Choose a class to join:", "Class Selection", JOptionPane.PLAIN_MESSAGE, null, availableClasses, availableClasses[0]);
-
-                if (selectedClass != null) {
-                    String description = Database.getInstance().getClassDescription(selectedClass);
-                    int confirm = JOptionPane.showConfirmDialog(frame, description + "\n\nWould you like to request to join?", "Join Class", JOptionPane.YES_NO_OPTION);
-
-                    if (confirm == JOptionPane.YES_OPTION) {
-                        Database.getInstance().requestJoinClass(frame.getUser().getUserName(), selectedClass);
-                        JOptionPane.showMessageDialog(frame, "Request to join '" + selectedClass + "' sent.");
-                    }
-                }
-            }
-        });
-
-
-        //frame.getContentPane().removeAll();
-        //frame.getContentPane().add(this);
-        //frame.add(this);
-        //frame.setTitle("Social Menu");
-        //frame.revalidate();
-        //frame.repaint();
     }
-
     private JButton styledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("Segoe UI", Font.PLAIN, 18));
@@ -389,3 +386,6 @@ public class SocialPanel extends JPanel {
         return button;
     }
 }
+
+
+
