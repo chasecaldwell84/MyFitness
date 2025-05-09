@@ -56,14 +56,14 @@ public class LandingPage extends JFrame {
             if(loginPanel.getAuthenticated()){
                 loginPanel.dispose();
                 app.setUser(loginPanel.getUser());
-
                 dispose();
                 app.setVisible(true);
+                app.getNavBar().showHomePage(app);
             }
         });
 
         JButton signUp = new JButton("Sign Up");
-        SignUp signUpPanel = new SignUp();
+        SignUp signUpPanel = new SignUp("Sign-Up",false);
 
         signUp.addActionListener(e -> {
             signUpPanel.setVisible(true);

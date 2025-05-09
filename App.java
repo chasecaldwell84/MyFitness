@@ -13,11 +13,17 @@ public class App extends JFrame {
     public static Font labelFontLarge = new Font("Arial", Font.PLAIN, 20);
     public static Font titleFont = new Font("Arial", Font.BOLD, 40);
 
+    private static NavBar navBar;
+
     public void setUser(User user) {
         this.user = user;
     }
     public User getUser() {
         return user;
+    }
+
+    public NavBar getNavBar(){
+        return navBar;
     }
 
     private FriendManager friendManager = new FriendManager();
@@ -36,7 +42,10 @@ public class App extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH); //NOTE automatic full screen
         setSize((int)screenSize.getWidth(), (int)screenSize.getHeight());
-        NavBar navBar = new NavBar(this);
+
+        getContentPane().setLayout(new BorderLayout());
+
+        navBar = new NavBar(this);
         add(navBar, BorderLayout.NORTH);
     }
     /*TODO should be the class that implements the interface that is updated by the other classes*/
