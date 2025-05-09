@@ -1,6 +1,9 @@
 package MyFitness.LoginSignUp;
 
+import MyFitness.App;
 import MyFitness.Database;
+import MyFitness.HomePage;
+import MyFitness.NavBar;
 import MyFitness.User.Admin;
 import MyFitness.User.GeneralUser;
 import MyFitness.User.Trainer;
@@ -16,6 +19,8 @@ public class Login extends JDialog {
     private Database db = Database.getInstance();
     private Boolean Authenticated = false;
     private User user = null;
+    private App frame;
+
 
     //private Font labelFont = new Font("Arial", Font.BOLD, 14);
     private Font loginTitleFont = new Font("Arial", Font.BOLD, 40);
@@ -28,8 +33,8 @@ public class Login extends JDialog {
         return Authenticated;
     }
 
-    public Login() {
-
+    public Login(App frame) {
+        this.frame = frame;
         setTitle("Login");
         setModal(true);
         setLayout(new BorderLayout());
@@ -209,7 +214,15 @@ public class Login extends JDialog {
             user = foundUser;
 
             JOptionPane.showMessageDialog(this, "You have successfully logged in.");
+            frame.setUser(foundUser);
             dispose();
+            frame.getContentPane().removeAll();
+            NavBar navBar = new NavBar(frame);
+            frame.add(navBar, BorderLayout.NORTH);
+            frame.add(new HomePage(frame), BorderLayout.CENTER);
+            frame.revalidate();
+            frame.repaint();
+
         } else {
             JOptionPane.showMessageDialog(this, "Incorrect username or password.");
             Authenticated = false;

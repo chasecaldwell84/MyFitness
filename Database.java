@@ -156,6 +156,86 @@ public class Database {
                             "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
                             ")"
             );
+            stmt.executeUpdate(
+                    "CREATE TABLE Friendships (" +
+                            "USER1 VARCHAR(255) NOT NULL, " +
+                            "USER2 VARCHAR(255) NOT NULL, " +
+                            "PRIMARY KEY (USER1, USER2), " +
+                            "FOREIGN KEY (USER1) REFERENCES Users(USERNAME) ON DELETE CASCADE, " +
+                            "FOREIGN KEY (USER2) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
+                            ")"
+            );
+
+            stmt.executeUpdate(
+                    "CREATE TABLE Challenges (" +
+                            "SENDER VARCHAR(255) NOT NULL, " +
+                            "RECIPIENT VARCHAR(255) NOT NULL, " +
+                            "MESSAGE VARCHAR(255) NOT NULL, " +
+                            "TIMESTAMP TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                            "FOREIGN KEY (SENDER) REFERENCES Users(USERNAME) ON DELETE CASCADE, " +
+                            "FOREIGN KEY (RECIPIENT) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
+                            ")"
+            );
+
+            stmt.executeUpdate(
+                    "CREATE TABLE GroupMemberships (" +
+                            "GROUPNAME VARCHAR(255) NOT NULL, " +
+                            "USERNAME VARCHAR(255) NOT NULL, " +
+                            "PRIMARY KEY (GROUPNAME, USERNAME), " +
+                            "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
+                            ")"
+            );
+
+            stmt.executeUpdate(
+                        "CREATE TABLE TrainerClasses (" +
+                            "CLASSNAME VARCHAR(255) PRIMARY KEY, " +
+                            "TRAINER VARCHAR(255), " +
+                            "DATE VARCHAR(255), " +
+                            "TIME VARCHAR(255), " +
+                                "DESCRIPTION VARCHAR(1000)"
+            );
+            stmt.executeUpdate(
+                    "CREATE TABLE ClassRequests (" +
+                            "CLASSNAME VARCHAR(255), " +
+                            "USERNAME VARCHAR(255)"
+
+            );
+            stmt.executeUpdate(
+                        "CREATE TABLE GroupChallenges (" +
+                            "GROUPNAME VARCHAR(255), " +
+                            "SENDER VARCHAR(255), " +
+                            "MESSAGE VARCHAR(255)"
+
+
+            );
+
+            stmt.executeUpdate(
+                    "CREATE TABLE GroupMessages (" +
+                            "GROUPNAME VARCHAR(255), " +
+                            "SENDER VARCHAR(255), " +
+                            "RECIPIENT VARCHAR(255)," +
+                            "MESSAGE VARCHAR(255)"
+
+            );
+
+            stmt.executeUpdate(
+                        "CREATE TABLE GroupDescriptions (\n" +
+                                "    GROUPNAME VARCHAR(255) PRIMARY KEY,\n" +
+                                "    DESCRIPTION VARCHAR(1000)\n"
+            );
+
+            stmt.executeUpdate(
+                    "CREATE TABLE GroupOwners (\n" +
+                            "    GROUPNAME VARCHAR(255),\n" +
+                            "    OWNER VARCHAR(255)\n"
+                            );
+            stmt.executeUpdate(
+                    "CREATE TABLE GroupJoinRequests (\n" +
+                            "    GROUPNAME VARCHAR(255),\n" +
+                            "    USERNAME VARCHAR(255)"
+            );
+
+
             stmt.close();
         }
         catch(SQLException e){
@@ -979,7 +1059,7 @@ public class Database {
 
 
 
-    
+
 
 
     public void saveSleep(User user, SleepReport sleepReport) {
@@ -1047,7 +1127,6 @@ public class Database {
                 sleepReport.setID(sleepId);
                 sleepReports.add(sleepReport);
             }
-
             rs.close();
             ps.close();
         } catch (SQLException e) {
@@ -1056,6 +1135,56 @@ public class Database {
 
         return sleepReports;
     }
+    public String[] getTrainerClasses(String trainerName) {
+        List<String> classes = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("SELECT CLASSNAME FROM TrainerClasses WHERE TRAINER = ?");
+            ps.setString(1, trainerName);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                classes.add(rs.getString("CLASSNAME"));
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return classes.toArray(new String[0]);
+    }
+
+    public String getClassDescription(String className) {
+        StringBuilder sb = new StringBuilder();
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM TrainerClasses WHERE CLASSNAME = ?");
+            ps.setString(1, className);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                sb.append("Class: ").append(rs.getString("CLASSNAME")).append("\n")
+                        .append("Trainer: ").append(rs.getString("TRAINER")).append("\n")
+                        .append("Date: ").append(rs.getString("DATE")).append("\n")
+                        .append("Time: ").append(rs.getString("TIME")).append("\n")
+                        .append("Description: ").append(rs.getString("DESCRIPTION"));
+            }
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+
+    public void requestJoinClass(String username, String className) {
+        try (Connection conn = DriverManager.getConnection("jdbc:derby:Database")) {
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO ClassRequests (CLASSNAME, USERNAME) VALUES (?, ?)");
+            ps.setString(1, className);
+            ps.setString(2, username);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void saveWeight(User user, WeightReport report) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
