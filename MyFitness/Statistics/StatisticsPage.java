@@ -23,7 +23,7 @@ public class StatisticsPage extends JPanel {
 
     static final String[][] StatLabels = {
             {"Sleep", "Cardio", "Weight Lifting"},
-            {"Average Sleep","Total Sleep"},
+            {"Average Sleep Per Night","Total Sleep"},
             {"Total Hours Ran", "Average Hours Ran", "Total Miles Ran","Average Miles Ran"},
             {"Workouts Best Set"}
     };
@@ -230,23 +230,30 @@ public class StatisticsPage extends JPanel {
                 Statistic liftBestWeight = new Statistic(liftingName+" Best Weight",bestWeight);
                 stats.add(liftBestRepStat);
                 stats.add(liftBestWeight);
-                liftingNames.add(liftingName);
+                if(!liftingNames.contains(liftingName)) {
+                    liftingNames.add(liftingName);
+                }
             }
 
         }
 
-        double totalSleep = 0;
         for(SleepReport sleepReport : sleepReports){
+            double totalSleep = 0;
             totalSleep+= sleepReport.getHours();
             totalSleep+= sleepReport.getMinutes()/60.0;
+
+            Statistic sleepStat = new Statistic("Sleep", totalSleep);
+            System.out.println("Sleep: " + totalSleep);
+            stats.add(sleepStat);
         }
+
 
 
         return stats;
     }
 
     public String getStatTag(String statName){
-        if(statName.contains("Hours")){
+        if(statName.contains("Hours") || statName.contains("Sleep")){
             return " Hours";
         }
         else if(statName.contains("Set")) {
@@ -266,6 +273,7 @@ public class StatisticsPage extends JPanel {
         if(statName.contains("Average") && total!=0){
             statValue/=total;
         }
+        statValue = Math.round(statValue*100.0) / 100.0;
         return statValue;
     }
 }
