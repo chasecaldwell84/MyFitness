@@ -36,7 +36,6 @@ public class StatsTracker extends JPanel{
 
         int dailyCalorieGoal = getCalorieGoalForUser(frame.getUser());
         calorieReport = new CalorieReport(dailyCalorieGoal); //change with goals
-        sleepReport = new SleepReport();
         weightReport = new WeightReport();
         user = frame.getUser();
         createGUI();
@@ -120,6 +119,7 @@ public class StatsTracker extends JPanel{
                     if(hours < 0 || minutes < 0 || minutes >= 60){
                         JOptionPane.showMessageDialog(StatsTracker.this, "Please enter valid hours and minutes (minutes < 60)");
                     } else{
+                        sleepReport = new SleepReport();
                         sleepReport.addSleep(hours, minutes);
                         updateSleepReport();
                     }
