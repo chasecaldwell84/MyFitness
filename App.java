@@ -12,6 +12,7 @@ public class App extends JFrame {
     public static Font boldLabelFontLarge = new Font("Arial", Font.BOLD, 20);
     public static Font labelFontLarge = new Font("Arial", Font.PLAIN, 20);
     public static Font titleFont = new Font("Arial", Font.BOLD, 40);
+    public static Font statsFont = new Font("Arial", Font.BOLD,30);
 
     private static NavBar navBar;
 
