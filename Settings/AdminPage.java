@@ -64,7 +64,9 @@ public class AdminPage extends JPanel {
         JLabel filterUserLabel = new JLabel("Search User: ");
         filterUserLabel.setFont(App.boldLabelFontLarge);
 
+        //FIXME filterfield not showing for windows user aka me
         JTextField filterField = new JTextField(60);
+
         filterField.getDocument().addDocumentListener(new DocumentListener() {
             private void filter() {
                 String text = filterField.getText().trim().toLowerCase();
@@ -83,7 +85,6 @@ public class AdminPage extends JPanel {
         filterPanel.add(filterUserLabel);
         filterPanel.add(filterField);
         listPanel.add(filterPanel, BorderLayout.SOUTH);
-
 
 
 
