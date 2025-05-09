@@ -1,4 +1,9 @@
 name: Deploy to GitHub Pages
+permissions:
+  contents: write     # allow pushes/commits
+  pages: write        # allow Pages deployments
+  id-token: write     # if you ever do OIDC (not required here)
+
 on:
   push:
     branches: [ main ]
