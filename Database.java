@@ -192,19 +192,22 @@ public class Database {
                             "TRAINER VARCHAR(255), " +
                             "DATE VARCHAR(255), " +
                             "TIME VARCHAR(255), " +
-                                "DESCRIPTION VARCHAR(1000)"
+                                "DESCRIPTION VARCHAR(1000)" +
+                               ")"
             );
             stmt.executeUpdate(
                     "CREATE TABLE ClassRequests (" +
                             "CLASSNAME VARCHAR(255), " +
-                            "USERNAME VARCHAR(255)"
+                            "USERNAME VARCHAR(255)" +
+                            ")"
 
             );
             stmt.executeUpdate(
                         "CREATE TABLE GroupChallenges (" +
                             "GROUPNAME VARCHAR(255), " +
                             "SENDER VARCHAR(255), " +
-                            "MESSAGE VARCHAR(255)"
+                            "MESSAGE VARCHAR(255)" +
+                            ")"
 
 
             );
@@ -214,25 +217,30 @@ public class Database {
                             "GROUPNAME VARCHAR(255), " +
                             "SENDER VARCHAR(255), " +
                             "RECIPIENT VARCHAR(255)," +
-                            "MESSAGE VARCHAR(255)"
+                            "MESSAGE VARCHAR(255)" + 
+                            ")"
 
             );
 
             stmt.executeUpdate(
-                        "CREATE TABLE GroupDescriptions (\n" +
-                                "    GROUPNAME VARCHAR(255) PRIMARY KEY,\n" +
-                                "    DESCRIPTION VARCHAR(1000)\n"
+                        "CREATE TABLE GroupDescriptions (" +
+                                "    GROUPNAME VARCHAR(255) PRIMARY KEY, " +
+                                "    DESCRIPTION VARCHAR(1000)" + 
+                                ")"
             );
 
             stmt.executeUpdate(
-                    "CREATE TABLE GroupOwners (\n" +
-                            "    GROUPNAME VARCHAR(255),\n" +
-                            "    OWNER VARCHAR(255)\n"
-                            );
+                    "CREATE TABLE GroupOwners (" +
+                            "    GROUPNAME VARCHAR(255), " +
+                            "    OWNER VARCHAR(255)" +
+                            ")"
+            );
+            
             stmt.executeUpdate(
-                    "CREATE TABLE GroupJoinRequests (\n" +
-                            "    GROUPNAME VARCHAR(255),\n" +
-                            "    USERNAME VARCHAR(255)"
+                    "CREATE TABLE GroupJoinRequests (" +
+                            "    GROUPNAME VARCHAR(255), " +
+                            "    USERNAME VARCHAR(255)" +
+                            ")"
             );
 
 
