@@ -430,7 +430,7 @@ public class Database {
         }
     }
 
-    public Set<Workout> getWorkouts(User user, String sessionDate){
+    public Set<Workout> getWorkoutsByDate(User user, String sessionDate){
         Set<Workout> workouts = new HashSet<>();
 
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
@@ -438,6 +438,68 @@ public class Database {
             try (PreparedStatement ps = conn.prepareStatement(workoutQuery)) {
                 ps.setString(1, user.getUserName());
                 ps.setString(2, sessionDate);
+                ResultSet rs = ps.executeQuery();
+
+                while (rs.next()) {
+                    int workoutId = rs.getInt("WORKOUT_ID");
+                    String workoutName = rs.getString("WORKOUTNAME");
+                    String workoutType = rs.getString("WORKOUTTYPE");
+
+                    if (workoutType.equals("LIFT")) {
+                        LiftWorkout liftWorkout = new LiftWorkout(workoutName);
+                        liftWorkout.setId(workoutId);
+
+                        String liftQuery = "SELECT * FROM WeightLifting WHERE WORKOUT_ID = ?";
+                        try (PreparedStatement liftPs = conn.prepareStatement(liftQuery)) {
+                            liftPs.setInt(1, workoutId);
+                            ResultSet liftRs = liftPs.executeQuery();
+                            while (liftRs.next()) {
+                                double weight = liftRs.getDouble("WEIGHT");
+                                int reps = liftRs.getInt("REPS");
+                                liftWorkout.addSet(new LiftWorkout.LiftSet(weight, reps));
+                            }
+                            liftRs.close();
+                        }
+
+                        workouts.add(liftWorkout);
+                    } else if (workoutType.equals("CARDIO")) {
+                        String cardioQuery = "SELECT * FROM Cardio WHERE WORKOUT_ID = ?";
+                        try (PreparedStatement cardioPs = conn.prepareStatement(cardioQuery)) {
+                            cardioPs.setInt(1, workoutId);
+                            ResultSet cardioRs = cardioPs.executeQuery();
+
+                            if (cardioRs.next()) {
+                                double distance = cardioRs.getDouble("DISTANCE");
+                                int hours = cardioRs.getInt("HOURS");
+                                int minutes = cardioRs.getInt("MINUTES");
+                                int seconds = cardioRs.getInt("SECONDS");
+
+                                CardioWorkout cardioWorkout = new CardioWorkout(workoutName, distance, hours, minutes, seconds);
+                                cardioWorkout.setId(workoutId);
+                                workouts.add(cardioWorkout);
+                            }
+
+                            cardioRs.close();
+                        }
+                    }
+                }
+
+                rs.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return workouts;
+    }
+
+    public Set<Workout> getAllWorkouts(User user){
+        Set<Workout> workouts = new HashSet<>();
+
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            String workoutQuery = "SELECT * FROM Workouts WHERE USERNAME = ?";
+            try (PreparedStatement ps = conn.prepareStatement(workoutQuery)) {
+                ps.setString(1, user.getUserName());
                 ResultSet rs = ps.executeQuery();
 
                 while (rs.next()) {

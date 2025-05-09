@@ -8,11 +8,6 @@ import MyFitness.User.User;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -141,7 +136,7 @@ public class ExerciseJournal extends JPanel {
                 cal.set(year, month, day);
                 String formattedDate = new SimpleDateFormat("yyyy-MM-dd").format(cal.getTime());
 
-                Set<Workout> workouts = Database.getInstance().getWorkouts(user, formattedDate);
+                Set<Workout> workouts = Database.getInstance().getWorkoutsByDate(user, formattedDate);
                 if (workouts.isEmpty()) {
                     workoutDisplay.setText("No workouts found for " + formattedDate);
                 } else {

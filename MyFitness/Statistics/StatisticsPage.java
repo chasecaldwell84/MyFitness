@@ -2,6 +2,7 @@
 package MyFitness.Statistics;
 
 import MyFitness.App;
+import MyFitness.ExerciseSession.Workout.Workout;
 import MyFitness.ExperienceTracker;
 
 import javax.swing.*;
@@ -9,7 +10,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import MyFitness.Database;
 
 public class StatisticsPage extends JPanel {
@@ -138,6 +142,15 @@ public class StatisticsPage extends JPanel {
         public void actionPerformed(ActionEvent e) {
            ExperienceTracker xpUI = new ExperienceTracker();
         }
+    }
+
+    public List<Statistic> getAllStats(){
+        List<Statistic> stats = new ArrayList<>();
+        Set<Workout> workouts = new HashSet<>();
+        workouts = Database.getInstance().getAllWorkouts(frame.getUser());
+        for(Workout workout : workouts){
+        }
+        return stats;
     }
 }
 
