@@ -1057,11 +1057,6 @@ public class Database {
     }
 
 
-
-
-
-
-
     public void saveSleep(User user, SleepReport sleepReport) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement(
@@ -1070,7 +1065,7 @@ public class Database {
             ps.setString(1, user.getUserName());
             ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
+            /*if (rs.next()) {
                 int existingStatsId = rs.getInt("SLEEP_ID");
 
                 PreparedStatement update = conn.prepareStatement(
@@ -1082,7 +1077,8 @@ public class Database {
                 update.executeUpdate();
 
                 update.close();
-            } else {
+            }*/
+
                 PreparedStatement insert = conn.prepareStatement(
                         "INSERT INTO Sleep (USERNAME, SLEEPHOURS, SLEEPMINUTES) VALUES (?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS
@@ -1099,7 +1095,7 @@ public class Database {
 
                 keys.close();
                 insert.close();
-            }
+
 
             rs.close();
             ps.close();
