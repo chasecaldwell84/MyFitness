@@ -1052,7 +1052,7 @@ public class Database {
             ps.setString(1, user.getUserName());
             ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
+            /*if (rs.next()) {
                 int existingStatsId = rs.getInt("SLEEP_ID");
 
                 PreparedStatement update = conn.prepareStatement(
@@ -1064,7 +1064,7 @@ public class Database {
                 update.executeUpdate();
 
                 update.close();
-            } else {
+            } else {*/
                 PreparedStatement insert = conn.prepareStatement(
                         "INSERT INTO Sleep (USERNAME, SLEEPHOURS, SLEEPMINUTES) VALUES (?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS
@@ -1081,7 +1081,7 @@ public class Database {
 
                 keys.close();
                 insert.close();
-            }
+
 
             rs.close();
             ps.close();
