@@ -1,150 +1,440 @@
 package MyFitness.ExerciseSession;
 
+import MyFitness.App;
 import MyFitness.Database;
 import MyFitness.ExerciseSession.Workout.*;
 import MyFitness.NavBar;
-//import MyFitness.Database;
-import MyFitness.User.User;
 
 import javax.swing.*;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import java.awt.*;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ExerciseSession extends JPanel {
-    String date;
-    Set<Workout> workouts;
+    private String date;
+    private Set<Workout> workouts;
+    private JTextArea workoutDisplay;
 
-    public ExerciseSession(JFrame frame, JPanel journal, NavBar navBar, User user) {
+    public ExerciseSession(App frame, JPanel journal, NavBar navBar) {
         this.date = null;
         this.workouts = new HashSet<>();
-
-        JPanel session = this;
 
         setSize(frame.getWidth(), frame.getHeight());
         setLayout(new GridBagLayout());
 
         GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(5, 5, 5, 5);
+        c.insets = new Insets(20,20,20,20);
         Dimension buttonsSize = new Dimension(120, 30);
 
-        //Set up Title
-        JLabel title = new JLabel("Exercise Session", JLabel.CENTER);
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        JLabel title = new JLabel("Exercise Session");
         title.setFont(new Font("Arial", Font.BOLD, 20));
-        c.gridx = 0;
-        c.gridy = 1;
-        c.gridwidth = 2;
-        add(title, c);
-
-//        // Input fields (centered)
-//        JLabel dateLabel = new JLabel("Date: ");
-//        JTextField dateField = new JTextField(14);
-//        c.gridy = 1;
-//        c.gridwidth = 1;
-//        c.anchor = GridBagConstraints.LINE_END;
-//        add(dateLabel, c);
-//        c.gridx = 1;
-//        c.anchor = GridBagConstraints.LINE_START;
-//        add(dateField, c);
-
-        JPanel namePanel = new JPanel(new FlowLayout());
-        namePanel.add(new JLabel("Enter Workout Name: "));
-        JTextField nameField = new JTextField(14);
-        namePanel.add(nameField);
-        namePanel.setVisible(false);
-        c.gridy = 3;
-        c.gridwidth = 1;
-        add(namePanel, c);
-
-        JLabel instructionLabel = new JLabel("Select Workout Type: ");
-        instructionLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        instructionLabel.setVisible(false);
-        c.gridy = 4;
-        add(instructionLabel, c);
-
-        JPanel workoutButtons = new JPanel(new FlowLayout());
 
         JButton liftButton = new JButton("Weight Lifting");
+        JButton cardioButton = new JButton("Cardio");
+        JPanel workoutPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel nameLabel = new JLabel("Enter Workout Name: ");
+        nameLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        namePanel.add(nameLabel);
+
+        JTextField nameField = new JTextField(27);
+        namePanel.add(nameField);
+
+        namePanel.setVisible(false);
+
+        JPanel liftInputPanel = new JPanel(new GridLayout(2, 2));
+
+        JLabel weightLabel = new JLabel("Weight: ");
+        weightLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        liftInputPanel.add(weightLabel);
+
+        JTextField weightField = new JTextField(20);
+        ((AbstractDocument) weightField.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+                    throws BadLocationException {
+                if (isValidInput(fb.getDocument().getText(0, fb.getDocument().getLength()), string, offset)) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+                    throws BadLocationException {
+                String oldText = fb.getDocument().getText(0, fb.getDocument().getLength());
+                String newText = new StringBuilder(oldText).replace(offset, offset + length, text).toString();
+                if (newText.matches("\\d*\\.?\\d*")) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+
+            private boolean isValidInput(String currentText, String newText, int offset) {
+                StringBuilder sb = new StringBuilder(currentText);
+                sb.insert(offset, newText);
+                return sb.toString().matches("\\d*\\.?\\d*");
+            }
+        });
+        liftInputPanel.add(weightField);
+
+        JLabel repsLabel = new JLabel("Reps: ");
+        repsLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        liftInputPanel.add(repsLabel);
+
+        JTextField repsField = new JTextField(20);
+        ((AbstractDocument) repsField.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+                    throws BadLocationException {
+                if (isValidInput(fb.getDocument().getText(0, fb.getDocument().getLength()), string, offset)) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+                    throws BadLocationException {
+                String oldText = fb.getDocument().getText(0, fb.getDocument().getLength());
+                String newText = new StringBuilder(oldText).replace(offset, offset + length, text).toString();
+                if (newText.matches("\\d*")) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+
+            private boolean isValidInput(String currentText, String newText, int offset) {
+                StringBuilder sb = new StringBuilder(currentText);
+                sb.insert(offset, newText);
+                return sb.toString().matches("\\d*");
+            }
+        });
+        liftInputPanel.add(repsField);
+
+        JPanel liftButtonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        JButton liftAddButton = new JButton("Add");
+        liftAddButton.addActionListener(e -> {
+            String workoutName = nameField.getText();
+            String weight = weightField.getText();
+            String reps = repsField.getText();
+            JDialog saveDialog = new JDialog(frame, "Add", true);
+
+            if(!workoutName.isEmpty() && !weight.isEmpty() && !reps.isEmpty()) {
+                boolean isNewWorkout = true;
+                LiftWorkout currWorkout = null;
+
+                for (Workout workout : workouts) {
+                    if (workout.getWorkoutName() != null
+                            && workout.getWorkoutName().equals(workoutName)
+                            && workout.getClass() == LiftWorkout.class) {
+                        isNewWorkout = false;
+                        currWorkout = (LiftWorkout) workout;
+                        currWorkout.addSet(new LiftWorkout.LiftSet(Double.parseDouble(weight), Integer.parseInt(reps)));
+                        break;
+                    }
+                }
+
+                if(isNewWorkout) {
+                    currWorkout = new LiftWorkout(workoutName);
+                    currWorkout.addSet(new LiftWorkout.LiftSet(Double.parseDouble(weight), Integer.parseInt(reps)));
+                    workouts.add(currWorkout);
+                }
+
+                updateDisplay();
+
+                panel.remove(liftInputPanel);
+                panel.remove(liftButtonsPanel);
+                panel.revalidate();
+                panel.repaint();
+                liftButton.setEnabled(true);
+                cardioButton.setEnabled(true);
+                namePanel.setVisible(false);
+                workoutPanel.setVisible(false);
+
+                JOptionPane.showMessageDialog(saveDialog,
+                        "Workout: " + workoutName +"\nWeight: " + weight + "\nReps: " + reps,
+                        "Workout Saved", JOptionPane.INFORMATION_MESSAGE);
+            }
+            else {
+                JOptionPane.showMessageDialog(saveDialog, "Please fill in all fields.",
+                        "Missing Information", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        liftButtonsPanel.add(liftAddButton);
+
+        JButton liftCancelButton = new JButton("Cancel");
+        liftCancelButton.addActionListener(e -> {
+            panel.remove(liftInputPanel);
+            panel.remove(liftButtonsPanel);
+            panel.revalidate();
+            panel.repaint();
+            liftButton.setEnabled(true);
+            cardioButton.setEnabled(true);
+        });
+        liftButtonsPanel.add(liftCancelButton);
+
+        JPanel distancePanel = new JPanel(new GridLayout(1, 2));
+
+        JLabel distanceLabel = new JLabel("Distance (miles): ");
+        distancePanel.add(distanceLabel);
+
+        JTextField distanceField = new JTextField(20);
+        ((AbstractDocument) distanceField.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+                    throws BadLocationException {
+                if (isValidInput(fb.getDocument().getText(0, fb.getDocument().getLength()), string, offset)) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+                    throws BadLocationException {
+                String oldText = fb.getDocument().getText(0, fb.getDocument().getLength());
+                String newText = new StringBuilder(oldText).replace(offset, offset + length, text).toString();
+                if (newText.matches("\\d*\\.?\\d*")) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+
+            private boolean isValidInput(String currentText, String newText, int offset) {
+                StringBuilder sb = new StringBuilder(currentText);
+                sb.insert(offset, newText);
+                return sb.toString().matches("\\d*\\.?\\d*");
+            }
+        });
+        distancePanel.add(distanceField);
+
+        JLabel durationLabel = new JLabel("Duration: ");
+
+        JPanel cardioInputPanel = new JPanel(new GridLayout(3, 2));
+
+        JLabel hoursLabel = new JLabel("Hours: ");
+        hoursLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        cardioInputPanel.add(hoursLabel);
+
+        JTextField hoursField = new JTextField(20);
+        ((AbstractDocument) hoursField.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+                    throws BadLocationException {
+                if (isValidInput(fb.getDocument().getText(0, fb.getDocument().getLength()), string, offset)) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+                    throws BadLocationException {
+                String oldText = fb.getDocument().getText(0, fb.getDocument().getLength());
+                String newText = new StringBuilder(oldText).replace(offset, offset + length, text).toString();
+                if (newText.matches("\\d*")) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+
+            private boolean isValidInput(String currentText, String newText, int offset) {
+                StringBuilder sb = new StringBuilder(currentText);
+                sb.insert(offset, newText);
+                return sb.toString().matches("\\d*");
+            }
+        });
+        cardioInputPanel.add(hoursField);
+
+        JLabel minutesLabel = new JLabel("Minutes: ");
+        minutesLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        cardioInputPanel.add(minutesLabel);
+
+        JTextField minutesField = new JTextField(20);
+        ((AbstractDocument) minutesField.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+                    throws BadLocationException {
+                if (isValidInput(fb.getDocument().getText(0, fb.getDocument().getLength()), string, offset)) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+                    throws BadLocationException {
+                String oldText = fb.getDocument().getText(0, fb.getDocument().getLength());
+                String newText = new StringBuilder(oldText).replace(offset, offset + length, text).toString();
+                if (newText.matches("\\d*")) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+
+            private boolean isValidInput(String currentText, String newText, int offset) {
+                StringBuilder sb = new StringBuilder(currentText);
+                sb.insert(offset, newText);
+                return sb.toString().matches("\\d*");
+            }
+        });
+        cardioInputPanel.add(minutesField);
+
+        JLabel secondsLabel = new JLabel("Seconds: ");
+        secondsLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        cardioInputPanel.add(secondsLabel);
+
+        JTextField secondsField = new JTextField(20);
+        ((AbstractDocument) secondsField.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
+                    throws BadLocationException {
+                if (isValidInput(fb.getDocument().getText(0, fb.getDocument().getLength()), string, offset)) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
+                    throws BadLocationException {
+                String oldText = fb.getDocument().getText(0, fb.getDocument().getLength());
+                String newText = new StringBuilder(oldText).replace(offset, offset + length, text).toString();
+                if (newText.matches("\\d*")) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+
+            private boolean isValidInput(String currentText, String newText, int offset) {
+                StringBuilder sb = new StringBuilder(currentText);
+                sb.insert(offset, newText);
+                return sb.toString().matches("\\d*");
+            }
+        });
+        cardioInputPanel.add(secondsField);
+
+        JPanel cardioButtonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        JButton cardioAddButton = new JButton("Add");
+        cardioAddButton.addActionListener(e -> {
+            String workoutName = nameField.getText();
+            String distance = distanceField.getText();
+            String hours = hoursField.getText();
+            String minutes = minutesField.getText();
+            String seconds = secondsField.getText();
+            JDialog saveDialog = new JDialog(frame, "Add", true);
+
+            if(!workoutName.isEmpty() && !distance.isEmpty() && !hours.isEmpty() && !minutes.isEmpty() && !seconds.isEmpty()) {
+                boolean isNewWorkout = true;
+                CardioWorkout currWorkout = null;
+
+                for (Workout workout : workouts) {
+                    if (workout.getWorkoutName() != null
+                            && workout.getWorkoutName().equals(workoutName)
+                            && workout.getClass() == CardioWorkout.class) {
+                        isNewWorkout = false;
+                        currWorkout = (CardioWorkout) workout;
+                        currWorkout.setDistance(Double.parseDouble(distance));
+                        currWorkout.setDuration(new CardioWorkout.CardioDuration(Integer.parseInt(hours), Integer.parseInt(minutes), Integer.parseInt(seconds)));
+                        break;
+                    }
+                }
+
+                if(isNewWorkout) {
+                    currWorkout = new CardioWorkout(workoutName, Double.parseDouble(distance), Integer.parseInt(hours), Integer.parseInt(minutes), Integer.parseInt(seconds));
+                    workouts.add(currWorkout);
+                }
+
+                updateDisplay();
+
+                panel.remove(distancePanel);
+                panel.remove(durationLabel);
+                panel.remove(cardioInputPanel);
+                panel.remove(cardioButtonsPanel);
+                panel.revalidate();
+                panel.repaint();
+                liftButton.setEnabled(true);
+                cardioButton.setEnabled(true);
+                namePanel.setVisible(false);
+                workoutPanel.setVisible(false);
+
+                JOptionPane.showMessageDialog(saveDialog,
+                        "Workout: " + workoutName +"\nDuration: " + currWorkout.getDuration() + "\nDistance: " + distance,
+                        "Workout Saved", JOptionPane.INFORMATION_MESSAGE);
+            }
+            else {
+                JOptionPane.showMessageDialog(saveDialog, "Please fill in all fields.",
+                        "Missing Information", JOptionPane.ERROR_MESSAGE);
+            }
+
+
+        });
+        cardioButtonsPanel.add(cardioAddButton);
+
+        JButton cardioCancelButton = new JButton("Cancel");
+        cardioCancelButton.addActionListener(e -> {
+            panel.remove(distancePanel);
+            panel.remove(durationLabel);
+            panel.remove(cardioInputPanel);
+            panel.remove(cardioButtonsPanel);
+            panel.revalidate();
+            panel.repaint();
+            liftButton.setEnabled(true);
+            cardioButton.setEnabled(true);
+        });
+        cardioButtonsPanel.add(cardioCancelButton);
+
+        JLabel workoutLabel = new JLabel("Select Workout Type: ");
+        workoutLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        workoutPanel.add(workoutLabel);
+
         liftButton.setPreferredSize(buttonsSize);
         liftButton.addActionListener(e -> {
-            namePanel.setVisible(false);
-            instructionLabel.setVisible(false);
-            workoutButtons.setVisible(false);
+            liftButton.setEnabled(false);
+            cardioButton.setEnabled(false);
 
-            frame.getContentPane().removeAll();
+            liftInputPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            panel.add(liftInputPanel);
 
-            Workout currWorkout = null;
-            String newWorkoutName = nameField.getText().trim();
-            boolean isNewWorkout = true;
+            liftButtonsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            panel.add(liftButtonsPanel);
 
-            for (Workout workout : workouts) {
-                if(workout.getWorkoutName() != null && workout.getWorkoutName().equals(newWorkoutName)) {
-                    isNewWorkout = false;
-                    currWorkout = workout;
-                    break;
-                }
-            }
-
-            if(isNewWorkout){
-                currWorkout = new LiftWorkout(frame, session, navBar, newWorkoutName);
-                workouts.add(currWorkout);
-            }
-
-            frame.add(navBar);
-            frame.getContentPane().add(currWorkout);
-            frame.revalidate();
-            frame.repaint();
+            panel.revalidate();
+            panel.repaint();
         });
-        workoutButtons.add(liftButton);
+        workoutPanel.add(liftButton);
 
-        JButton cardioButton = new JButton("Cardio");
         cardioButton.setPreferredSize(buttonsSize);
         cardioButton.addActionListener(e -> {
-            namePanel.setVisible(false);
-            instructionLabel.setVisible(false);
-            workoutButtons.setVisible(false);
+            liftButton.setEnabled(false);
+            cardioButton.setEnabled(false);
 
-            frame.getContentPane().removeAll();
+            distancePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            panel.add(distancePanel);
 
-            Workout currWorkout = null;
-            String newWorkoutName = nameField.getText().trim();
-            boolean isNewWorkout = true;
+            durationLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            panel.add(durationLabel);
 
-            for (Workout workout : workouts) {
-                if(workout.getWorkoutName() != null && workout.getWorkoutName().equals(newWorkoutName)) {
-                    isNewWorkout = false;
-                    currWorkout = workout;
-                    break;
-                }
-            }
+            cardioInputPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            panel.add(cardioInputPanel);
 
-            if(isNewWorkout){
-                currWorkout = new CardioWorkout(frame, session, navBar, newWorkoutName);
-                workouts.add(currWorkout);
-            }
+            cardioButtonsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            panel.add(cardioButtonsPanel);
 
-            frame.add(navBar);
-            frame.getContentPane().add(currWorkout);
-            frame.revalidate();
-            frame.repaint();
+            panel.revalidate();
+            panel.repaint();
         });
-        workoutButtons.add(cardioButton);
-
-        c.gridy = 5;
-        workoutButtons.setVisible(false);
-        add(workoutButtons, c);
+        workoutPanel.add(cardioButton);
+        workoutPanel.setVisible(false);
 
         JPanel buttons = new JPanel();
-        buttons.setLayout(new FlowLayout());
+        buttons.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         JButton addWorkout = new JButton("Add Workout");
         addWorkout.setPreferredSize(buttonsSize);
         addWorkout.addActionListener(e -> {
             namePanel.setVisible(true);
-            instructionLabel.setVisible(true);
-            workoutButtons.setVisible(true);
+            workoutPanel.setVisible(true);
         });
         buttons.add(addWorkout);
 
@@ -227,7 +517,7 @@ public class ExerciseSession extends JPanel {
                     JOptionPane.showMessageDialog(frame, "Date set to: " + date);
 
                     workouts.forEach(workout -> {
-                        Database.getInstance().saveWorkout(user, workout, date);
+                        Database.getInstance().saveWorkout(frame.getUser(), workout, date);
                     });
 
                     dialog.dispose();
@@ -249,15 +539,10 @@ public class ExerciseSession extends JPanel {
             dialog.setLocationRelativeTo(frame);
             dialog.setVisible(true);
         });
-
         buttons.add(saveSession);
 
-        c.gridy = 2;
-
-        add(buttons, c);
-
-        // Back Button to return to the journal
-        JButton backButton = new JButton("Back");
+        JButton backButton = new JButton("Cancel");
+        backButton.setPreferredSize(buttonsSize);
         backButton.addActionListener(e -> {
             frame.getContentPane().removeAll();
             frame.getContentPane().add(navBar);
@@ -265,22 +550,70 @@ public class ExerciseSession extends JPanel {
             frame.revalidate();
             frame.repaint();
         });
-
-        JPanel exitButtonPanel = new JPanel();
-        exitButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        exitButtonPanel.add(backButton);
+        buttons.add(backButton);
 
 
-        c.gridy = 6;
-        c.anchor = GridBagConstraints.LAST_LINE_END;
-        c.weightx = 1;
-        c.weighty = 1;
-        add(exitButtonPanel, c);
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        titlePanel.add(title);
+        titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(titlePanel);
+
+        buttons.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(buttons);
+
+        panel.add(Box.createVerticalStrut(20));
+
+        namePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(namePanel);
+
+        panel.add(Box.createVerticalStrut(10));
+
+        workoutPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(workoutPanel);
+
+        panel.add(Box.createVerticalStrut(10));
+
+        c.gridx = 0;
+        c.gridy = 0;
+        c.anchor = GridBagConstraints.FIRST_LINE_START;
+        c.fill = GridBagConstraints.NONE;
+        c.weighty = 1.0;
+        c.weightx = 1.0;
+        add(Box.createVerticalStrut(80));
+
+        c.gridy = 1;
+        add(panel, c);
+
+        c.gridx = 1;
+        workoutDisplay = new JTextArea(40, 40);
+        workoutDisplay.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(workoutDisplay);
+        add(scrollPane, c);
 
         setVisible(true);
     }
 
     public void setDate(String date){
         this.date = date;
+    }
+
+    public void updateDisplay(){
+        StringBuilder sb = new StringBuilder();
+        for (Workout w : workouts) {
+            sb.append("- ").append(w.getWorkoutType()).append(": ").append(w.getWorkoutName()).append("\n");
+
+            if (w instanceof LiftWorkout) {
+                for (LiftWorkout.LiftSet set : ((LiftWorkout) w).getSets()) {
+                    sb.append("    Weight: ").append(set.getWeight()).append(" lbs, Reps: ").append(set.getReps()).append("\n");
+                }
+            } else if (w instanceof CardioWorkout) {
+                CardioWorkout cw = (CardioWorkout) w;
+                sb.append("    Distance: ").append(cw.getDistance()).append(" miles, Duration: ")
+                        .append(cw.getHours()).append("h ")
+                        .append(cw.getMinutes()).append("m ")
+                        .append(cw.getSeconds()).append("s\n");
+            }
+        }
+        workoutDisplay.setText(sb.toString());
     }
 }

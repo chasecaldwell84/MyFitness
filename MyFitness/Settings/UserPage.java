@@ -2,6 +2,7 @@ package MyFitness.Settings;
 
 import MyFitness.App;
 import MyFitness.Database;
+import MyFitness.LoginSignUp.LandingPage;
 import MyFitness.User.*;
 
 import javax.swing.*;
@@ -95,6 +96,28 @@ public class UserPage extends JPanel {
 
 
         JPanel buttonPanel = new JPanel();
+
+        JButton signOutButton = new JButton("Sign Out");
+
+        signOutButton.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to sign out?",
+                    "Confirm Sign Out",
+                    JOptionPane.YES_NO_OPTION
+            );
+            if (confirm == JOptionPane.YES_OPTION) {
+                frame.dispose();
+                frame.setUser(null);
+                SwingUtilities.invokeLater(() -> {
+                    LandingPage lp = new LandingPage(new App());
+                    lp.setVisible(true);
+                });
+            }
+        });
+        if(!(frame.getUser() instanceof Admin)){
+            buttonPanel.add(signOutButton);
+        }
 
         /*
         if(!(viewedUser instanceof Admin) || (viewedUser.getUserName().equals(frame.getUser().getUserName()))) {
