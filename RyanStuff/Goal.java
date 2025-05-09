@@ -31,7 +31,7 @@ public class Goal {
     private String goalType;
     private int goalValue;
     private User user;
-
+    private int ID;
     public int getID() {
         return ID;
     }
@@ -40,7 +40,7 @@ public class Goal {
         this.ID = ID;
     }
 
-    private int ID;
+
     public Goal(String goalLength, String goalType, int goalValue, User user) {
         this.goalLength = goalLength;
         this.goalType = goalType;

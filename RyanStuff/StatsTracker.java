@@ -13,7 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class CalorieTracker extends JPanel{
+public class StatsTracker extends JPanel{
 
     private CalorieReport calorieReport;
     private JLabel totalCaloriesLabel;
@@ -26,8 +26,10 @@ public class CalorieTracker extends JPanel{
     private WeightReport weightReport;
     private JLabel weightLabel;
     private JPanel weightReportPanel;
+    private Database db = Database.getInstance();
+    private User user;
 
-    public CalorieTracker(App frame){
+    public StatsTracker(App frame){
         frame.setTitle("Statistics Tracker");
         setLayout(new GridBagLayout());
         setSize(500, 500);
@@ -36,7 +38,7 @@ public class CalorieTracker extends JPanel{
         calorieReport = new CalorieReport(dailyCalorieGoal); //change with goals
         sleepReport = new SleepReport();
         weightReport = new WeightReport();
-
+        user = frame.getUser();
         createGUI();
     }
 
@@ -65,13 +67,13 @@ public class CalorieTracker extends JPanel{
                 try{
                     int inputCals = Integer.parseInt(caloriesField.getText());
                     if(inputCals <= 0){
-                        JOptionPane.showMessageDialog(CalorieTracker.this, "Please enter a positive number!");
+                        JOptionPane.showMessageDialog(StatsTracker.this, "Please enter a positive number!");
                     } else{
                         calorieReport.addCalories(inputCals);
                         updateCalorieReport();
                     }
                 } catch (NumberFormatException ex){
-                    JOptionPane.showMessageDialog(CalorieTracker.this, "Please enter a valid number!",
+                    JOptionPane.showMessageDialog(StatsTracker.this, "Please enter a valid number!",
                             "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -116,13 +118,13 @@ public class CalorieTracker extends JPanel{
                     int minutes = Integer.parseInt(minutesField.getText());
 
                     if(hours < 0 || minutes < 0 || minutes >= 60){
-                        JOptionPane.showMessageDialog(CalorieTracker.this, "Please enter valid hours and minutes (minutes < 60)");
+                        JOptionPane.showMessageDialog(StatsTracker.this, "Please enter valid hours and minutes (minutes < 60)");
                     } else{
                         sleepReport.addSleep(hours, minutes);
                         updateSleepReport();
                     }
                 } catch(NumberFormatException ex){
-                    JOptionPane.showMessageDialog(CalorieTracker.this, "Enter valid numbers for sleep.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(StatsTracker.this, "Enter valid numbers for sleep.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -162,13 +164,13 @@ public class CalorieTracker extends JPanel{
                 try{
                     double weight = Double.parseDouble(weightField.getText());
                     if(weight <= 0){
-                        JOptionPane.showMessageDialog(CalorieTracker.this, "Please enter a positive number!");
+                        JOptionPane.showMessageDialog(StatsTracker.this, "Please enter a positive number!");
                     } else{
                         weightReport.setWeight(weight);
                         updateWeightReport();
                     }
                 } catch(NumberFormatException ex){
-                    JOptionPane.showMessageDialog(CalorieTracker.this, "Please enter a valid number!",  "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(StatsTracker.this, "Please enter a valid number!",  "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -189,6 +191,7 @@ public class CalorieTracker extends JPanel{
         c.gridy = 9;
         add(weightReportPanel, c);
 
+
         //make frame size and visible
         revalidate();
         repaint();
@@ -204,11 +207,15 @@ public class CalorieTracker extends JPanel{
     public void updateSleepReport() {
         int hours = sleepReport.getHours();
         int minutes = sleepReport.getMinutes();
+        db.saveSleep(user,sleepReport);
         totalSleepLabel.setText("Total Sleep Time: " + hours + "h " + minutes + "m");
         sleepReportPanel.setVisible(true);
+        //FIXME testing
+        //System.out.println(db.getAllSleepReports(user));
     }
 
     public void updateWeightReport() {
+        db.saveWeight(user,weightReport);
         weightLabel.setText("Current Weight: " + weightReport.getWeight() + " lbs");
         weightReportPanel.setVisible(true);
     }

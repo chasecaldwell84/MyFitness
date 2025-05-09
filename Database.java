@@ -3,7 +3,10 @@ package MyFitness;
 import MyFitness.ExerciseSession.Workout.CardioWorkout;
 import MyFitness.ExerciseSession.Workout.LiftWorkout;
 import MyFitness.ExerciseSession.Workout.Workout;
+import MyFitness.RyanStuff.CalorieReport;
 import MyFitness.RyanStuff.Goal;
+import MyFitness.RyanStuff.SleepReport;
+import MyFitness.RyanStuff.WeightReport;
 import MyFitness.Statistics.Statistic;
 import MyFitness.User.Admin;
 import MyFitness.User.GeneralUser;
@@ -38,10 +41,21 @@ public class Database {
                             ")"
             );
             stmt.executeUpdate(
-                    "CREATE TABLE UserStats (" +
-                            "STAT_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+                    "CREATE TABLE Sleep (" +
+                            "SLEEP_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
                             "USERNAME VARCHAR(255) NOT NULL, " +
-                            "PRIMARY KEY (STAT_ID), " +
+                            "SLEEPHOURS INTEGER NOT NULL, " +
+                            "SLEEPMINUTES INTEGER NOT NULL, " +
+                            "PRIMARY KEY (SLEEP_ID), " +
+                            "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
+                            ")"
+            );
+            stmt.executeUpdate(
+                    "CREATE TABLE Weight (" +
+                            "WEIGHT_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+                            "USERNAME VARCHAR(255) NOT NULL, " +
+                            "WEIGHTVALUE DOUBLE NOT NULL, " +
+                            "PRIMARY KEY (WEIGHT_ID), " +
                             "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
                             ")"
             );
@@ -494,13 +508,136 @@ public class Database {
     }
 
 
-    //FIXME needs to save stats into userstats table
-    public void saveStats(){
+    public void saveSleep(User user, SleepReport sleepReport) {
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            PreparedStatement ps = conn.prepareStatement(
+                    "SELECT SLEEP_ID FROM Sleep WHERE USERNAME = ?"
+            );
+            ps.setString(1, user.getUserName());
+            ResultSet rs = ps.executeQuery();
 
+            if (rs.next()) {
+                int existingStatsId = rs.getInt("SLEEP_ID");
+
+                PreparedStatement update = conn.prepareStatement(
+                        "UPDATE Sleep SET SLEEPHOURS = ?, SLEEPMINUTES = ? WHERE SLEEP_ID = ?"
+                );
+                update.setInt(1, sleepReport.getHours());
+                update.setInt(2, sleepReport.getMinutes());
+                update.setInt(3, existingStatsId);
+                update.executeUpdate();
+
+                update.close();
+            } else {
+                PreparedStatement insert = conn.prepareStatement(
+                        "INSERT INTO Sleep (USERNAME, SLEEPHOURS, SLEEPMINUTES) VALUES (?, ?, ?)",
+                        Statement.RETURN_GENERATED_KEYS
+                );
+                insert.setString(1, user.getUserName());
+                insert.setInt(2, sleepReport.getHours());
+                insert.setInt(3, sleepReport.getMinutes());
+                insert.executeUpdate();
+
+                ResultSet keys = insert.getGeneratedKeys();
+                if (keys.next()) {
+                    sleepReport.setID(keys.getInt(1));
+                }
+
+                keys.close();
+                insert.close();
+            }
+
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<SleepReport> getAllSleepReports(User user) {
+        List<SleepReport> sleepReports = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            PreparedStatement ps = conn.prepareStatement(
+                    "SELECT SLEEP_ID, SLEEPHOURS, SLEEPMINUTES FROM Sleep WHERE USERNAME = ?"
+            );
+            ps.setString(1, user.getUserName());
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int sleepId = rs.getInt("SLEEP_ID");
+                int hours = rs.getInt("SLEEPHOURS");
+                int minutes = rs.getInt("SLEEPMINUTES");
+
+                SleepReport sleepReport = new SleepReport();
+                sleepReport.addSleep(hours, minutes);
+                sleepReport.setID(sleepId);
+                sleepReports.add(sleepReport);
+            }
+
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return sleepReports;
+    }
+
+    public void saveWeight(User user, WeightReport report) {
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            PreparedStatement insert = conn.prepareStatement(
+                    "INSERT INTO Weight (USERNAME, WEIGHTVALUE) VALUES (?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+            );
+            insert.setString(1, user.getUserName());
+            insert.setDouble(2, report.getWeight());
+            //insert.setDate(3, java.sql.Date.valueOf(report.getDate())); // assuming LocalDate in report
+            insert.executeUpdate();
+
+            ResultSet keys = insert.getGeneratedKeys();
+            if (keys.next()) {
+                report.setID(keys.getInt(1));
+            }
+
+            keys.close();
+            insert.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public List<WeightReport> getAllWeightReports(User user) {
+        List<WeightReport> weightReports = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            PreparedStatement ps = conn.prepareStatement(
+                    "SELECT WEIGHT_ID, WEIGHTVALUE FROM Weight WHERE USERNAME = ?"
+            );
+            ps.setString(1, user.getUserName());
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("WEIGHT_ID");
+                double value = rs.getDouble("WEIGHTVALUE");
+                //LocalDate date = rs.getDate("WEIGHTDATE").toLocalDate();
+
+                WeightReport report = new WeightReport();
+                report.setID(id);
+                report.setWeight(value);
+
+                weightReports.add(report);
+            }
+
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return weightReports;
     }
     //FIXME needs to return stats
     public List<Statistic> getAllStats(String username){
         List<Statistic> stats = new ArrayList<>();
+
         return stats;
     }
 

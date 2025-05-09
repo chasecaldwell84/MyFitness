@@ -4,6 +4,16 @@ public class SleepReport {
     private int hours;
     private int minutes;
 
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+
+    private int ID;
+
     public SleepReport() {
         this.hours = 0;
         this.minutes = 0;

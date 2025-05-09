@@ -4,6 +4,15 @@ public class CalorieReport {
     //variables for calories consumed and daily goal
     private int caloriesConsumed;
     private int dailyGoal;
+    private int ID;
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+
 
     //constructor to initialize the calorie report with a daily goal
     public CalorieReport(int dailyGoal) {
