@@ -1,16 +1,26 @@
 package MyFitness.LoginSignUp;
 
+import MyFitness.App;
 import MyFitness.Database;
+import MyFitness.HomePage;
+import MyFitness.NavBar;
+import MyFitness.User.Admin;
+import MyFitness.User.GeneralUser;
+import MyFitness.User.Trainer;
 import MyFitness.User.User;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class Login extends JDialog {
     private Database db = Database.getInstance();
     private Boolean Authenticated = false;
     private User user = null;
+    private App frame;
+
 
     //private Font labelFont = new Font("Arial", Font.BOLD, 14);
     private Font loginTitleFont = new Font("Arial", Font.BOLD, 40);
@@ -23,8 +33,8 @@ public class Login extends JDialog {
         return Authenticated;
     }
 
-    public Login() {
-
+    public Login(App frame) {
+        this.frame = frame;
         setTitle("Login");
         setModal(true);
         setLayout(new BorderLayout());
@@ -147,8 +157,8 @@ public class Login extends JDialog {
             if(TypeInput.isEmpty()){
                 JOptionPane.showMessageDialog(this, "SYSTEM ERROR Not assigned type");
             }
-            else if(TypeInput.equals("MyFitness.User")){
-                user = new MyFitness.User(username, password);
+            else if(TypeInput.equals("User")){
+                user = new User(username, password);
             }
             else if(TypeInput.equals("Trainer")){
                 user = new Trainer(username, password);
@@ -166,7 +176,7 @@ public class Login extends JDialog {
         scanner.close();
     }*/
     /*public void authenicating(String username, String password) throws FileNotFoundException {
-        MyFitness.User user1 = db.findByUsername(username);
+        User user1 = db.findByUsername(username);
 
         if(user1 != null && user1.getPassword() != null && user1.getPassword().equals(password)){
             Authenticated = true;
@@ -204,7 +214,15 @@ public class Login extends JDialog {
             user = foundUser;
 
             JOptionPane.showMessageDialog(this, "You have successfully logged in.");
+            frame.setUser(foundUser);
             dispose();
+            frame.getContentPane().removeAll();
+            NavBar navBar = new NavBar(frame);
+            frame.add(navBar, BorderLayout.NORTH);
+            frame.add(new HomePage(frame), BorderLayout.CENTER);
+            frame.revalidate();
+            frame.repaint();
+
         } else {
             JOptionPane.showMessageDialog(this, "Incorrect username or password.");
             Authenticated = false;

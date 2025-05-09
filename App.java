@@ -30,6 +30,9 @@ public class App extends JFrame {
     private FriendManager friendManager = new FriendManager();
     public FriendManager getFriendManager() { return friendManager; }
 
+    private GroupManager groupManager = new GroupManager();
+    public GroupManager getGroupManager() { return groupManager; }
+
     private List<User> allUsers = new ArrayList<User>();
     public List<User> getAllUsers() { return allUsers; }
     public void setAllUsers(List<User> users) { this.allUsers = users; }
@@ -40,6 +43,9 @@ public class App extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH); //NOTE automatic full screen
         setSize((int)screenSize.getWidth(), (int)screenSize.getHeight());
+
+        getContentPane().setLayout(new BorderLayout());
+
         navBar = new NavBar(this);
         add(navBar, BorderLayout.NORTH);
     }
