@@ -106,7 +106,7 @@ public class StatisticsPage extends JPanel {
             filterButton.addActionListener(new openFilterUI(this));
 
             buttonPanel.add(filterButton);
-            buttonPanel.add(experienceButton);
+            //buttonPanel.add(experienceButton); (Did not have time to finish implementing)
 
             add(titlePanel, BorderLayout.NORTH);
             add(infoPanel, BorderLayout.CENTER);
