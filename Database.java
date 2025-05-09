@@ -151,6 +151,23 @@ public class Database {
 
             );
 
+            stmt.executeUpdate(
+                        "CREATE TABLE GroupDescriptions (\n" +
+                                "    GROUPNAME VARCHAR(255) PRIMARY KEY,\n" +
+                                "    DESCRIPTION VARCHAR(1000)\n"
+            );
+
+            stmt.executeUpdate(
+                    "CREATE TABLE GroupOwners (\n" +
+                            "    GROUPNAME VARCHAR(255),\n" +
+                            "    OWNER VARCHAR(255)\n"
+                            );
+            stmt.executeUpdate(
+                    "REATE TABLE GroupJoinRequests (\n" +
+                            "    GROUPNAME VARCHAR(255),\n" +
+                            "    USERNAME VARCHAR(255)"
+            );
+
 
             stmt.close();
         }
