@@ -1,7 +1,8 @@
 package MyFitness;
 
+import MyFitness.RyanStuff.StatsTracker;
 import MyFitness.Settings.AdminPage;
-import MyFitness.RyanStuff.CalorieTracker;
+import MyFitness.RyanStuff.StatsTracker;
 import MyFitness.RyanStuff.CreateGoals;
 import MyFitness.Settings.UserPage;
 import MyFitness.Statistics.StatisticsPage;
@@ -43,7 +44,7 @@ public class NavBar extends JPanel {
         });
         JButton CalorieTracker = new JButton("Stats Tracker");
         CalorieTracker.addActionListener(e -> {
-            CalorieTracker calorieTrackerPannel = new CalorieTracker(frame);
+            StatsTracker calorieTrackerPannel = new StatsTracker(frame);
             frame.getContentPane().removeAll();
 
             frame.getContentPane().add(this);

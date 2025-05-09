@@ -34,7 +34,7 @@ public class AdminPage extends JPanel {
     private void createGUI(){
         readUsers();
 
-        JLabel titleLabel = new JLabel("MyFitness.User List", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("User List", SwingConstants.CENTER);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         titleLabel.setFont(App.titleFont);
 
@@ -61,11 +61,11 @@ public class AdminPage extends JPanel {
 
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
 
-        JLabel filterUserLabel = new JLabel("Search MyFitness.User: ");
+        JLabel filterUserLabel = new JLabel("Search User: ");
         filterUserLabel.setFont(App.boldLabelFontLarge);
 
         //FIXME filterfield not showing for windows user aka me
-        JTextField filterField = new JTextField(60);
+        JTextField filterField = new JTextField(30);
 
         filterField.getDocument().addDocumentListener(new DocumentListener() {
             private void filter() {
