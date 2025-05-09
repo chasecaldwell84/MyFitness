@@ -17,12 +17,13 @@ import java.util.List;
 import java.util.Set;
 
 import MyFitness.Database;
+import MyFitness.RyanStuff.SleepReport;
 
 public class StatisticsPage extends JPanel {
 
     static final String[][] StatLabels = {
-            {"Sleep & Calories", "Cardio", "Weight Lifting"},
-            {"Average Sleep","Total Sleep","Total Calories Consumed", "Average Calories Consumed"},
+            {"Sleep", "Cardio", "Weight Lifting"},
+            {"Average Sleep","Total Sleep"},
             {"Total Hours Ran", "Average Hours Ran", "Total Miles Ran","Average Miles Ran"},
             {"Workouts Best Set"}
     };
@@ -176,8 +177,13 @@ public class StatisticsPage extends JPanel {
 
     public List<Statistic> initializeAllStats(){
         List<Statistic> stats = new ArrayList<>();
+
         Set<Workout> workouts = new HashSet<>();
+        List<SleepReport> sleepReports = new ArrayList<>();
+
         workouts = Database.getInstance().getAllWorkouts(frame.getUser());
+        sleepReports = Database.getInstance().getAllSleepReports(frame.getUser());
+
         for(Workout workout : workouts){
             if(workout instanceof CardioWorkout){
 
@@ -196,7 +202,8 @@ public class StatisticsPage extends JPanel {
                 stats.add(cardioMilesRan);
 
             }
-            if(workout instanceof LiftWorkout){
+
+            else if(workout instanceof LiftWorkout){
 
                 //Create Best Rep and Best Weight stat
                 String liftingName = workout.getWorkoutName();
@@ -225,10 +232,16 @@ public class StatisticsPage extends JPanel {
                 stats.add(liftBestWeight);
                 liftingNames.add(liftingName);
             }
+
         }
-        if (workouts.isEmpty()) {
-            System.out.println("No workouts");
+
+        double totalSleep = 0;
+        for(SleepReport sleepReport : sleepReports){
+            totalSleep+= sleepReport.getHours();
+            totalSleep+= sleepReport.getMinutes()/60.0;
         }
+
+
         return stats;
     }
 
