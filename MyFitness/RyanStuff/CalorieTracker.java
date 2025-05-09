@@ -28,7 +28,7 @@ public class CalorieTracker extends JPanel{
     private JPanel weightReportPanel;
 
     public CalorieTracker(App frame){
-        frame.setTitle("Statistics Tracker");
+        frame.setTitle("MyFitness.Statistics Tracker");
         setLayout(new GridBagLayout());
         setSize(500, 500);
 

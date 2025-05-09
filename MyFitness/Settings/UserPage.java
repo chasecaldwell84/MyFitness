@@ -43,7 +43,7 @@ public class UserPage extends JPanel {
     }
 
     private void createGUI(){
-        JLabel titleLabel = new JLabel("User Settings", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("MyFitness.User MyFitness.Settings", SwingConstants.CENTER);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         titleLabel.setFont(App.titleFont);
 
@@ -56,7 +56,7 @@ public class UserPage extends JPanel {
         userSettingsPanel.setLayout(new BoxLayout(userSettingsPanel,BoxLayout.Y_AXIS));
 
         JLabel usernameTitle = new JLabel("Username");
-        JLabel userTypeTitle = new JLabel("User Type");
+        JLabel userTypeTitle = new JLabel("MyFitness.User Type");
         JLabel passwordTitle = new JLabel("Password");
 
         usernameLabel = new JLabel(viewedUser.getUserName());

@@ -625,8 +625,8 @@ public class Database {
         }
 
         System.out.println("\n Testing getting all users should have 2 \n");
-        List<User> allUsers = db.getAllUsers();
-        for (User u : allUsers) {
+        List<MyFitness.User> allUsers = db.getAllUsers();
+        for (MyFitness.User u : allUsers) {
             System.out.println(u);
         }
         //Testing types of users
@@ -635,8 +635,8 @@ public class Database {
         db.saveUser(ad2);
         db.saveUser(t1);
 
-        User test = db.findByUsername("jeremy");
-        User TrainerTest = db.findByUsername("Michael");
+        MyFitness.User test = db.findByUsername("jeremy");
+        MyFitness.User TrainerTest = db.findByUsername("Michael");
 
         if(test instanceof Admin){
             System.out.println("ADMIN");

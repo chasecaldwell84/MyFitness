@@ -34,7 +34,7 @@ public class AdminPage extends JPanel {
     private void createGUI(){
         readUsers();
 
-        JLabel titleLabel = new JLabel("User List", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("MyFitness.User List", SwingConstants.CENTER);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         titleLabel.setFont(App.titleFont);
 
@@ -61,7 +61,7 @@ public class AdminPage extends JPanel {
 
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
 
-        JLabel filterUserLabel = new JLabel("Search User: ");
+        JLabel filterUserLabel = new JLabel("Search MyFitness.User: ");
         filterUserLabel.setFont(App.boldLabelFontLarge);
 
         //FIXME filterfield not showing for windows user aka me
@@ -90,15 +90,15 @@ public class AdminPage extends JPanel {
 
         JPanel buttonPanel = new JPanel();
 
-        JButton viewButton = new JButton("View User");
+        JButton viewButton = new JButton("View MyFitness.User");
         viewButton.addActionListener(new viewUser(this));
         buttonPanel.add(viewButton);
 
-        JButton addUserButton = new JButton("Add User");
+        JButton addUserButton = new JButton("Add MyFitness.User");
         addUserButton.addActionListener(new addUser());
         buttonPanel.add(addUserButton);
 
-        JButton deleteUserButton = new JButton("Delete User");
+        JButton deleteUserButton = new JButton("Delete MyFitness.User");
         deleteUserButton.addActionListener(new deleteUser());
         buttonPanel.add(deleteUserButton);
 
@@ -133,7 +133,7 @@ public class AdminPage extends JPanel {
             if(userList.getSelectedValue() == null){
                 JOptionPane.showMessageDialog(
                         frame,
-                        "No User Selected.",
+                        "No MyFitness.User Selected.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE
                 );
@@ -155,7 +155,7 @@ public class AdminPage extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            SignUp signupWindow = new SignUp("Create User",true);
+            SignUp signupWindow = new SignUp("Create MyFitness.User",true);
             signupWindow.setVisible(true);
             readUsers();
             userList.setListData(users.toArray(new String[0]));
@@ -212,7 +212,7 @@ public class AdminPage extends JPanel {
                     JOptionPane.showMessageDialog(
                             frame,
                             "User " + selectedUserName + " was successfully deleted.",
-                            "User Deleted",
+                            "MyFitness.User Deleted",
                             JOptionPane.INFORMATION_MESSAGE
                     );
                 }

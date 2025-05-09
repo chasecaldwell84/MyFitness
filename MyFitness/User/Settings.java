@@ -1,14 +1,12 @@
 package MyFitness.User;
 
-import MyFitness.App;
-
 import javax.swing.*;
 import java.awt.*;
 
 public class Settings extends JPanel {
-    /*public Settings() {}*/
+    /*public MyFitness.Settings() {}*/
     public Settings(/*App frame*/) {
-        /*frame.setTitle("Settings");
+        /*frame.setTitle("MyFitness.Settings");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(frame.getWidth(), frame.getHeight());*/
         setLayout(new GridBagLayout());

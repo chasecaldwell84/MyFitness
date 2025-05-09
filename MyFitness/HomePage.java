@@ -34,7 +34,7 @@ public class HomePage extends JPanel {
         buttonGrid.add(createIconButton("🎯 Goals", "Set and crush health goals"));
         buttonGrid.add(createIconButton("🌐 Social", "Connect and compete with friends"));
         buttonGrid.add(createIconButton("📊 Stats", "View your performance stats"));
-        buttonGrid.add(createIconButton("⚙️ Settings", "Edit your profile and preferences"));
+        buttonGrid.add(createIconButton("⚙️ MyFitness.Settings", "Edit your profile and preferences"));
 
         JPanel centerCombined = new JPanel();
         centerCombined.setLayout(new BoxLayout(centerCombined, BoxLayout.Y_AXIS));

@@ -110,7 +110,7 @@ public class NavBar extends JPanel {
                         .findFirst().orElse(null);
 
                 if (friend == null) {
-                    JOptionPane.showMessageDialog(frame, "User not found.");
+                    JOptionPane.showMessageDialog(frame, "MyFitness.User not found.");
                     return;
                 }
 

@@ -152,8 +152,8 @@ public class Login extends JDialog {
             if(TypeInput.isEmpty()){
                 JOptionPane.showMessageDialog(this, "SYSTEM ERROR Not assigned type");
             }
-            else if(TypeInput.equals("User")){
-                user = new User(username, password);
+            else if(TypeInput.equals("MyFitness.User")){
+                user = new MyFitness.User(username, password);
             }
             else if(TypeInput.equals("Trainer")){
                 user = new Trainer(username, password);
@@ -171,7 +171,7 @@ public class Login extends JDialog {
         scanner.close();
     }*/
     /*public void authenicating(String username, String password) throws FileNotFoundException {
-        User user1 = db.findByUsername(username);
+        MyFitness.User user1 = db.findByUsername(username);
 
         if(user1 != null && user1.getPassword() != null && user1.getPassword().equals(password)){
             Authenticated = true;

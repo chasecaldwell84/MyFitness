@@ -21,14 +21,15 @@ import MyFitness.Database;
 public class StatisticsPage extends JPanel {
 
     static final String[][] StatLabels = {
-            {"Sleep & Calories", "Workout", "Classes & Goals"},
+            {"Sleep & Calories", "Cardio", "Weight Lifting"},
             {"Average Sleep","Total Sleep","Total Calories Consumed", "Average Calories Consumed"},
             {"Total Hours Ran", "Average Hours Ran", "Total Miles Ran","Average Miles Ran"},
-            {"Classes Attended","Total Class Hours","Average Class Hours","Goals Started","Goals Completed"}
+            {"Workouts Best Set"}
     };
 
     public static boolean[][] selectedStat;
     public static List<Statistic> allStats;
+    public static List<String> liftingNames = new ArrayList<>();
 
     private JList<String> statsList;
     private JScrollPane statsScrollPane;
@@ -78,6 +79,16 @@ public class StatisticsPage extends JPanel {
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
 
             statsList = new JList<>();
+            statsList.setCellRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                              boolean isSelected, boolean cellHasFocus) {
+                    JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                    label.setText((String) value); // HTML will be parsed and rendered
+                    return label;
+                }
+            });
+
             statsList.setFont(App.statsFont);
             statsScrollPane = new JScrollPane(statsList);
             infoPanel.add(statsScrollPane,BorderLayout.CENTER);
@@ -112,17 +123,32 @@ public class StatisticsPage extends JPanel {
         repaint();
     }
 
-    private void updateStatsPanel() {
+    private void updateStatsPanel(){
 
         List<String> metrics = new ArrayList<>();
 
         for (int cat = 1; cat < StatLabels.length; cat++) {
             for (int i = 0; i < StatLabels[cat].length; i++) {
                 if(selectedStat[cat][i]) {
-                    String metric = StatLabels[cat][i];
-                    metric+= " " + calculateStat(StatLabels[cat][i]) + ":";
-                    metric+= getStatTag(StatLabels[cat][i]);
-                    metrics.add(metric);
+                    if(!StatLabels[cat][i].contains("Workout")) {
+                        String metric = "<html><pre><b>"+ StatLabels[cat][i];
+                        for(int j = metric.length(); j < 40; j++){
+                            metric+=" ";
+                        }
+                        metric += ": </b>" + calculateStat(StatLabels[cat][i]);
+                        metric += getStatTag(StatLabels[cat][i]) + "</pre></html>";
+                        metrics.add(metric);
+                    }
+                    else{
+                        for(String liftingName : liftingNames){
+                            String metric = "<html><pre><b>" + liftingName + " " + getStatTag(StatLabels[cat][i]);
+                            for(int j = metric.length(); j < 40; j++){
+                                metric+=" ";
+                            }
+                            metric += ":</b> Weight (" + calculateStat(liftingName + " Best Weight") + ")" + " Reps (" + calculateStat(liftingName+ " Best Rep") + ")</pre></html>";
+                            metrics.add(metric);
+                        }
+                    }
                 }
             }
         }
@@ -160,15 +186,44 @@ public class StatisticsPage extends JPanel {
                 double cardioMin = ((CardioWorkout) workout).getMinutes()/60.0;
                 double cardioHour = ((CardioWorkout) workout).getHours();
                 double cardioTime = cardioSec+cardioHour+cardioMin;
-                Statistic cardioHoursRan = new Statistic("Cardio Hours",cardioTime);
+                Statistic cardioHoursRan = new Statistic("Hours Ran",cardioTime);
                 System.out.println(cardioHour);
                 stats.add(cardioHoursRan);
 
                 //Create Running Distance stat
                 double cardioMiles = ((CardioWorkout) workout).getDistance();
-                Statistic cardioMilesRan = new Statistic("Cardio Miles",cardioMiles);
+                Statistic cardioMilesRan = new Statistic("Miles Ran",cardioMiles);
                 stats.add(cardioMilesRan);
 
+            }
+            if(workout instanceof LiftWorkout){
+
+                //Create Best Rep and Best Weight stat
+                String liftingName = workout.getWorkoutName();
+                if(liftingName.isBlank()){
+                    continue;
+                }
+                int bestRep = 0;
+                double bestWeight = 0;
+                Set<LiftWorkout.LiftSet> sets = new HashSet<>(((LiftWorkout) workout).getSets());
+                for(LiftWorkout.LiftSet lift : sets){
+                    System.out.println("Weightliftng: " + liftingName);
+                    System.out.println("---- Reps: " + lift.getReps());
+                    System.out.println("---- Weight: " + lift.getWeight());
+                    if(bestWeight < lift.getWeight()){
+                        bestWeight = lift.getWeight();
+                    }
+                    if(bestRep < lift.getReps()){
+                        bestRep = lift.getReps();
+                        System.out.println("Best Rep: " + bestRep);
+                    }
+                }
+
+                Statistic liftBestRepStat = new Statistic(liftingName+" Best Rep",bestRep);
+                Statistic liftBestWeight = new Statistic(liftingName+" Best Weight",bestWeight);
+                stats.add(liftBestRepStat);
+                stats.add(liftBestWeight);
+                liftingNames.add(liftingName);
             }
         }
         if (workouts.isEmpty()) {
@@ -181,23 +236,18 @@ public class StatisticsPage extends JPanel {
         if(statName.contains("Hours")){
             return " Hours";
         }
+        else if(statName.contains("Set")) {
+            return "Best Set";
+        }
         return "";
     }
     public double calculateStat(String statName){
         double statValue = 0.0;
         int total = 0;
         for(Statistic stat : allStats){
-            if(statName.contains("Hours Ran")){
-                if(stat.getStatName().equals("Cardio Hours")){
-                    statValue+=stat.getStatValue();
-                    total++;
-                }
-            }
-            if(statName.contains("Miles Ran")){
-                if(stat.getStatName().equals("Cardio Miles")){
-                    statValue+=stat.getStatValue();
-                    total++;
-                }
+            if(statName.contains(stat.getStatName())){
+                statValue+=stat.getStatValue();
+                total++;
             }
         }
         if(statName.contains("Average") && total!=0){

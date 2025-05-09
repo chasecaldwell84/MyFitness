@@ -9,7 +9,7 @@ public class ExerciseClass extends ExercisePlan {
     private JButton addButton;
 
     public ExerciseClass() {
-        /*setTitle("Add User to Workout Class");*/
+        /*setTitle("Add MyFitness.User to Workout Class");*/
         setSize(1200, 800);
         /*setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);*/
@@ -19,14 +19,14 @@ public class ExerciseClass extends ExercisePlan {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel titleLabel = new JLabel("Add User to Class", JLabel.CENTER);
+        JLabel titleLabel = new JLabel("Add MyFitness.User to Class", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         gbc.gridwidth = 2;
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(titleLabel, gbc);
 
-        JLabel userIdLabel = new JLabel("User Name:");
+        JLabel userIdLabel = new JLabel("MyFitness.User Name:");
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -49,7 +49,7 @@ public class ExerciseClass extends ExercisePlan {
         gbc.gridx = 1;
         add(classComboBox, gbc);
 
-        addButton = new JButton("Add User to Class");
+        addButton = new JButton("Add MyFitness.User to Class");
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
@@ -63,13 +63,13 @@ public class ExerciseClass extends ExercisePlan {
         String selectedClass = (String) classComboBox.getSelectedItem();
 
         if (userId.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid User Name.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please enter a valid MyFitness.User Name.", "Input Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // Simulate backend logic
         JOptionPane.showMessageDialog(this,
-                "User '" + userId + "' successfully added to '" + selectedClass + "'.",
+                "MyFitness.User '" + userId + "' successfully added to '" + selectedClass + "'.",
                 "Success",
                 JOptionPane.INFORMATION_MESSAGE);
 
