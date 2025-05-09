@@ -163,7 +163,7 @@ public class Database {
                             "    OWNER VARCHAR(255)\n"
                             );
             stmt.executeUpdate(
-                    "REATE TABLE GroupJoinRequests (\n" +
+                    "CREATE TABLE GroupJoinRequests (\n" +
                             "    GROUPNAME VARCHAR(255),\n" +
                             "    USERNAME VARCHAR(255)"
             );
