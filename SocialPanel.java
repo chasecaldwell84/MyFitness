@@ -247,6 +247,10 @@ public class SocialPanel extends JPanel {
                         }
                     }
                     String[] availableOptions = availableGroups.toArray(new String[0]);
+                    if (availableOptions.length == 0) {
+                        JOptionPane.showMessageDialog(frame, "No available groups to join.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
                     int choiceAG = JOptionPane.showOptionDialog(
                             frame, "Select a group to view or join:", "Available Groups",
                             JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, availableOptions, availableOptions[0]);
