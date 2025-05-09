@@ -1,3 +1,5 @@
+//you don't need that, it's just a text file
+
 package MyFitness;
 
 import MyFitness.ExerciseSession.Workout.CardioWorkout;
