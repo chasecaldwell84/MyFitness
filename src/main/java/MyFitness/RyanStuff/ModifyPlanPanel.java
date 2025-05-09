@@ -27,6 +27,8 @@ public class ModifyPlanPanel extends JPanel {
     private final JTextField durationField = new JTextField(10);
     private final JTextArea planDescArea = new JTextArea(3, 20);
     private String selectedExerciseName = null;
+    private final JCheckBox selfPacedBox = new JCheckBox("Self-Paced Class");
+
 
 
     private final int classId;
@@ -54,10 +56,14 @@ public class ModifyPlanPanel extends JPanel {
         addLabelAndField("Days (e.g., Mon, Wed):", daysField, c, 6);
         addLabelAndField("Session Length (min):", lengthField, c, 7);
         addLabelAndField("Duration (weeks):", weeksField, c, 8);
+        c.gridx = 0; c.gridy = 9;
+        add(new JLabel("Self-Paced Option:"), c);
+        c.gridx = 1;
+        add(selfPacedBox, c);
 
         JButton saveClassButton = new JButton("Save Class Info");
         saveClassButton.addActionListener(this::saveClassInfo);
-        c.gridx = 1; c.gridy = 9; c.gridwidth = 1;
+        c.gridx = 5; c.gridy = 9; c.gridwidth = 1;
         add(saveClassButton, c);
 
         c.gridx = 0; c.gridy = 10; c.gridwidth = 2;
@@ -132,6 +138,7 @@ public class ModifyPlanPanel extends JPanel {
             daysField.setText(info[4]);
             lengthField.setText(info[5]);
             weeksField.setText(info[6]);
+            selfPacedBox.setSelected(Boolean.parseBoolean(info[7]));
         }
     }
 
@@ -146,7 +153,8 @@ public class ModifyPlanPanel extends JPanel {
                     Integer.parseInt(seatsField.getText().trim()),
                     daysField.getText().trim(),
                     Integer.parseInt(lengthField.getText().trim()),
-                    Integer.parseInt(weeksField.getText().trim())
+                    Integer.parseInt(weeksField.getText().trim()),
+                    selfPacedBox.isSelected() // <--- NEW
             );
             JOptionPane.showMessageDialog(this, success ? "Class info updated!" : "Update failed.");
         } catch (Exception ex) {

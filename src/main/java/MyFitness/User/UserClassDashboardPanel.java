@@ -1,3 +1,4 @@
+//Author:Dannis Wu
 package MyFitness.User;
 
 import MyFitness.App;

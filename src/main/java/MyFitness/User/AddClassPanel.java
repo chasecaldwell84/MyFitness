@@ -1,3 +1,4 @@
+//Author: Dannis Wu
 package MyFitness.User;
 
 import MyFitness.App;
@@ -22,12 +23,16 @@ public class AddClassPanel extends JPanel {
 
         JTextField searchField = new JTextField();
         JButton searchBtn = new JButton("Search");
+        JCheckBox selfPacedFilter = new JCheckBox("Show only Self-Paced Classes");
 
         JPanel searchPanel = new JPanel(new BorderLayout(5, 5));
+        JPanel topPanel = new JPanel(new BorderLayout());
         searchPanel.add(new JLabel("Search by ID, Title, or Trainer:"), BorderLayout.WEST);
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchBtn, BorderLayout.EAST);
-        centerPanel.add(searchPanel, BorderLayout.NORTH);
+        topPanel.add(searchPanel, BorderLayout.CENTER);
+        topPanel.add(selfPacedFilter, BorderLayout.SOUTH);
+        centerPanel.add(topPanel, BorderLayout.NORTH);
 
         DefaultListModel<String> classListModel = new DefaultListModel<>();
         JList<String> classList = new JList<>(classListModel);
@@ -46,8 +51,12 @@ public class AddClassPanel extends JPanel {
         // Search functionality
         searchBtn.addActionListener(e -> {
             String keyword = searchField.getText().trim().toLowerCase();
+            List<Map<String, Object>> filtered = selfPacedFilter.isSelected() ?
+                    Database.getInstance().getSelfPacedClasses() :
+                    Database.getInstance().getAllClasses();
+
             classListModel.clear();
-            for (Map<String, Object> cls : allClasses) {
+            for (Map<String, Object> cls : filtered) {
                 String classId = String.valueOf(cls.get("CLASS_ID"));
                 String titleText = String.valueOf(cls.get("TITLE")).toLowerCase();
                 String trainer = String.valueOf(cls.get("TRAINER_USERNAME")).toLowerCase();
@@ -55,6 +64,14 @@ public class AddClassPanel extends JPanel {
                     classListModel.addElement(formatClass(cls));
                 }
             }
+        });
+
+        // Filter checkbox functionality
+        selfPacedFilter.addActionListener(e -> {
+            List<Map<String, Object>> filtered = selfPacedFilter.isSelected() ?
+                    Database.getInstance().getSelfPacedClasses() :
+                    Database.getInstance().getAllClasses();
+            updateClassList(classListModel, filtered);
         });
 
         // Join functionality
@@ -103,12 +120,14 @@ public class AddClassPanel extends JPanel {
         int totalSeats = (int) cls.get("SEATS");
         int enrolled = Database.getInstance().getEnrollmentCount(classId);
         String description = (String) cls.get("DESCRIPTION");
+        boolean isSelfPaced = (boolean) cls.get("IS_SELF_PACED");
+        String selfPacedText = isSelfPaced ? "Yes" : "No";
 
         return "Class ID: " + classId
                 + " | Title: " + cls.get("TITLE")
                 + " | Trainer: " + cls.get("TRAINER_USERNAME")
                 + " | Seats: " + enrolled + " / " + totalSeats
-                + " | Description: " + description;
+                + " | Description: " + description
+                + " | Self-Paced: " + selfPacedText;
     }
-
 }

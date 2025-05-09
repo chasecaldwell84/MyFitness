@@ -374,12 +374,12 @@ public class Database {
     }
 
 
-    //class stuff
+    //class stuff, author:Dannis Wu
     public void saveClass(String trainerUsername, String title, String description, String dateTime,
                           int seats, String days, int sessionLength, int numWeeks, boolean isSelfPaced) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO WorkoutClasses (TRAINER_USERNAME, TITLE, DESCRIPTION, DATETIME, SEATS, DAYS, SESSION_LENGTH, NUM_WEEKS) " +
+                    "INSERT INTO WorkoutClasses (TRAINER_USERNAME, TITLE, DESCRIPTION, DATETIME, SEATS, DAYS, SESSION_LENGTH, NUM_WEEKS, IS_SELF_PACED) " +
                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
             ps.setString(1, trainerUsername);
@@ -413,6 +413,8 @@ public class Database {
                 row.put("TRAINER_USERNAME", rs.getString("TRAINER_USERNAME"));
                 row.put("SEATS", rs.getInt("SEATS"));
                 row.put("DESCRIPTION", rs.getString("DESCRIPTION"));
+                row.put("IS_SELF_PACED", rs.getBoolean("IS_SELF_PACED"));
+
 
 
                 // Count current enrollment
@@ -540,9 +542,10 @@ public class Database {
                 String[] parts = dateTime.split(" ");
                 String date = parts.length > 0 ? parts[0] : "N/A";
                 String time = parts.length > 1 ? parts[1] : "N/A";
+                boolean selfPaced = rs.getBoolean("IS_SELF_PACED");
 
                 String details = String.format(
-                        "Class ID: %d\nTitle: %s\nDescription: %s\nStart Date: %s\nTime: %s\nSeats: %d\nDays: %s\nSession Length: %d minutes\nDuration: %d weeks",
+                        "Class ID: %d\nTitle: %s\nDescription: %s\nStart Date: %s\nTime: %s\nSeats: %d\nDays: %s\nSession Length: %d minutes\nDuration: %d weeks\nSelf-Paced: %s",
                         rs.getInt("CLASS_ID"),
                         rs.getString("TITLE"),
                         rs.getString("DESCRIPTION"),
@@ -551,7 +554,8 @@ public class Database {
                         rs.getInt("SEATS"),
                         rs.getString("DAYS"),
                         rs.getInt("SESSION_LENGTH"),
-                        rs.getInt("NUM_WEEKS")
+                        rs.getInt("NUM_WEEKS"),
+                        selfPaced ? "Yes" : "No"
                 );
                 classList.add(details);
             }
@@ -563,10 +567,11 @@ public class Database {
         return classList;
     }
 
-    public boolean updateClassInfo(int classId, String title, String description, String date, String time, int seats, String days, int sessionLength, int numWeeks) {
+
+    public boolean updateClassInfo(int classId, String title, String description, String date, String time, int seats, String days, int sessionLength, int numWeeks, boolean isSelfPaced) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE WorkoutClasses SET TITLE=?, DESCRIPTION=?, DATETIME=?, SEATS=?, DAYS=?, SESSION_LENGTH=?, NUM_WEEKS=? WHERE CLASS_ID=?"
+                    "UPDATE WorkoutClasses SET TITLE=?, DESCRIPTION=?, DATETIME=?, SEATS=?, DAYS=?, SESSION_LENGTH=?, NUM_WEEKS=?, IS_SELF_PACED=? WHERE CLASS_ID=?"
             );
             ps.setString(1, title);
             ps.setString(2, description);
@@ -575,7 +580,8 @@ public class Database {
             ps.setString(5, days);
             ps.setInt(6, sessionLength);
             ps.setInt(7, numWeeks);
-            ps.setInt(8, classId);
+            ps.setBoolean(8, isSelfPaced);
+            ps.setInt(9, classId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -599,7 +605,8 @@ public class Database {
                         String.valueOf(rs.getInt("SEATS")),
                         rs.getString("DAYS"),
                         String.valueOf(rs.getInt("SESSION_LENGTH")),
-                        String.valueOf(rs.getInt("NUM_WEEKS"))
+                        String.valueOf(rs.getInt("NUM_WEEKS")),
+                        String.valueOf(rs.getBoolean("IS_SELF_PACED"))
                 };
             }
             rs.close();
@@ -666,21 +673,28 @@ public class Database {
         }
         return classIds;
     }
-
+    // not use
     public String getJoinedClassInfo(int classId) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM WorkoutClasses WHERE CLASS_ID = ?");
             ps.setInt(1, classId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
+                String[] dateTimeParts = rs.getString("DATETIME").split(" ");
+                String date = dateTimeParts.length > 0 ? dateTimeParts[0] : "N/A";
+                String time = dateTimeParts.length > 1 ? dateTimeParts[1] : "N/A";
+                boolean isSelfPaced = rs.getBoolean("IS_SELF_PACED");
+
                 return "Class ID: " + rs.getInt("CLASS_ID") + "\n"
                         + "Title: " + rs.getString("TITLE") + "\n"
                         + "Description: " + rs.getString("DESCRIPTION") + "\n"
-                        + "Start: " + rs.getTimestamp("START_TIME") + "\n"
+                        + "Start Date: " + date + "\n"
+                        + "Time: " + time + "\n"
                         + "Seats: " + rs.getInt("SEATS") + "\n"
                         + "Days: " + rs.getString("DAYS") + "\n"
-                        + "Length: " + rs.getInt("SESSION_LENGTH") + "\n"
-                        + "Weeks: " + rs.getInt("DURATION_WEEKS") + "\n"
+                        + "Length: " + rs.getInt("SESSION_LENGTH") + " minutes\n"
+                        + "Weeks: " + rs.getInt("NUM_WEEKS") + "\n"
+                        + "Self-Paced: " + (isSelfPaced ? "Yes" : "No") + "\n"
                         + "Trainer: " + rs.getString("TRAINER_USERNAME");
             }
             rs.close();
@@ -690,6 +704,7 @@ public class Database {
         }
         return "No info found.";
     }
+
 
     public List<String> getJoinedClassInfo(String username) {
         List<String> infoList = new ArrayList<>();
@@ -701,11 +716,14 @@ public class Database {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
+                boolean isSelfPaced = rs.getBoolean("IS_SELF_PACED");
+                String selfPacedText = isSelfPaced ? "Yes" : "No";
                 String info = "Class ID: " + rs.getInt("CLASS_ID") +
                         " | Title: " + rs.getString("TITLE") +
                         " | Trainer: " + rs.getString("TRAINER_USERNAME") +
                         " | Seats: " + rs.getInt("SEATS") +
-                        " | Description: " + rs.getString("DESCRIPTION");
+                        " | Description: " + rs.getString("DESCRIPTION") +
+                        " | Self-Paced: " + selfPacedText;
                 infoList.add(info);
             }
             rs.close();
@@ -815,13 +833,44 @@ public class Database {
         return planBuilder.length() > 0 ? planBuilder.toString() : "No plan found for this class.";
     }
 
+    public List<Map<String, Object>> getSelfPacedClasses() {
+        List<Map<String, Object>> classes = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM WorkoutClasses WHERE IS_SELF_PACED = TRUE");
 
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                int classId = rs.getInt("CLASS_ID");
+                row.put("CLASS_ID", classId);
+                row.put("TITLE", rs.getString("TITLE"));
+                row.put("TRAINER_USERNAME", rs.getString("TRAINER_USERNAME"));
+                row.put("SEATS", rs.getInt("SEATS"));
+                row.put("DESCRIPTION", rs.getString("DESCRIPTION"));
+                row.put("IS_SELF_PACED", rs.getBoolean("IS_SELF_PACED"));
 
+                // Count enrollment
+                PreparedStatement countPs = conn.prepareStatement("SELECT COUNT(*) FROM ClassMembers WHERE CLASS_ID = ?");
+                countPs.setInt(1, classId);
+                ResultSet countRs = countPs.executeQuery();
+                int current = 0;
+                if (countRs.next()) {
+                    current = countRs.getInt(1);
+                }
+                row.put("CURRENT_ENROLLMENT", current);
+                countRs.close();
+                countPs.close();
 
+                classes.add(row);
+            }
 
-
-
-
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return classes;
+    }
 
     public void saveWorkout(User user, Workout workout, String sessionDate){
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
