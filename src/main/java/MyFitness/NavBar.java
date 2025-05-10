@@ -1,23 +1,32 @@
 package MyFitness;
 
+import MyFitness.RyanStuff.CalorieTracker;
 import MyFitness.Settings.AdminPage;
 import MyFitness.RyanStuff.StatsTracker;
 import MyFitness.RyanStuff.CreateGoals;
 import MyFitness.Settings.UserPage;
+import MyFitness.Settings.*;
 import MyFitness.Statistics.StatisticsPage;
 import MyFitness.User.Admin;
+import MyFitness.Trainer.*;
+import MyFitness.User.*;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class NavBar extends JPanel {
+    private User loggedInUser;
+
+    public void setLoggedInUser(User user) {
+        this.loggedInUser = user;
+    }
+
+    public User getLoggedInUser() {
+        return this.loggedInUser;
+    }
 
     public NavBar(App frame) {
         setLayout(new FlowLayout(FlowLayout.LEFT));
-
-        //NOTE: if we want backButton need to store previous frames in like a stack
-        /*JButton backButton = new JButton("Back");*/
-
 
         JButton Home = new JButton("Home");
         Home.addActionListener(e -> {
@@ -25,7 +34,6 @@ public class NavBar extends JPanel {
             //frame.getContentPane().add(this);
             frame.getContentPane().setLayout(new BorderLayout());
             frame.getContentPane().add(this, BorderLayout.NORTH);
-
             HomePage home = new HomePage(frame);
             frame.getContentPane().add(home, BorderLayout.CENTER);
             //frame.add(home);
@@ -108,10 +116,8 @@ public class NavBar extends JPanel {
                 //frame.add(userPage);
                 frame.getContentPane().add(userPage, BorderLayout.CENTER);
             }
-
             frame.revalidate();
             frame.repaint();
-
         });
 
         JButton statistics = new JButton("Statistics");
@@ -125,7 +131,90 @@ public class NavBar extends JPanel {
             frame.revalidate();
             frame.repaint();
         });
+
+        JButton classDashboardButton = new JButton("Class Dashboard");
+        classDashboardButton.addActionListener(e -> {
+            frame.getContentPane().removeAll();
+            frame.setTitle("Class Dashboard");
+            if (frame.getUser() instanceof Trainer) {
+                Trainer trainer = (Trainer) frame.getUser();
+                JPanel trainerPanel = new JPanel();
+                trainerPanel.setLayout(new BoxLayout(trainerPanel, BoxLayout.Y_AXIS));
+                trainerPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+                JLabel title = new JLabel("Class Dashboard (Trainer)");
+                title.setFont(new Font("Arial", Font.BOLD, 24));
+                title.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+                JButton createClass = new JButton("Create New Class");
+                createClass.setAlignmentX(Component.CENTER_ALIGNMENT);
+                createClass.addActionListener(ae -> {
+                    frame.getContentPane().removeAll();
+                    frame.add(new NavBar(frame), BorderLayout.NORTH);
+                    frame.add(new CreateClassPage(frame, trainer));
+                    frame.revalidate();
+                    frame.repaint();
+                });
+
+                JButton viewClasses = new JButton("View My Classes");
+                viewClasses.setAlignmentX(Component.CENTER_ALIGNMENT);
+                viewClasses.addActionListener(ae -> {
+                    frame.getContentPane().removeAll();
+                    frame.add(new NavBar(frame), BorderLayout.NORTH);
+                    frame.add(new TrainerClassesPage(frame, trainer));
+                    frame.revalidate();
+                    frame.repaint();
+                });
+
+                trainerPanel.add(title);
+                trainerPanel.add(Box.createVerticalStrut(20));
+                trainerPanel.add(createClass);
+                trainerPanel.add(Box.createVerticalStrut(10));
+                trainerPanel.add(viewClasses);
+                frame.add(new NavBar(frame), BorderLayout.NORTH);
+                frame.add(trainerPanel);
+            } else {
+                GeneralUser user = (GeneralUser) frame.getUser();
+                JPanel userPanel = new JPanel();
+                userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
+                userPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+                JLabel label = new JLabel("Class Dashboard (User)");
+                label.setFont(new Font("Arial", Font.BOLD, 24));
+                label.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+                JButton addClassBtn = new JButton("Add Class");
+                addClassBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+                addClassBtn.addActionListener(ae -> {
+                    frame.getContentPane().removeAll();
+                    frame.add(new NavBar(frame), BorderLayout.NORTH);
+                    frame.add(new AddClassPanel(frame, user));
+                    frame.revalidate();
+                    frame.repaint();
+                });
+
+                JButton seeMyClassBtn = new JButton("See My Class");
+                seeMyClassBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+                seeMyClassBtn.addActionListener(ae -> {
+                    frame.getContentPane().removeAll();
+                    frame.add(new NavBar(frame), BorderLayout.NORTH);
+                    frame.add(new SeeMyClassPanel(frame, user));
+                    frame.revalidate();
+                    frame.repaint();
+                });
+
+                userPanel.add(label);
+                userPanel.add(Box.createVerticalStrut(20));
+                userPanel.add(addClassBtn);
+                userPanel.add(Box.createVerticalStrut(10));
+                userPanel.add(seeMyClassBtn);
+                frame.add(new NavBar(frame), BorderLayout.NORTH);
+                frame.add(userPanel);
+            }
+            frame.revalidate();
+            frame.repaint();
+        });
+
         add(Home);
+        add(classDashboardButton);
         add(exerciseButton);
         add(CalorieTracker);
         add(goalButton);

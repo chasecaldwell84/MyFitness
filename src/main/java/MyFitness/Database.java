@@ -26,6 +26,9 @@ public class Database {
         System.out.println("Reloaded users: " + allUsers.size());
     }
 
+
+
+
     public static Database getInstance() {
         if (instance == null) {
             instance = new Database();
@@ -58,7 +61,10 @@ public class Database {
             stmt.executeUpdate(
                     "CREATE TABLE Weight (" +
                             "WEIGHT_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+                    "CREATE TABLE UserStats (" +
+                            "STAT_ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
                             "USERNAME VARCHAR(255) NOT NULL, " +
+                            "PRIMARY KEY (STAT_ID), " +
                             "WEIGHTVALUE DOUBLE NOT NULL, " +
                             "PRIMARY KEY (WEIGHT_ID), " +
                             "FOREIGN KEY (USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
@@ -109,7 +115,6 @@ public class Database {
                             "FOREIGN KEY (WORKOUT_ID) REFERENCES Workouts(WORKOUT_ID) ON DELETE CASCADE " +
                             ")"
             );
-
             //for WorkoutClasses
             DatabaseMetaData meta = conn.getMetaData();
             ResultSet tables = meta.getTables(null, null, "WORKOUTCLASSES", null);
@@ -125,6 +130,7 @@ public class Database {
                                 "DAYS VARCHAR(255), " +
                                 "SESSION_LENGTH INT, " +
                                 "NUM_WEEKS INT, " +
+                                "IS_SELF_PACED BOOLEAN DEFAULT FALSE, " +
                                 "PRIMARY KEY (CLASS_ID), " +
                                 "FOREIGN KEY (TRAINER_USERNAME) REFERENCES Users(USERNAME) ON DELETE CASCADE" +
                                 ")"
@@ -255,7 +261,7 @@ public class Database {
                 else if(Objects.equals(rs.getString("USERTYPE"), "general")){
                     return new GeneralUser(rs.getString("USERNAME"), rs.getString("PASSWORD"));
                 }
-                else if(Objects.equals(rs.getString("USERTYPE"), "user")){
+                else if(Objects.equals(rs.getString("USERTYPE"), "user")){//fix
                     return new GeneralUser(rs.getString("USERNAME"), rs.getString("PASSWORD"));
                 }
                 else{
@@ -282,7 +288,6 @@ public class Database {
             e.printStackTrace();
         }
     }
-
     /*
      * Saves goal to a specific user or updates goal for that specific user if
      * the type, and length matches
@@ -558,6 +563,7 @@ public class Database {
         return workouts;
     }
 
+
     public Set<Workout> getAllWorkouts(User user){
         Set<Workout> workouts = new HashSet<>();
 
@@ -616,50 +622,74 @@ public class Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return workouts;
     }
 
-    // class stuff
-    public List<Map<String, Object>> getAllClasses() {
-        List<Map<String, Object>> classes = new ArrayList<>();
+    //class stuff, author:Dannis Wu
+    public void saveClass(String trainerUsername, String title, String description, String dateTime,
+                          int seats, String days, int sessionLength, int numWeeks, boolean isSelfPaced) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM WorkoutClasses");
-
-            while (rs.next()) {
-                Map<String, Object> row = new HashMap<>();
-                int classId = rs.getInt("CLASS_ID");
-                row.put("CLASS_ID", classId);
-                row.put("TITLE", rs.getString("TITLE"));
-                row.put("TRAINER_USERNAME", rs.getString("TRAINER_USERNAME"));
-                row.put("SEATS", rs.getInt("SEATS"));
-                row.put("DESCRIPTION", rs.getString("DESCRIPTION"));
-
-
-                // Count current enrollment
-                PreparedStatement countPs = conn.prepareStatement("SELECT COUNT(*) FROM ClassMembers WHERE CLASS_ID = ?");
-                countPs.setInt(1, classId);
-                ResultSet countRs = countPs.executeQuery();
-                int current = 0;
-                if (countRs.next()) {
-                    current = countRs.getInt(1);
-                }
-                row.put("CURRENT_ENROLLMENT", current);
-
-                countRs.close();
-                countPs.close();
-
-                classes.add(row);
-            }
-
-            rs.close();
-            stmt.close();
+            PreparedStatement ps = conn.prepareStatement(
+                    "INSERT INTO WorkoutClasses (TRAINER_USERNAME, TITLE, DESCRIPTION, DATETIME, SEATS, DAYS, SESSION_LENGTH, NUM_WEEKS, IS_SELF_PACED) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            );
+            ps.setString(1, trainerUsername);
+            ps.setString(2, title);
+            ps.setString(3, description);
+            ps.setString(4, dateTime);
+            ps.setInt(5, seats);
+            ps.setString(6, days);
+            ps.setInt(7, sessionLength);
+            ps.setInt(8, numWeeks);
+            ps.setBoolean(9, isSelfPaced);
+            ps.executeUpdate();
+            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return classes;
     }
+
+    // class stuff
+        public List<Map<String, Object>> getAllClasses() {
+            List<Map<String, Object>> classes = new ArrayList<>();
+            try (Connection conn = DriverManager.getConnection(DB_URL)) {
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM WorkoutClasses");
+
+                while (rs.next()) {
+                    Map<String, Object> row = new HashMap<>();
+                    int classId = rs.getInt("CLASS_ID");
+                    row.put("CLASS_ID", classId);
+                    row.put("TITLE", rs.getString("TITLE"));
+                    row.put("TRAINER_USERNAME", rs.getString("TRAINER_USERNAME"));
+                    row.put("SEATS", rs.getInt("SEATS"));
+                    row.put("DESCRIPTION", rs.getString("DESCRIPTION"));
+                    row.put("IS_SELF_PACED", rs.getBoolean("IS_SELF_PACED"));
+
+
+
+                    // Count current enrollment
+                    PreparedStatement countPs = conn.prepareStatement("SELECT COUNT(*) FROM ClassMembers WHERE CLASS_ID = ?");
+                    countPs.setInt(1, classId);
+                    ResultSet countRs = countPs.executeQuery();
+                    int current = 0;
+                    if (countRs.next()) {
+                        current = countRs.getInt(1);
+                    }
+                    row.put("CURRENT_ENROLLMENT", current);
+
+                    countRs.close();
+                    countPs.close();
+
+                    classes.add(row);
+                }
+
+                rs.close();
+                stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return classes;
+        }
 
 
     //savePlanToClass
@@ -730,65 +760,67 @@ public class Database {
         return result;
     }
 
-    public void updateExercisePlan(String planName, String exercise, String instruction, int duration, String notes, String trainerUsername) {
-        try (Connection conn = DriverManager.getConnection(DB_URL)) {
-            PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE ClassPlans SET EXERCISE_NAME = ?, INSTRUCTION = ?, DURATION = ?, DESCRIPTION = ? " +
-                            "WHERE EXERCISE_NAME = ? AND CLASS_ID IN (SELECT CLASS_ID FROM WorkoutClasses WHERE TRAINER_USERNAME = ?)"
-            );
-            ps.setString(1, exercise);
-            ps.setString(2, instruction);
-            ps.setInt(3, duration);
-            ps.setString(4, notes);
-            ps.setString(5, planName);
-            ps.setString(6, trainerUsername);
-            ps.executeUpdate();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public List<String> findClassesByTrainer(String trainerUsername) {
-        List<String> classList = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(DB_URL)) {
-            PreparedStatement ps = conn.prepareStatement(
-                    "SELECT * FROM WorkoutClasses WHERE TRAINER_USERNAME = ?"
-            );
-            ps.setString(1, trainerUsername);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                String dateTime = rs.getString("DATETIME");
-                String[] parts = dateTime.split(" ");
-                String date = parts.length > 0 ? parts[0] : "N/A";
-                String time = parts.length > 1 ? parts[1] : "N/A";
-
-                String details = String.format(
-                        "Class ID: %d\nTitle: %s\nDescription: %s\nStart Date: %s\nTime: %s\nSeats: %d\nDays: %s\nSession Length: %d minutes\nDuration: %d weeks",
-                        rs.getInt("CLASS_ID"),
-                        rs.getString("TITLE"),
-                        rs.getString("DESCRIPTION"),
-                        date,
-                        time,
-                        rs.getInt("SEATS"),
-                        rs.getString("DAYS"),
-                        rs.getInt("SESSION_LENGTH"),
-                        rs.getInt("NUM_WEEKS")
+        public void updateExercisePlan(String planName, String exercise, String instruction, int duration, String notes, String trainerUsername) {
+            try (Connection conn = DriverManager.getConnection(DB_URL)) {
+                PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE ClassPlans SET EXERCISE_NAME = ?, INSTRUCTION = ?, DURATION = ?, DESCRIPTION = ? " +
+                                "WHERE EXERCISE_NAME = ? AND CLASS_ID IN (SELECT CLASS_ID FROM WorkoutClasses WHERE TRAINER_USERNAME = ?)"
                 );
-                classList.add(details);
+                ps.setString(1, exercise);
+                ps.setString(2, instruction);
+                ps.setInt(3, duration);
+                ps.setString(4, notes);
+                ps.setString(5, planName);
+                ps.setString(6, trainerUsername);
+                ps.executeUpdate();
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            rs.close();
-            ps.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return classList;
-    }
 
-    public boolean updateClassInfo(int classId, String title, String description, String date, String time, int seats, String days, int sessionLength, int numWeeks) {
+        public List<String> findClassesByTrainer(String trainerUsername) {
+            List<String> classList = new ArrayList<>();
+            try (Connection conn = DriverManager.getConnection(DB_URL)) {
+                PreparedStatement ps = conn.prepareStatement(
+                        "SELECT * FROM WorkoutClasses WHERE TRAINER_USERNAME = ?"
+                );
+                ps.setString(1, trainerUsername);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    String dateTime = rs.getString("DATETIME");
+                    String[] parts = dateTime.split(" ");
+                    String date = parts.length > 0 ? parts[0] : "N/A";
+                    String time = parts.length > 1 ? parts[1] : "N/A";
+                    boolean selfPaced = rs.getBoolean("IS_SELF_PACED");
+
+                    String details = String.format(
+                            "Class ID: %d\nTitle: %s\nDescription: %s\nStart Date: %s\nTime: %s\nSeats: %d\nDays: %s\nSession Length: %d minutes\nDuration: %d weeks\nSelf-Paced: %s",
+                            rs.getInt("CLASS_ID"),
+                            rs.getString("TITLE"),
+                            rs.getString("DESCRIPTION"),
+                            date,
+                            time,
+                            rs.getInt("SEATS"),
+                            rs.getString("DAYS"),
+                            rs.getInt("SESSION_LENGTH"),
+                            rs.getInt("NUM_WEEKS"),
+                            selfPaced ? "Yes" : "No"
+                    );
+                    classList.add(details);
+                }
+                rs.close();
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return classList;
+        }
+
+    public boolean updateClassInfo(int classId, String title, String description, String date, String time, int seats, String days, int sessionLength, int numWeeks, boolean isSelfPaced) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE WorkoutClasses SET TITLE=?, DESCRIPTION=?, DATETIME=?, SEATS=?, DAYS=?, SESSION_LENGTH=?, NUM_WEEKS=? WHERE CLASS_ID=?"
+                    "UPDATE WorkoutClasses SET TITLE=?, DESCRIPTION=?, DATETIME=?, SEATS=?, DAYS=?, SESSION_LENGTH=?, NUM_WEEKS=?, IS_SELF_PACED=? WHERE CLASS_ID=?"
             );
             ps.setString(1, title);
             ps.setString(2, description);
@@ -797,7 +829,8 @@ public class Database {
             ps.setString(5, days);
             ps.setInt(6, sessionLength);
             ps.setInt(7, numWeeks);
-            ps.setInt(8, classId);
+            ps.setBoolean(8, isSelfPaced);
+            ps.setInt(9, classId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -821,7 +854,8 @@ public class Database {
                         String.valueOf(rs.getInt("SEATS")),
                         rs.getString("DAYS"),
                         String.valueOf(rs.getInt("SESSION_LENGTH")),
-                        String.valueOf(rs.getInt("NUM_WEEKS"))
+                        String.valueOf(rs.getInt("NUM_WEEKS")),
+                        String.valueOf(rs.getBoolean("IS_SELF_PACED"))
                 };
             }
             rs.close();
@@ -847,7 +881,7 @@ public class Database {
     }
 
 
-    /*public List<Map<String, Object>> getTrainerClassesWithId(String trainerUsername) {
+    public List<Map<String, Object>> getTrainerClassesWithId(String trainerUsername) {
         List<Map<String, Object>> classList = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement(
@@ -870,7 +904,7 @@ public class Database {
             e.printStackTrace();
         }
         return classList;
-    }*/
+    }
 
     public List<Integer> getClassIdsJoinedByUser(String username) {
         List<Integer> classIds = new ArrayList<>();
@@ -888,21 +922,28 @@ public class Database {
         }
         return classIds;
     }
-
-    /*public String getJoinedClassInfo(int classId) {
+    // not use
+    public String getJoinedClassInfo(int classId) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM WorkoutClasses WHERE CLASS_ID = ?");
             ps.setInt(1, classId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
+                String[] dateTimeParts = rs.getString("DATETIME").split(" ");
+                String date = dateTimeParts.length > 0 ? dateTimeParts[0] : "N/A";
+                String time = dateTimeParts.length > 1 ? dateTimeParts[1] : "N/A";
+                boolean isSelfPaced = rs.getBoolean("IS_SELF_PACED");
+
                 return "Class ID: " + rs.getInt("CLASS_ID") + "\n"
                         + "Title: " + rs.getString("TITLE") + "\n"
                         + "Description: " + rs.getString("DESCRIPTION") + "\n"
-                        + "Start: " + rs.getTimestamp("START_TIME") + "\n"
+                        + "Start Date: " + date + "\n"
+                        + "Time: " + time + "\n"
                         + "Seats: " + rs.getInt("SEATS") + "\n"
                         + "Days: " + rs.getString("DAYS") + "\n"
-                        + "Length: " + rs.getInt("SESSION_LENGTH") + "\n"
-                        + "Weeks: " + rs.getInt("DURATION_WEEKS") + "\n"
+                        + "Length: " + rs.getInt("SESSION_LENGTH") + " minutes\n"
+                        + "Weeks: " + rs.getInt("NUM_WEEKS") + "\n"
+                        + "Self-Paced: " + (isSelfPaced ? "Yes" : "No") + "\n"
                         + "Trainer: " + rs.getString("TRAINER_USERNAME");
             }
             rs.close();
@@ -911,7 +952,7 @@ public class Database {
             e.printStackTrace();
         }
         return "No info found.";
-    }*/
+    }
 
     public List<String> getJoinedClassInfo(String username) {
         List<String> infoList = new ArrayList<>();
@@ -923,11 +964,14 @@ public class Database {
             ps.setString(1, username);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
+                boolean isSelfPaced = rs.getBoolean("IS_SELF_PACED");
+                String selfPacedText = isSelfPaced ? "Yes" : "No";
                 String info = "Class ID: " + rs.getInt("CLASS_ID") +
                         " | Title: " + rs.getString("TITLE") +
                         " | Trainer: " + rs.getString("TRAINER_USERNAME") +
                         " | Seats: " + rs.getInt("SEATS") +
-                        " | Description: " + rs.getString("DESCRIPTION");
+                        " | Description: " + rs.getString("DESCRIPTION") +
+                        " | Self-Paced: " + selfPacedText;
                 infoList.add(info);
             }
             rs.close();
@@ -1037,11 +1081,213 @@ public class Database {
         return planBuilder.length() > 0 ? planBuilder.toString() : "No plan found for this class.";
     }
 
+    public List<Map<String, Object>> getSelfPacedClasses() {
+        List<Map<String, Object>> classes = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM WorkoutClasses WHERE IS_SELF_PACED = TRUE");
 
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                int classId = rs.getInt("CLASS_ID");
+                row.put("CLASS_ID", classId);
+                row.put("TITLE", rs.getString("TITLE"));
+                row.put("TRAINER_USERNAME", rs.getString("TRAINER_USERNAME"));
+                row.put("SEATS", rs.getInt("SEATS"));
+                row.put("DESCRIPTION", rs.getString("DESCRIPTION"));
+                row.put("IS_SELF_PACED", rs.getBoolean("IS_SELF_PACED"));
 
+                // Count enrollment
+                PreparedStatement countPs = conn.prepareStatement("SELECT COUNT(*) FROM ClassMembers WHERE CLASS_ID = ?");
+                countPs.setInt(1, classId);
+                ResultSet countRs = countPs.executeQuery();
+                int current = 0;
+                if (countRs.next()) {
+                    current = countRs.getInt(1);
+                }
+                row.put("CURRENT_ENROLLMENT", current);
+                countRs.close();
+                countPs.close();
 
+                classes.add(row);
+            }
 
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return classes;
+    }
 
+    public void saveWorkout(User user, Workout workout, String sessionDate){
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+
+            // First, check if the workout already exists in the Workouts table
+            String checkSql = "SELECT 1 FROM Workouts WHERE USERNAME = ? AND WORKOUT_ID = ? AND WORKOUTNAME = ? AND SESSION_DATE = ? AND WORKOUTTYPE = ?";
+            try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+                checkStmt.setString(1, user.getUserName());
+                checkStmt.setInt(2, workout.getId());
+                checkStmt.setString(3, workout.getWorkoutName());
+                checkStmt.setString(4, sessionDate);
+                checkStmt.setString(5, workout.getWorkoutType().name());
+
+                ResultSet rs = checkStmt.executeQuery();
+                boolean exists = rs.next();
+                rs.close();
+
+                if (!exists) {
+                    // Insert into Workouts table
+                    String insertWorkoutSql = "INSERT INTO Workouts (USERNAME, WORKOUTNAME, SESSION_DATE, WORKOUTTYPE) VALUES (?, ?, ?, ?)";
+                    try (PreparedStatement insertStmt = conn.prepareStatement(insertWorkoutSql, Statement.RETURN_GENERATED_KEYS)) {
+                        insertStmt.setString(1, user.getUserName());
+                        insertStmt.setString(2, workout.getWorkoutName());
+                        insertStmt.setString(3, sessionDate);
+                        insertStmt.setString(4, workout.getWorkoutType().name());
+                        insertStmt.executeUpdate();
+
+                        // Get the generated workout ID
+                        try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
+                            if (generatedKeys.next()) {
+                                int generatedId = generatedKeys.getInt(1);
+                                workout.setId(generatedId); // Make sure this method exists
+                            } else {
+                                throw new SQLException("Creating workout failed, no ID obtained.");
+                            }
+                        }
+                    }
+                }
+
+                if (workout.getWorkoutType() == Workout.WorkoutType.LIFT) {
+                    LiftWorkout lifting = (LiftWorkout) workout;
+
+                    for (LiftWorkout.LiftSet set : lifting.getSets()) {
+                        boolean updated = false;
+
+                        if (set.getLiftID() != null) {
+                            String updateSql = "UPDATE WeightLifting SET WEIGHT = ?, REPS = ? WHERE WORKOUT_ID = ? AND WEIGHTLIFTING_ID = ?";
+                            try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                                updateStmt.setDouble(1, set.getWeight());
+                                updateStmt.setDouble(2, set.getReps());
+                                updateStmt.setInt(3, workout.getId());
+                                updateStmt.setInt(4, set.getLiftID());
+                                int rowsAffected = updateStmt.executeUpdate();
+                                updated = rowsAffected > 0;
+                            }
+                        }
+
+                        if (!updated) {
+                            String insertSql = "INSERT INTO WeightLifting (WORKOUT_ID, WEIGHT, REPS) VALUES (?, ?, ?)";
+                            try (PreparedStatement insertStmt = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
+                                insertStmt.setInt(1, workout.getId());
+                                insertStmt.setDouble(2, set.getWeight());
+                                insertStmt.setDouble(3, set.getReps());
+                                insertStmt.executeUpdate();
+
+                                try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
+                                    if (generatedKeys.next()) {
+                                        int generatedId = generatedKeys.getInt(1);
+                                        set.setLiftID(generatedId);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (workout.getWorkoutType() == Workout.WorkoutType.CARDIO) {
+                    CardioWorkout cardio = (CardioWorkout) workout;
+
+                    String updateSql = "UPDATE Cardio SET DISTANCE = ?, HOURS = ?, MINUTES = ?, SECONDS = ? WHERE WORKOUT_ID = ?";
+                    try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                        updateStmt.setDouble(1, cardio.getDistance());
+                        updateStmt.setDouble(2, cardio.getHours());
+                        updateStmt.setDouble(3, cardio.getMinutes());
+                        updateStmt.setDouble(4, cardio.getSeconds());
+                        updateStmt.setInt(5, workout.getId());
+
+                        int rowsAffected = updateStmt.executeUpdate();
+
+                        if (rowsAffected == 0) {
+                            String insertSql = "INSERT INTO Cardio (WORKOUT_ID, DISTANCE, HOURS, MINUTES, SECONDS) VALUES (?, ?, ?, ?, ?)";
+                            try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                                insertStmt.setInt(1, workout.getId());
+                                insertStmt.setDouble(2, cardio.getDistance());
+                                insertStmt.setDouble(3, cardio.getHours());
+                                insertStmt.setDouble(4, cardio.getMinutes());
+                                insertStmt.setDouble(5, cardio.getSeconds());
+                                insertStmt.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Set<Workout> getWorkouts(User user, String sessionDate) {
+        Set<Workout> workouts = new HashSet<>();
+
+        try (Connection conn = DriverManager.getConnection(DB_URL)) {
+            String workoutQuery = "SELECT * FROM Workouts WHERE USERNAME = ? AND SESSION_DATE = ?";
+            try (PreparedStatement ps = conn.prepareStatement(workoutQuery)) {
+                ps.setString(1, user.getUserName());
+                ps.setString(2, sessionDate);
+                ResultSet rs = ps.executeQuery();
+
+                while (rs.next()) {
+                    int workoutId = rs.getInt("WORKOUT_ID");
+                    String workoutName = rs.getString("WORKOUTNAME");
+                    String workoutType = rs.getString("WORKOUTTYPE");
+
+                    if (workoutType.equals("LIFT")) {
+                        LiftWorkout liftWorkout = new LiftWorkout(workoutName);
+                        liftWorkout.setId(workoutId);
+
+                        String liftQuery = "SELECT * FROM WeightLifting WHERE WORKOUT_ID = ?";
+                        try (PreparedStatement liftPs = conn.prepareStatement(liftQuery)) {
+                            liftPs.setInt(1, workoutId);
+                            ResultSet liftRs = liftPs.executeQuery();
+                            while (liftRs.next()) {
+                                double weight = liftRs.getDouble("WEIGHT");
+                                int reps = liftRs.getInt("REPS");
+                                liftWorkout.addSet(new LiftWorkout.LiftSet(weight, reps));
+                            }
+                            liftRs.close();
+                        }
+
+                        workouts.add(liftWorkout);
+                    } else if (workoutType.equals("CARDIO")) {
+                        String cardioQuery = "SELECT * FROM Cardio WHERE WORKOUT_ID = ?";
+                        try (PreparedStatement cardioPs = conn.prepareStatement(cardioQuery)) {
+                            cardioPs.setInt(1, workoutId);
+                            ResultSet cardioRs = cardioPs.executeQuery();
+
+                            if (cardioRs.next()) {
+                                double distance = cardioRs.getDouble("DISTANCE");
+                                int hours = cardioRs.getInt("HOURS");
+                                int minutes = cardioRs.getInt("MINUTES");
+                                int seconds = cardioRs.getInt("SECONDS");
+
+                                CardioWorkout cardioWorkout = new CardioWorkout(workoutName, distance, hours, minutes, seconds);
+                                cardioWorkout.setId(workoutId);
+                                workouts.add(cardioWorkout);
+                            }
+
+                            cardioRs.close();
+                        }
+                    }
+                }
+
+                rs.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return workouts;
+    }
 
     public void saveSleep(User user, SleepReport sleepReport) {
         try (Connection conn = DriverManager.getConnection(DB_URL)) {
@@ -1169,12 +1415,18 @@ public class Database {
 
         return weightReports;
     }
+
+
+    //FIXME needs to save stats into userstats table
+    public void saveStats(){
+
+    }
     //FIXME needs to return stats
     public List<Statistic> getAllStats(String username){
         List<Statistic> stats = new ArrayList<>();
-
         return stats;
     }
+
 
 
     /*public static void main(String[] args) {
@@ -1235,8 +1487,6 @@ public class Database {
         }
 
         System.out.println("\n Testing getting all users should have 2 \n");
-        List<MyFitness.Statistics.User> allUsers = db.getAllUsers();
-        for (MyFitness.Statistics.User u : allUsers) {
             System.out.println(u);
         }
         //Testing types of users
@@ -1245,8 +1495,8 @@ public class Database {
         db.saveUser(ad2);
         db.saveUser(t1);
 
-        MyFitness.Statistics.User test = db.findByUsername("jeremy");
-        MyFitness.Statistics.User TrainerTest = db.findByUsername("Michael");
+        User test = db.findByUsername("jeremy");
+        User TrainerTest = db.findByUsername("Michael");
 
         if(test instanceof Admin){
             System.out.println("ADMIN");
@@ -1273,5 +1523,6 @@ public class Database {
         GeneralUser test2 = new GeneralUser("John1", "5678");
         db.saveUser(test1);
         db.saveUser(test2);
+
     }*/
 }

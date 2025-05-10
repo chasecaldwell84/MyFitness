@@ -1,8 +1,9 @@
+
 package MyFitness.LoginSignUp;
 
 import MyFitness.App;
 import MyFitness.Database;
-
+import MyFitness.HomePage;
 import javax.swing.*;
 import java.awt.*;
 

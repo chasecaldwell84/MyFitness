@@ -9,7 +9,7 @@ public class ExerciseClass extends ExercisePlan {
     private JButton addButton;
 
     public ExerciseClass() {
-        /*setTitle("Add MyFitness.MyFitness.Statistics.User to Workout Class");*/
+        /*setTitle("Add User to Workout Class");*/
         setSize(1200, 800);
         /*setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);*/
@@ -63,13 +63,13 @@ public class ExerciseClass extends ExercisePlan {
         String selectedClass = (String) classComboBox.getSelectedItem();
 
         if (userId.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid MyFitness.MyFitness.Statistics.User Name.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please enter a valid User Name.", "Input Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // Simulate backend logic
         JOptionPane.showMessageDialog(this,
-                "MyFitness.MyFitness.Statistics.User '" + userId + "' successfully added to '" + selectedClass + "'.",
+                "User '" + userId + "' successfully added to '" + selectedClass + "'.",
                 "Success",
                 JOptionPane.INFORMATION_MESSAGE);
 

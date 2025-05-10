@@ -9,6 +9,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
 public class UserPage extends JPanel {
 
@@ -40,7 +44,7 @@ public class UserPage extends JPanel {
     }
 
     private void createGUI(){
-        JLabel titleLabel = new JLabel("MyFitness.Statistics.User Settings", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("User Settings", SwingConstants.CENTER);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         titleLabel.setFont(App.titleFont);
 
@@ -53,7 +57,7 @@ public class UserPage extends JPanel {
         userSettingsPanel.setLayout(new BoxLayout(userSettingsPanel,BoxLayout.Y_AXIS));
 
         JLabel usernameTitle = new JLabel("Username");
-        JLabel userTypeTitle = new JLabel("MyFitness.Statistics.User Type");
+        JLabel userTypeTitle = new JLabel("User Type");
         JLabel passwordTitle = new JLabel("Password");
 
         usernameLabel = new JLabel(viewedUser.getUserName());

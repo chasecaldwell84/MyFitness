@@ -92,7 +92,7 @@ public class ChallengeSender extends JPanel {
     }
 
    /* public static void main(String[] args) {
-        // test 
+        // test
         SwingUtilities.invokeLater(() -> {
             MyFitness.MyFitness.Statistics.User chase = new MyFitness.MyFitness.MyFitness.Statistics.User.GeneralUser("chase", "pass123");
             MyFitness.MyFitness.Statistics.User ryan = new MyFitness.MyFitness.MyFitness.Statistics.User.GeneralUser("ryan", "pass456");

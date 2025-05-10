@@ -64,8 +64,8 @@ public class CreateGoals extends JPanel {
                     } else{
                         currentGoal = new Goal(selectedGoalLength, selectedGoalType, goalValue, currentUser);
                         /*NOTE: could update database here but i need to know the user so i can store it under so either the
-                        *  CreateGoals page could know about the user or the user could have a list of goals that it stores
-                        * */
+                         *  CreateGoals page could know about the user or the user could have a list of goals that it stores
+                         * */
                         db.saveGoal(currentUser, currentGoal);
                         updateGoalStatus();
                     }

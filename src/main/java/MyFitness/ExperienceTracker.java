@@ -1,6 +1,4 @@
-//Author: Larry O'Connor
-
-package MyFitness;
+package MyFitness;//Author: Larry O'Connor
 
 import javax.swing.*;
 import java.awt.*;

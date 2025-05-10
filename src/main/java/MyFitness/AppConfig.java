@@ -8,7 +8,7 @@ public class AppConfig {
     public static final int LOGO_HEIGHT = WIDTH / 5;
 
     public static void printAppInfo() {//for debug
-        System.out.println("App running on iPhone 16 screen size: " + WIDTH + "x" + HEIGHT);
+        System.out.println("MyFitness.App running on iPhone 16 screen size: " + WIDTH + "x" + HEIGHT);
         System.out.println("Logo location: " + LOGO_PATH);
         System.out.println("Logo display size: " + LOGO_WIDTH + "x" + LOGO_HEIGHT);
     }
