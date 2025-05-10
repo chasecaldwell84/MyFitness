@@ -12,9 +12,9 @@ import java.util.List;
 public class SeeMyClassPanel extends JPanel {
     private final JTextArea outputArea = new JTextArea();
     private final JComboBox<Integer> classDropdown;
-    private final GeneralUser user;
+    private final User user;
 
-    public SeeMyClassPanel(App frame, GeneralUser user) {
+    public SeeMyClassPanel(App frame, User user) {
         this.user = user;
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));

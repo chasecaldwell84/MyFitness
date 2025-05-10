@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class AddClassPanel extends JPanel {
 
-    public AddClassPanel(App frame, GeneralUser user) {
+    public AddClassPanel(App frame, User user) {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 

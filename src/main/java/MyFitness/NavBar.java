@@ -173,7 +173,7 @@ public class NavBar extends JPanel {
                 frame.add(new NavBar(frame), BorderLayout.NORTH);
                 frame.add(trainerPanel);
             } else {
-                GeneralUser user = (GeneralUser) frame.getUser();
+                User user = frame.getUser();
                 JPanel userPanel = new JPanel();
                 userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
                 userPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
