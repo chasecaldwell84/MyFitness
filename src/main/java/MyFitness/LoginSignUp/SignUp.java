@@ -58,7 +58,6 @@ public class SignUp extends JDialog {
         JLabel roleLabel = new JLabel("Role:");
         roleLabel.setBounds(20, 180, 80, 25);
         add(roleLabel);
-        String[] roleList;
         String[] roleList = adminCreateUser ? new String[]{"User", "Trainer", "Admin"} : new String[]{"User", "Trainer"};
         roleSelector = new JComboBox<>(roleList);
         roleSelector.setBounds(120, 180, 180, 25);

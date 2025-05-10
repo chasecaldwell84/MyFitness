@@ -19,8 +19,6 @@ public class App extends JFrame {
     public static Font titleFont = new Font("Arial", Font.BOLD, 40);
     public static Font statsFont = new Font("Courier", Font.PLAIN,30);
 
-    private static NavBar navBar;
-
     public void setUser(User user) {
         this.user = user;
     }

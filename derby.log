@@ -1,13 +1,13 @@
 ----------------------------------------------------------------
-Fri May 09 01:06:41 CDT 2025:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585): instance a816c00e-0196-b3a7-31f9-000007748388 
-on database directory /Users/danniswu/Desktop/MyFitness-next/Database with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@5a07e868 
-Loaded from file:/Users/danniswu/.m2/repository/org/apache/derby/derby/10.15.2.0/derby-10.15.2.0.jar
+Sat May 10 02:45:07 CDT 2025:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.17.1.0 - (1913217): instance a816c00e-0196-b927-ac79-00000f76bf50 
+on database directory /Users/patches/Downloads/MyFitnessLastDitchEffort/Database with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@5a07e868 
+Loaded from file:/Users/patches/.m2/repository/org/apache/derby/derby/10.17.1.0/derby-10.17.1.0.jar
 java.vendor=Oracle Corporation
-java.runtime.version=23.0.2+7-58
-user.dir=/Users/danniswu/Desktop/MyFitness-next
+java.runtime.version=23.0.1+11-39
+user.dir=/Users/patches/Downloads/MyFitnessLastDitchEffort
 os.name=Mac OS X
-os.arch=x86_64
-os.version=15.4.1
+os.arch=aarch64
+os.version=13.3
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''
